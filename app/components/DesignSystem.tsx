@@ -3,52 +3,56 @@
 import React from "react";
 
 // --- Típusok ---
-type ThemeType = "minimal" | "dark" | "gradient" | "glass";
+export type ThemeType = "minimal" | "dark" | "gradient" | "glass";
 
 interface BaseProps {
   theme: ThemeType;
-  animate: boolean;
+  animate?: boolean;
   children?: React.ReactNode;
   className?: string;
   onClick?: () => void;
 }
 
-// --- Segédfüggvény a stílusokhoz ---
-const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "text") => {
+// --- Stílus definíciók ---
+const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "modal" | "toggle") => {
   const styles = {
     minimal: {
       card: "bg-white border border-gray-200 text-gray-800 shadow-sm",
       button: "bg-gray-900 text-white hover:bg-gray-700",
       input: "bg-gray-50 border border-gray-300 text-gray-900 focus:ring-gray-500",
-      text: "text-gray-800",
+      modal: "bg-white text-gray-900 shadow-2xl border border-gray-100",
+      toggle: "bg-gray-900",
     },
     dark: {
       card: "bg-gray-800 border border-gray-700 text-gray-100 shadow-md",
       button: "bg-blue-600 text-white hover:bg-blue-500",
       input: "bg-gray-700 border border-gray-600 text-white focus:ring-blue-500",
-      text: "text-gray-100",
+      modal: "bg-gray-800 text-white border border-gray-700 shadow-2xl",
+      toggle: "bg-blue-600",
     },
     gradient: {
       card: "bg-white/90 border-none text-purple-900 shadow-xl",
       button: "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90",
       input: "bg-white/50 border border-purple-200 text-purple-900 focus:ring-purple-400",
-      text: "text-purple-900",
+      modal: "bg-white/95 text-purple-900 border-none shadow-2xl shadow-purple-500/20",
+      toggle: "bg-gradient-to-r from-purple-500 to-pink-500",
     },
     glass: {
       card: "bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-lg",
       button: "bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm",
       input: "bg-black/20 border border-white/10 text-white placeholder-gray-300 focus:ring-white/50",
-      text: "text-white",
+      modal: "bg-black/60 backdrop-blur-xl border border-white/20 text-white shadow-2xl",
+      toggle: "bg-white/40",
     },
   };
-  return styles[theme][type];
+  return styles[theme][type] || "";
 };
 
-// --- Komponensek ---
+// --- EREDETI KOMPONENSEK ---
 
 export const Card = ({ theme, animate, children, className = "" }: BaseProps) => {
   const baseStyle = getThemeStyles(theme, "card");
-  const animationClass = animate ? "transition-all duration-500 hover:scale-105 hover:shadow-2xl" : "";
+  const animationClass = animate ? "transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl" : "";
   
   return (
     <div className={`p-6 rounded-xl ${baseStyle} ${animationClass} ${className}`}>
@@ -57,14 +61,14 @@ export const Card = ({ theme, animate, children, className = "" }: BaseProps) =>
   );
 };
 
-export const Button = ({ theme, animate, children, onClick }: BaseProps) => {
+export const Button = ({ theme, animate, children, onClick, className = "" }: BaseProps) => {
   const baseStyle = getThemeStyles(theme, "button");
   const animationClass = animate ? "transition-transform active:scale-95 hover:-translate-y-1" : "";
 
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 rounded-lg font-medium ${baseStyle} ${animationClass}`}
+      className={`px-4 py-2 rounded-lg font-medium shadow-md ${baseStyle} ${animationClass} ${className}`}
     >
       {children}
     </button>
@@ -94,5 +98,63 @@ export const Badge = ({ theme, children }: { theme: ThemeType, children: React.R
     <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${style}`}>
       {children}
     </span>
+  );
+};
+
+// --- ÚJ KOMPONENSEK (Modal, Toggle, Toast) ---
+
+export const Toggle = ({ theme, isActive, onToggle }: { theme: ThemeType, isActive: boolean, onToggle: () => void }) => {
+  const activeColor = getThemeStyles(theme, "toggle");
+  
+  return (
+    <div 
+      onClick={onToggle}
+      className={`w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer transition-colors duration-300 ${isActive ? activeColor : 'bg-gray-400'}`}
+    >
+      <div className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${isActive ? 'translate-x-6' : ''}`}></div>
+    </div>
+  );
+};
+
+export const Modal = ({ theme, isOpen, onClose, title, children }: BaseProps & { isOpen: boolean, onClose: () => void, title: string }) => {
+  if (!isOpen) return null;
+  const modalStyle = getThemeStyles(theme, "modal");
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop (sötétítés) */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
+      
+      {/* Modal tartalom */}
+      <div className={`relative z-10 w-full max-w-lg rounded-2xl p-8 transform transition-all animate-in fade-in zoom-in duration-300 ${modalStyle}`}>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">{title}</h2>
+          <button onClick={onClose} className="p-2 opacity-60 hover:opacity-100">✕</button>
+        </div>
+        <div>{children}</div>
+        <div className="mt-8 flex justify-end gap-3">
+            <button onClick={onClose} className="px-4 py-2 opacity-70 hover:opacity-100 font-medium">Mégse</button>
+            <Button theme={theme} animate={false} onClick={onClose}>Rendben</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ToastContainer = ({ theme, messages }: { theme: ThemeType, messages: { id: number, text: string }[] }) => {
+  // A Toast stílusa hasonló a kártyához, de kicsit más pozícióban
+  const style = theme === 'glass' ? "bg-black/80 backdrop-blur text-white border border-white/20" : 
+                theme === 'dark' ? "bg-gray-800 text-white border border-gray-700" : 
+                "bg-white text-gray-900 border border-gray-200 shadow-xl";
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+      {messages.map((msg) => (
+        <div key={msg.id} className={`pointer-events-auto px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-in slide-in-from-right duration-300 ${style}`}>
+          <span className="text-green-500 text-xl">✓</span>
+          <p className="font-medium text-sm">{msg.text}</p>
+        </div>
+      ))}
+    </div>
   );
 };
