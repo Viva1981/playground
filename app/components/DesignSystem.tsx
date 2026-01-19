@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 // --- Típusok ---
 export type ThemeType = "minimal" | "dark" | "gradient" | "glass";
@@ -15,9 +15,11 @@ interface BaseProps {
   style?: React.CSSProperties;
 }
 
-// --- Stílus definíciók ---
-const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "modal" | "toggle" | "spinner" | "tooltip" | "skeleton") => {
-  const styles = {
+// --- Stílus definíciók (JAVÍTOTT RÉSZ) ---
+const getThemeStyles = (theme: ThemeType, type: string) => {
+  // Itt a "Record<string, Record<string, string>>" a varázslat, 
+  // ami megnyugtatja a TypeScriptet.
+  const styles: Record<string, Record<string, string>> = {
     minimal: {
       card: "bg-white border border-gray-200 text-gray-800 shadow-sm",
       button: "bg-gray-900 text-white hover:bg-gray-700 disabled:bg-gray-400",
@@ -58,10 +60,12 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       skeleton: "bg-white/10 border border-white/5",
     },
   };
-  return styles[theme][type] || "";
+  
+  // Biztonsági ellenőrzés: ha nincs meg a stílus, üres stringet ad vissza
+  return styles[theme]?.[type] || "";
 };
 
-// --- SKELETON KOMPONENSEK (ÚJ!) ---
+// --- SKELETON KOMPONENSEK ---
 
 export const Skeleton = ({ theme, className = "" }: { theme: ThemeType, className?: string }) => {
   const baseClass = getThemeStyles(theme, "skeleton");
