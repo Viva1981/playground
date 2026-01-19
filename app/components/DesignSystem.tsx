@@ -12,11 +12,11 @@ interface BaseProps {
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
-  style?: React.CSSProperties; // Stílus prop hozzáadva a késleltetéshez
+  style?: React.CSSProperties;
 }
 
 // --- Stílus definíciók ---
-const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "modal" | "toggle" | "spinner" | "tooltip") => {
+const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "modal" | "toggle" | "spinner" | "tooltip" | "skeleton") => {
   const styles = {
     minimal: {
       card: "bg-white border border-gray-200 text-gray-800 shadow-sm",
@@ -26,6 +26,7 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       toggle: "bg-gray-900",
       spinner: "border-gray-900",
       tooltip: "bg-gray-900 text-white",
+      skeleton: "bg-gray-200",
     },
     dark: {
       card: "bg-gray-800 border border-gray-700 text-gray-100 shadow-md",
@@ -35,6 +36,7 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       toggle: "bg-blue-600",
       spinner: "border-blue-500",
       tooltip: "bg-blue-600 text-white",
+      skeleton: "bg-gray-700",
     },
     gradient: {
       card: "bg-white/90 border-none text-purple-900 shadow-xl",
@@ -43,7 +45,7 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       modal: "bg-white/95 text-purple-900 border-none shadow-2xl shadow-purple-500/20",
       toggle: "bg-gradient-to-r from-purple-500 to-pink-500",
       spinner: "border-purple-600",
-      tooltip: "bg-purple-900 text-white",
+      skeleton: "bg-purple-100",
     },
     glass: {
       card: "bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-lg",
@@ -53,33 +55,53 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       toggle: "bg-white/40",
       spinner: "border-white",
       tooltip: "bg-black/80 border border-white/20 text-white backdrop-blur-md",
+      skeleton: "bg-white/10 border border-white/5",
     },
   };
   return styles[theme][type] || "";
 };
 
-// --- SEGÉDKOMPONENSEK ---
+// --- SKELETON KOMPONENSEK (ÚJ!) ---
+
+export const Skeleton = ({ theme, className = "" }: { theme: ThemeType, className?: string }) => {
+  const baseClass = getThemeStyles(theme, "skeleton");
+  return (
+    <div className={`shimmer-wrapper rounded ${baseClass} ${className}`}></div>
+  );
+};
+
+export const SkeletonCard = ({ theme }: { theme: ThemeType }) => {
+    return (
+        <Card theme={theme} animate={false}>
+            {/* Cím helye */}
+            <Skeleton theme={theme} className="h-8 w-3/4 mb-4" />
+            {/* Szöveg sorok helye */}
+            <Skeleton theme={theme} className="h-4 w-full mb-2" />
+            <Skeleton theme={theme} className="h-4 w-5/6 mb-2" />
+            <Skeleton theme={theme} className="h-4 w-4/6 mb-6" />
+            {/* Gomb helye */}
+            <Skeleton theme={theme} className="h-10 w-24 rounded-lg" />
+        </Card>
+    );
+}
+
+// --- UI KOMPONENSEK ---
 
 export const Tooltip = ({ theme, text, children }: { theme: ThemeType, text: string, children: React.ReactNode }) => {
   const style = getThemeStyles(theme, "tooltip");
   return (
     <div className="group relative flex items-center justify-center w-full">
       {children}
-      {/* Tooltip Buborék */}
       <div className={`absolute bottom-full mb-2 hidden group-hover:block w-48 p-2 text-xs rounded shadow-lg text-center z-50 animate-in fade-in zoom-in duration-200 ${style}`}>
         {text}
-        {/* Nyíl lefelé */}
         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-current opacity-80"></div>
       </div>
     </div>
   );
 };
 
-// --- UI KOMPONENSEK ---
-
 export const Card = ({ theme, animate, children, className = "", style }: BaseProps) => {
   const baseStyle = getThemeStyles(theme, "card");
-  // Ha animate true, alap hover effektek. Ha nem, akkor is engedjük a beúszást.
   const animationClass = animate ? "transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl" : "";
   
   return (
