@@ -8,7 +8,29 @@
   --background-end-rgb: 255, 255, 255;
 }
 
-/* Alapvető body beállítás a teljes képernyős élményhez */
 body {
   min-height: 100vh;
+}
+
+/* --- EGYEDI ANIMÁCIÓK --- */
+
+/* Rázkódás (Shake) - Hibás bevitelhez */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Lebegés (Float) - Kiemelt elemekhez */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }

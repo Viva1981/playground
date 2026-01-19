@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 // --- Típusok ---
 export type ThemeType = "minimal" | "dark" | "gradient" | "glass";
@@ -12,10 +12,11 @@ interface BaseProps {
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
+  style?: React.CSSProperties; // Stílus prop hozzáadva a késleltetéshez
 }
 
 // --- Stílus definíciók ---
-const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "modal" | "toggle" | "spinner") => {
+const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "modal" | "toggle" | "spinner" | "tooltip") => {
   const styles = {
     minimal: {
       card: "bg-white border border-gray-200 text-gray-800 shadow-sm",
@@ -24,6 +25,7 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       modal: "bg-white text-gray-900 shadow-2xl border border-gray-100",
       toggle: "bg-gray-900",
       spinner: "border-gray-900",
+      tooltip: "bg-gray-900 text-white",
     },
     dark: {
       card: "bg-gray-800 border border-gray-700 text-gray-100 shadow-md",
@@ -32,6 +34,7 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       modal: "bg-gray-800 text-white border border-gray-700 shadow-2xl",
       toggle: "bg-blue-600",
       spinner: "border-blue-500",
+      tooltip: "bg-blue-600 text-white",
     },
     gradient: {
       card: "bg-white/90 border-none text-purple-900 shadow-xl",
@@ -40,6 +43,7 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       modal: "bg-white/95 text-purple-900 border-none shadow-2xl shadow-purple-500/20",
       toggle: "bg-gradient-to-r from-purple-500 to-pink-500",
       spinner: "border-purple-600",
+      tooltip: "bg-purple-900 text-white",
     },
     glass: {
       card: "bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-lg",
@@ -48,19 +52,38 @@ const getThemeStyles = (theme: ThemeType, type: "card" | "button" | "input" | "m
       modal: "bg-black/60 backdrop-blur-xl border border-white/20 text-white shadow-2xl",
       toggle: "bg-white/40",
       spinner: "border-white",
+      tooltip: "bg-black/80 border border-white/20 text-white backdrop-blur-md",
     },
   };
   return styles[theme][type] || "";
 };
 
-// --- ALAP KOMPONENSEK ---
+// --- SEGÉDKOMPONENSEK ---
 
-export const Card = ({ theme, animate, children, className = "" }: BaseProps) => {
+export const Tooltip = ({ theme, text, children }: { theme: ThemeType, text: string, children: React.ReactNode }) => {
+  const style = getThemeStyles(theme, "tooltip");
+  return (
+    <div className="group relative flex items-center justify-center w-full">
+      {children}
+      {/* Tooltip Buborék */}
+      <div className={`absolute bottom-full mb-2 hidden group-hover:block w-48 p-2 text-xs rounded shadow-lg text-center z-50 animate-in fade-in zoom-in duration-200 ${style}`}>
+        {text}
+        {/* Nyíl lefelé */}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-current opacity-80"></div>
+      </div>
+    </div>
+  );
+};
+
+// --- UI KOMPONENSEK ---
+
+export const Card = ({ theme, animate, children, className = "", style }: BaseProps) => {
   const baseStyle = getThemeStyles(theme, "card");
+  // Ha animate true, alap hover effektek. Ha nem, akkor is engedjük a beúszást.
   const animationClass = animate ? "transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl" : "";
   
   return (
-    <div className={`p-6 rounded-xl ${baseStyle} ${animationClass} ${className}`}>
+    <div style={style} className={`p-6 rounded-xl ${baseStyle} ${animationClass} ${className}`}>
       {children}
     </div>
   );
@@ -81,7 +104,7 @@ export const Button = ({ theme, animate, children, onClick, className = "", disa
   );
 };
 
-export const Input = ({ theme, animate, placeholder, name }: BaseProps & { placeholder: string, name?: string }) => {
+export const Input = ({ theme, animate, placeholder, name, className = "" }: BaseProps & { placeholder: string, name?: string }) => {
   const baseStyle = getThemeStyles(theme, "input");
   const animationClass = animate ? "transition-all focus:scale-105" : "";
 
@@ -90,19 +113,19 @@ export const Input = ({ theme, animate, placeholder, name }: BaseProps & { place
       type="text"
       name={name}
       placeholder={placeholder}
-      className={`w-full px-4 py-2 rounded-lg outline-none ring-2 ring-transparent ${baseStyle} ${animationClass}`}
+      className={`w-full px-4 py-2 rounded-lg outline-none ring-2 ring-transparent ${baseStyle} ${animationClass} ${className}`}
     />
   );
 };
 
-export const Badge = ({ theme, children }: { theme: ThemeType, children: React.ReactNode }) => {
+export const Badge = ({ theme, children, className="" }: { theme: ThemeType, children: React.ReactNode, className?: string }) => {
   let style = "bg-gray-200 text-gray-800";
   if (theme === 'dark') style = "bg-gray-700 text-blue-300";
   if (theme === 'gradient') style = "bg-pink-100 text-pink-700";
   if (theme === 'glass') style = "bg-white/20 text-white";
 
   return (
-    <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${style}`}>
+    <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${style} ${className}`}>
       {children}
     </span>
   );
@@ -115,11 +138,8 @@ export const Spinner = ({ theme }: { theme: ThemeType }) => {
   );
 };
 
-// --- INTERAKTÍV ELEMEK ---
-
 export const Toggle = ({ theme, isActive, onToggle }: { theme: ThemeType, isActive: boolean, onToggle: () => void }) => {
   const activeColor = getThemeStyles(theme, "toggle");
-  
   return (
     <div 
       onClick={onToggle}
