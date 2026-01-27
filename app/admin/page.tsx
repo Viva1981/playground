@@ -81,6 +81,14 @@ export default function AdminDashboardPage() {
             <div className="text-sm text-neutral-600">Szerkesztő</div>
             <div className="mt-1 text-lg font-semibold">Home Hero</div>
           </a>
+          <a
+  className="rounded-2xl border p-5 hover:bg-neutral-50"
+  href="/admin/about"
+>
+  <div className="text-sm text-neutral-600">Szerkesztő</div>
+  <div className="mt-1 text-lg font-semibold">Home About / Vision</div>
+</a>
+
         </div>
       </div>
     </main>
