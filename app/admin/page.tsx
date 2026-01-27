@@ -88,6 +88,13 @@ export default function AdminDashboardPage() {
   <div className="text-sm text-neutral-600">Szerkesztő</div>
   <div className="mt-1 text-lg font-semibold">Home About / Vision</div>
 </a>
+<a
+  className="rounded-2xl border p-5 hover:bg-neutral-50"
+  href="/admin/events"
+>
+  <div className="text-sm text-neutral-600">Kezelés</div>
+  <div className="mt-1 text-lg font-semibold">Események</div>
+</a>
 
         </div>
       </div>
