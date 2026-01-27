@@ -57,22 +57,32 @@ export default function AdminAboutEditorPage() {
         .maybeSingle<Section>();
 
       if (!existing) {
-        const { data: created } = await supabase
-          .from("page_sections")
-          .insert({
-            key: SECTION_KEY,
-            title: "Mi az a Miskolci Soho?",
-            body:
-              "A Miskolci Soho egy városi kísérlet. Egy tér, ahol meg lehet állni, találkozni, lelassulni.",
-            is_active: true,
-          })
-          .select("*")
-          .single<Section>();
+const { data: created, error: createError } = await supabase
+  .from("page_sections")
+  .insert({
+    key: SECTION_KEY,
+    title: "Mi az a Miskolci Soho?",
+    body:
+      "A Miskolci Soho egy városi kísérlet. Egy tér, ahol meg lehet állni, találkozni, lelassulni.",
+    is_active: true,
+  })
+  .select("*")
+  .single<Section>();
 
-        setSectionId(created.id);
-        setTitle(created.title ?? "");
-        setBody(created.body ?? "");
-        setIsActive(created.is_active);
+if (createError || !created) {
+  setError(
+    createError?.message ??
+      "Nem sikerült létrehozni az About szekciót."
+  );
+  setChecking(false);
+  return;
+}
+
+setSectionId(created.id);
+setTitle(created.title ?? "");
+setBody(created.body ?? "");
+setIsActive(created.is_active);
+
       } else {
         setSectionId(existing.id);
         setTitle(existing.title ?? "");
