@@ -1,10 +1,13 @@
 import HomeHero from "@/app/components/HomeHero";
+import HomeAbout from "@/app/components/HomeAbout";
 import { getHomeHero } from "@/app/lib/getHomeHero";
+import { getHomeSection } from "@/app/lib/getHomeSection";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const hero = await getHomeHero();
+  const about = await getHomeSection("home_about");
 
   return (
     <main>
@@ -15,11 +18,11 @@ export default async function HomePage() {
           ctaLabel={hero.cta_label}
           ctaUrl={hero.cta_url}
         />
-      ) : (
-        <div className="p-12 text-sm text-neutral-500">
-          Hero szekció nem aktív vagy nem létezik.
-        </div>
-      )}
+      ) : null}
+
+      {about ? (
+        <HomeAbout title={about.title} body={about.body} />
+      ) : null}
     </main>
   );
 }
