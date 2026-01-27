@@ -2,13 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  {
-    global: {
-      fetch: (url, options) =>
-        fetch(url, { ...options, cache: "no-store" }),
-    },
-  }
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 export type HomeHeroSection = {
@@ -26,7 +20,10 @@ export async function getHomeHero(): Promise<HomeHeroSection | null> {
     .eq("is_active", true)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) {
+    console.error("getHomeHero error:", error.message);
+    return null;
+  }
 
-  return data;
+  return data ?? null;
 }
