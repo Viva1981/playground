@@ -1,7 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
+import { unstable_noStore as noStore } from "next/cache"; // Ezt importáljuk a cache tiltáshoz
 
-// Megjegyzés: Server Componentekben érdemes lehet a createClient-et minden hívásnál példányosítani
-// vagy a globális cache-t kikapcsolni, de a page.tsx force-dynamic-ja ezt megoldja.
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -16,21 +15,25 @@ export type EventListItem = {
   cover_path: string | null;
 };
 
+// Felemeltem a limit alapértelmezését 6-ról 12-re, hogy biztosan beleférjenek
 export async function getUpcomingEvents(
-  limit: number = 6
+  limit: number = 12
 ): Promise<EventListItem[]> {
-  // 1. LÉPÉS: Nem a "most"-ot vesszük, hanem a mai nap elejét.
-  // Így a ma esti buli akkor is látszik, ha már elkezdődött.
+  // 1. LÉPÉS: Ez a parancs közli a Next.js-szel, hogy TILOS cache-elni ennek a függvénynek az eredményét.
+  // Minden egyes oldalbetöltéskor friss adatot fog kérni a Supabase-től.
+  noStore();
+
+  // Mai nap éjfél meghatározása
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Beállítjuk éjfélre (00:00:00)
+  today.setHours(0, 0, 0, 0);
   const filterDateIso = today.toISOString();
 
   const { data, error } = await supabase
     .from("events")
     .select("id, title, slug, starts_at, summary, cover_path")
     .eq("is_published", true)
-    .gte("starts_at", filterDateIso) // 2. LÉPÉS: Éjféltől szűrünk
-    .order("starts_at", { ascending: true })
+    .gte("starts_at", filterDateIso)
+    .order("starts_at", { ascending: true }) // A legkorábbi esemény van legelöl
     .limit(limit);
 
   if (error) {
