@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 
+// 1. Típus cseréje
 type EventRow = {
   id: string;
   title: string;
@@ -11,6 +13,7 @@ type EventRow = {
   starts_at: string;
   summary: string | null;
   is_published: boolean;
+  cover_path: string | null; // Hozzáadva
 };
 
 export default function EditEventPage() {
@@ -22,6 +25,8 @@ export default function EditEventPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // 2. State (már benne volt az eredetiben is, de itt van)
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -60,6 +65,8 @@ export default function EditEventPage() {
         starts_at: event.starts_at,
         summary: event.summary,
         is_published: event.is_published,
+        // Megjegyzés: a cover_path-et az uploadCover frissíti külön,
+        // de ha itt is szeretnéd menteni, ide írhatod: cover_path: event.cover_path
       })
       .eq("id", event.id);
 
@@ -68,6 +75,41 @@ export default function EditEventPage() {
     if (error) {
       setError(error.message);
     }
+  }
+
+  // 3. Feltöltő függvény beillesztése
+  async function uploadCover(file: File) {
+    if (!event) return;
+
+    setUploading(true);
+
+    const fileExt = file.name.split(".").pop();
+    const filePath = `events/${event.id}/cover.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("public-media")
+      .upload(filePath, file, {
+        upsert: true,
+      });
+
+    if (uploadError) {
+      setError(uploadError.message);
+      setUploading(false);
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("events")
+      .update({ cover_path: filePath })
+      .eq("id", event.id);
+
+    if (updateError) {
+      setError(updateError.message);
+    } else {
+      setEvent({ ...event, cover_path: filePath });
+    }
+
+    setUploading(false);
   }
 
   async function remove() {
@@ -152,6 +194,39 @@ export default function EditEventPage() {
             />
             Publikus
           </label>
+
+          {/* 4. Borítókép feltöltő UI beillesztése */}
+          <div className="rounded-xl border p-4">
+            <div className="text-sm font-medium mb-2">Borítókép</div>
+
+            {event.cover_path ? (
+              <div className="mb-3">
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
+                  alt="Borítókép"
+                  width={800}
+                  height={450}
+                  className="rounded-lg object-cover"
+                />
+              </div>
+            ) : null}
+
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploading}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadCover(file);
+              }}
+            />
+
+            {uploading ? (
+              <div className="mt-2 text-sm text-neutral-600">
+                Feltöltés folyamatban…
+              </div>
+            ) : null}
+          </div>
 
           {error && (
             <div className="rounded-xl bg-red-50 text-red-700 p-3 text-sm">
