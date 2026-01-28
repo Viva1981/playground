@@ -4,6 +4,7 @@ type EventListItem = {
   slug: string;
   starts_at: string;
   summary: string | null;
+  cover_path: string | null; // Ezt hozzáadtam
 };
 
 function formatHuDate(iso: string) {
@@ -45,6 +46,15 @@ export default function HomeEvents({ events }: { events: EventListItem[] }) {
               href={`/events/${e.slug}`}
               className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
             >
+              {/* Kép beillesztve ide: */}
+              {e.cover_path ? (
+                <img
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${e.cover_path}`}
+                  alt={e.title}
+                  className="mb-3 rounded-lg object-cover w-full h-[200px]"
+                />
+              ) : null}
+
               <div className="text-sm text-neutral-600">
                 {formatHuDate(e.starts_at)}
               </div>

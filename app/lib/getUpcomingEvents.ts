@@ -11,6 +11,7 @@ export type EventListItem = {
   slug: string;
   starts_at: string;
   summary: string | null;
+  cover_path: string | null;
 };
 
 export async function getUpcomingEvents(
@@ -20,7 +21,7 @@ export async function getUpcomingEvents(
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, title, slug, starts_at, summary")
+    .select("id, title, slug, starts_at, summary, cover_path")
     .eq("is_published", true)
     .gte("starts_at", nowIso)
     .order("starts_at", { ascending: true })

@@ -200,16 +200,18 @@ export default function EditEventPage() {
             <div className="text-sm font-medium mb-2">Borítókép</div>
 
             {event.cover_path ? (
-              <div className="mb-3">
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
-                  alt="Borítókép"
-                  width={800}
-                  height={450}
-                  className="rounded-lg object-cover"
-                />
-              </div>
-            ) : null}
+  <div className="mb-3">
+    <img
+      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
+      alt="Borítókép"
+      className="rounded-lg object-cover w-full max-h-[300px]"
+    />
+  </div>
+) : (
+  <div className="text-sm text-neutral-500">
+    Nincs feltöltött borítókép.
+  </div>
+)}
 
             <input
               type="file"
