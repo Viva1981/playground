@@ -2,14 +2,13 @@ import { supabase } from "@/app/utils/supabaseClient";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-// Force-dynamic, hogy mindig friss adatot mutasson (Supabase cache elkerülése)
 export const dynamic = "force-dynamic";
 
+// 1. Típus frissítése: A params most már Promise!
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
-// Segédfüggvény dátumhoz
 function formatHuDate(iso: string) {
   const d = new Date(iso);
   return d.toLocaleString("hu-HU", {
@@ -21,12 +20,14 @@ function formatHuDate(iso: string) {
   });
 }
 
-// 1. SEO Metadata generálás (Böngésző fül címe, megosztás kép)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  // ITT IS várni kell a params-ra!
+  const { slug } = await params;
+  
   const { data: event } = await supabase
     .from("events")
     .select("title, summary, cover_path")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .eq("is_published", true)
     .single();
 
@@ -47,16 +48,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// 2. Maga az oldal komponens
 export default async function EventDetailPage({ params }: Props) {
-  const { data: event } = await supabase
+  // 2. KRITIKUS SOR: Itt bontjuk ki a slugot await-tel
+  const { slug } = await params;
+
+  // Debuggolás: Nézzük meg a logokban, mit keresünk (opcionális, de hasznos)
+  console.log("Keresett slug:", slug);
+
+  // Az URL-ben lehetnek kódolt karakterek (pl. térnyitó -> t%C3%A9rnyit%C3%B3), dekódoljuk:
+  const decodedSlug = decodeURIComponent(slug);
+
+  const { data: event, error } = await supabase
     .from("events")
     .select("*")
-    .eq("slug", params.slug)
+    .eq("slug", decodedSlug)
     .eq("is_published", true)
     .single();
 
+  if (error) {
+    console.error("Supabase hiba:", error.message);
+  }
+
   if (!event) {
+    console.log("Nincs találat erre a slugra:", decodedSlug);
     notFound();
   }
 
@@ -66,7 +80,6 @@ export default async function EventDetailPage({ params }: Props) {
 
   return (
     <main className="min-h-screen pb-20">
-      {/* Fejléc / Navigáció helye - egyelőre egy egyszerű Vissza gomb */}
       <div className="mx-auto max-w-4xl px-6 py-6">
         <a
           href="/#events"
@@ -77,10 +90,8 @@ export default async function EventDetailPage({ params }: Props) {
       </div>
 
       <article className="mx-auto max-w-3xl px-6">
-        {/* Borítókép */}
         {coverUrl ? (
           <div className="mb-8 overflow-hidden rounded-2xl border bg-neutral-100">
-            {/* Standard img tag a Next/Image helyett, ahogy kérted a kontextusban */}
             <img
               src={coverUrl}
               alt={event.title}
@@ -90,7 +101,6 @@ export default async function EventDetailPage({ params }: Props) {
           </div>
         ) : null}
 
-        {/* Címsor és Dátum */}
         <header className="mb-8">
           <div className="mb-3 text-sm font-medium text-neutral-500 uppercase tracking-wide">
             {formatHuDate(event.starts_at)}
@@ -100,13 +110,8 @@ export default async function EventDetailPage({ params }: Props) {
           </h1>
         </header>
 
-        {/* Tartalom */}
         <div className="prose prose-neutral prose-lg max-w-none text-neutral-800">
-          {/* Mivel egyelőre csak summary mezőnk van, azt jelenítjük meg, 
-              de sortörésekkel (whitespace-pre-wrap), ha vannak benne enter-ek */}
           <p className="whitespace-pre-wrap">{event.summary}</p>
-          
-          {/* Ide jöhet később a bővebb leírás (body), ha bővítjük az adatbázist */}
         </div>
       </article>
     </main>
