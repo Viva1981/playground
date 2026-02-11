@@ -37,7 +37,7 @@ export default function HomeHero({
   const opacity = settings?.overlay_opacity ?? 50;
   const order: HeroComponentType[] = settings?.components_order || ['title', 'body', 'buttons'];
 
-  // --- ÚJ: SZÍNEK ---
+  // --- SZÍNEK ---
   const customContentColor = settings?.content_color || undefined;
   const customBgColor = settings?.background_color || undefined;
 
@@ -53,22 +53,48 @@ export default function HomeHero({
     return () => clearInterval(interval);
   }, [images.length]);
 
-  // --- HELPEREK ---
-  const getAlignClasses = (alignStr: string) => {
-    const base = "flex flex-col gap-6 "; 
-    switch (alignStr) {
-      case "top-left": return base + "md:justify-start md:items-start md:text-left items-center text-center";
-      case "top-center": return base + "md:justify-start md:items-center md:text-center items-center text-center";
-      case "top-right": return base + "md:justify-start md:items-end md:text-right items-center text-center";
-      case "center-left": return base + "md:justify-center md:items-start md:text-left items-center text-center";
-      case "center-center": return base + "md:justify-center md:items-center md:text-center items-center text-center";
-      case "center-right": return base + "md:justify-center md:items-end md:text-right items-center text-center";
-      case "bottom-left": return base + "md:justify-end md:items-start md:text-left items-center text-center";
-      case "bottom-center": return base + "md:justify-end md:items-center md:text-center items-center text-center";
-      case "bottom-right": return base + "md:justify-end md:items-end md:text-right items-center text-center";
-      default: return base + "md:justify-center md:items-center md:text-center items-center text-center";
+  // --- POZÍCIÓ ÉS IGAZÍTÁS LOGIKA (JAVÍTVA) ---
+  // Egy objektumban adjuk vissza a szükséges osztályokat, hogy minden szinkronban legyen
+  const getPositionClasses = (alignStr: string) => {
+    // Alapértelmezett MOBIL nézet: Mindig középre rendezett, flex oszlop
+    const mobileBase = "flex flex-col justify-center items-center text-center";
+    
+    // Desktop logikák (md: prefix-szel)
+    // 1. A konténer elhelyezése a rácsban (justify/items)
+    // 2. A szöveg igazítása (text-left/center/right)
+    // 3. A gombok igazítása (justify-start/center/end)
+    
+    let desktopContainer = "";
+    let desktopText = "";
+    let desktopButtonAlign = "";
+
+    // Függőleges pozíció
+    if (alignStr.startsWith("top")) desktopContainer += "md:justify-start ";
+    else if (alignStr.startsWith("bottom")) desktopContainer += "md:justify-end ";
+    else desktopContainer += "md:justify-center ";
+
+    // Vízszintes pozíció + Szöveg igazítás + Gomb igazítás
+    if (alignStr.includes("left")) {
+        desktopContainer += "md:items-start ";
+        desktopText = "md:text-left";
+        desktopButtonAlign = "md:justify-start";
+    } else if (alignStr.includes("right")) {
+        desktopContainer += "md:items-end ";
+        desktopText = "md:text-right";
+        desktopButtonAlign = "md:justify-end";
+    } else {
+        desktopContainer += "md:items-center ";
+        desktopText = "md:text-center";
+        desktopButtonAlign = "md:justify-center";
     }
+
+    return {
+        container: `${mobileBase} ${desktopContainer} ${desktopText}`,
+        buttonAlign: `justify-center ${desktopButtonAlign}` // Mobilon center, Desktopon változó
+    };
   };
+
+  const { container: containerClasses, buttonAlign: buttonAlignClasses } = getPositionClasses(align);
 
   // --- KOMPONENSEK RENDERELÉSE ---
   const renderContent = (isOverlayModeOnDesktop: boolean) => {
@@ -82,13 +108,6 @@ export default function HomeHero({
     const defaultBtnSecondary = isOverlayModeOnDesktop
         ? "md:border-white md:text-white border-neutral-300 text-black"
         : "border-neutral-300 bg-white text-black";
-
-    let buttonJustifyClass = "justify-center"; 
-    if (isOverlayModeOnDesktop) {
-        if (align.includes('left')) buttonJustifyClass = "md:justify-start justify-center";
-        else if (align.includes('right')) buttonJustifyClass = "md:justify-end justify-center";
-        else buttonJustifyClass = "md:justify-center justify-center";
-    }
 
     const components = {
         title: title ? (
@@ -104,7 +123,7 @@ export default function HomeHero({
         body: body ? (
             <p 
                 key="body" 
-                className={`text-lg md:text-xl leading-relaxed max-w-2xl ${!customContentColor ? defaultBodyColor : ''}`}
+                className={`text-lg md:text-xl leading-relaxed ${!customContentColor ? defaultBodyColor : ''}`}
                 style={{ color: customContentColor }}
             >
                 {body}
@@ -112,7 +131,7 @@ export default function HomeHero({
         ) : null,
         
         buttons: (ctaLabel || ctaLabel2) ? (
-            <div key="buttons" className={`flex flex-wrap gap-4 pt-2 w-full ${buttonJustifyClass}`}>
+            <div key="buttons" className={`flex flex-wrap gap-4 pt-2 w-full ${buttonAlignClasses}`}>
                 {ctaLabel && ctaUrl && (
                     <a 
                         href={ctaUrl} 
@@ -171,11 +190,9 @@ export default function HomeHero({
   if (layout === "overlay") {
     return (
       <section className="flex flex-col md:block md:relative w-full bg-white md:bg-black md:h-[700px]">
-        {/* Kép Konténer */}
-        {/* JAVÍTÁS 1: aspect-[3/1] a 3:1 képarányhoz mobilon */}
+        {/* Kép Konténer (Mobil 3:1) */}
         <div className="relative w-full aspect-[3/1] md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
              <ImageSlider isStackMobile={true} />
-             {/* Sötétítés */}
              <div 
                 className="hidden md:block absolute inset-0 bg-black pointer-events-none transition-opacity duration-500" 
                 style={{ opacity: opacity / 100 }} 
@@ -189,13 +206,18 @@ export default function HomeHero({
                 px-6 py-12 md:p-12 
                 h-auto md:h-full 
                 pointer-events-none md:pointer-events-none
-                ${getAlignClasses(align)}
+                flex flex-col
+                ${containerClasses}
                 md:!bg-transparent 
             `}
-            // JAVÍTÁS 2: A md:!bg-transparent a className-ben felülírja ezt desktopon
             style={{ backgroundColor: customBgColor ? customBgColor : undefined }}
         >
-            <div className={`pointer-events-auto max-w-4xl flex flex-col gap-6 md:gap-8 w-full`}>
+            {/* 
+               Belső tartalom doboz:
+               - max-w-3xl: Hogy ne folyjon szét
+               - w-full: Hogy kitöltse a teret a max szélességig
+            */}
+            <div className="pointer-events-auto w-full max-w-3xl flex flex-col gap-6 md:gap-8">
                 {renderContent(true)}
             </div>
         </div>
@@ -209,13 +231,12 @@ export default function HomeHero({
         className="bg-white"
         style={{ backgroundColor: customBgColor }} 
     >
-      {/* JAVÍTÁS 1: Itt is aspect-[3/1] a mobilhoz */}
       <div className="relative w-full aspect-[3/1] md:aspect-[3822/1254] max-h-[600px] overflow-hidden bg-neutral-50">
         <ImageSlider isStackMobile={true} />
       </div>
 
-      <div className={`px-6 py-16 md:py-24 ${getAlignClasses(align)}`}>
-         <div className="max-w-4xl flex flex-col gap-6 w-full">
+      <div className={`px-6 py-16 md:py-24 flex flex-col ${containerClasses}`}>
+         <div className="w-full max-w-3xl flex flex-col gap-6">
             {renderContent(false)}
          </div>
       </div>
