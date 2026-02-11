@@ -36,7 +36,7 @@ export default function HomeHero({
   const layout = settings?.layout || "overlay";
   const align = settings?.align || "center-center";
   const opacity = settings?.overlay_opacity ?? 50;
-  // Alapértelmezett sorrend, ha nincs beállítva
+  // Alapértelmezett sorrend
   const order: HeroComponentType[] = settings?.components_order || ['title', 'body', 'buttons'];
 
   // --- SLIDESHOW LOGIKA ---
@@ -53,38 +53,46 @@ export default function HomeHero({
 
   // --- HELPEREK ---
   
-  // Szövegigazítás osztályok (Desktopon érvényes, mobilon felülírjuk ha kell)
+  // Szövegigazítás osztályok (A konténerre vonatkozik)
   const getAlignClasses = (alignStr: string) => {
-    // Mobilon mindig balra vagy középre, desktopon a beállítás szerint
-    const base = "flex flex-col gap-6 "; // gap-6 a térköz az elemek között
+    const base = "flex flex-col gap-6 "; 
     switch (alignStr) {
-      case "top-left": return base + "md:justify-start md:items-start md:text-left items-start text-left";
+      case "top-left": return base + "md:justify-start md:items-start md:text-left items-center text-center";
       case "top-center": return base + "md:justify-start md:items-center md:text-center items-center text-center";
-      case "top-right": return base + "md:justify-start md:items-end md:text-right items-end text-right";
-      case "center-left": return base + "md:justify-center md:items-start md:text-left items-start text-left";
+      case "top-right": return base + "md:justify-start md:items-end md:text-right items-center text-center";
+      case "center-left": return base + "md:justify-center md:items-start md:text-left items-center text-center";
       case "center-center": return base + "md:justify-center md:items-center md:text-center items-center text-center";
-      case "center-right": return base + "md:justify-center md:items-end md:text-right items-end text-right";
-      case "bottom-left": return base + "md:justify-end md:items-start md:text-left items-start text-left";
+      case "center-right": return base + "md:justify-center md:items-end md:text-right items-center text-center";
+      case "bottom-left": return base + "md:justify-end md:items-start md:text-left items-center text-center";
       case "bottom-center": return base + "md:justify-end md:items-center md:text-center items-center text-center";
-      case "bottom-right": return base + "md:justify-end md:items-end md:text-right items-end text-right";
+      case "bottom-right": return base + "md:justify-end md:items-end md:text-right items-center text-center";
       default: return base + "md:justify-center md:items-center md:text-center items-center text-center";
     }
   };
 
   // --- KOMPONENSEK RENDERELÉSE SORREND SZERINT ---
   const renderContent = (isOverlayModeOnDesktop: boolean) => {
-    // Szövegszín: Ha Overlay módban vagyunk DESKTOPON, akkor fehér, egyébként (mobilon vagy stack módban) fekete/szürke
     const textColorTitle = isOverlayModeOnDesktop ? "md:text-white text-neutral-900" : "text-neutral-900";
     const textColorBody = isOverlayModeOnDesktop ? "md:text-neutral-100 text-neutral-600" : "text-neutral-600";
     
-    // Gomb stílusok
     const btnPrimaryClass = isOverlayModeOnDesktop 
-        ? "md:bg-white md:text-black md:hover:bg-neutral-200 bg-black text-white hover:bg-neutral-800" // Desktopon fehér gomb sötét háttéren, Mobilon fekete
+        ? "md:bg-white md:text-black md:hover:bg-neutral-200 bg-black text-white hover:bg-neutral-800"
         : "bg-black text-white hover:bg-neutral-800";
 
     const btnSecondaryClass = isOverlayModeOnDesktop
         ? "md:border-white md:text-white md:hover:bg-white md:hover:text-black border-neutral-300 text-black hover:bg-neutral-50 hover:border-black"
         : "border-neutral-300 bg-white text-black hover:bg-neutral-50 hover:border-black";
+
+    // JAVÍTÁS 1: Gombok igazítása
+    // Mobilon mindig 'justify-center'. Desktopon az 'align' beállítástól függ.
+    let buttonJustifyClass = "justify-center"; // Default mobil (center)
+    
+    if (isOverlayModeOnDesktop) {
+        // Desktop nézetben figyeljük az align beállítást
+        if (align.includes('left')) buttonJustifyClass = "md:justify-start justify-center";
+        else if (align.includes('right')) buttonJustifyClass = "md:justify-end justify-center";
+        else buttonJustifyClass = "md:justify-center justify-center";
+    }
 
     const components = {
         title: title ? (
@@ -100,7 +108,7 @@ export default function HomeHero({
         ) : null,
         
         buttons: (ctaLabel || ctaLabel2) ? (
-            <div key="buttons" className="flex flex-wrap gap-4 pt-2">
+            <div key="buttons" className={`flex flex-wrap gap-4 pt-2 w-full ${buttonJustifyClass}`}>
                 {ctaLabel && ctaUrl && (
                     <a href={ctaUrl} className={`rounded-full px-8 py-3 text-sm font-semibold transition ${btnPrimaryClass}`}>
                         {ctaLabel}
@@ -118,8 +126,11 @@ export default function HomeHero({
     return order.map(key => components[key]);
   };
 
-  // --- KÉP MEGJELENÍTŐ (Közös) ---
-  const ImageSlider = () => (
+  // --- KÉP MEGJELENÍTŐ ---
+  // JAVÍTÁS 2: Object-fit kezelés
+  // isStackMobile: Ha true, akkor mobilon vagyunk és a kép külön van (nem overlay).
+  // Ilyenkor object-contain-t használunk, hogy ne vágja le a szélét.
+  const ImageSlider = ({ isStackMobile = false }: { isStackMobile?: boolean }) => (
     <>
       {images.length > 0 ? (
         images.map((path, idx) => (
@@ -133,7 +144,8 @@ export default function HomeHero({
               src={getStorageUrl(path)}
               alt="Hero image"
               fill
-              className="object-cover"
+              // Mobilon (isStackMobile) 'contain', hogy kiférjen a felirat. Desktopon 'cover' a teljes kitöltésért.
+              className={isStackMobile ? "object-contain md:object-cover" : "object-cover"}
               priority={idx === 0}
             />
           </div>
@@ -149,15 +161,14 @@ export default function HomeHero({
   // --- FŐ RENDER LOGIKA ---
   
   // 1. ESET: OVERLAY LAYOUT (Desktopon)
-  // Mobilon ez szétválik (Stack), Desktopon egyben marad.
   if (layout === "overlay") {
     return (
       <section className="flex flex-col md:block md:relative w-full bg-white md:bg-black md:h-[700px]">
         
         {/* Kép Konténer */}
-        {/* Mobilon: Relatív magasság. Desktopon: Abszolút teljes kitöltés */}
-        <div className="relative w-full h-[400px] md:absolute md:inset-0 md:h-full overflow-hidden">
-             <ImageSlider />
+        {/* JAVÍTÁS 2: aspect-[4/3] helyett aspect-video (szélesebb), így kevésbé kell kicsinyíteni a széles képet */}
+        <div className="relative w-full aspect-video md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
+             <ImageSlider isStackMobile={true} />
              {/* Sötétítés CSAK Desktopon */}
              <div 
                 className="hidden md:block absolute inset-0 bg-black pointer-events-none transition-opacity duration-500" 
@@ -166,7 +177,6 @@ export default function HomeHero({
         </div>
 
         {/* Tartalom Konténer */}
-        {/* Mobilon: Normál flow, fehér háttér. Desktopon: Abszolút pozíció a kép felett. */}
         <div className={`
             relative md:absolute md:inset-0 
             px-6 py-12 md:p-12 
@@ -175,8 +185,7 @@ export default function HomeHero({
             pointer-events-none md:pointer-events-none
             ${getAlignClasses(align)}
         `}>
-            {/* A belső tartalomnak kell a pointer-events-auto, hogy a gombok kattinthatók legyenek overlay alatt is */}
-            <div className="pointer-events-auto max-w-4xl flex flex-col gap-6 md:gap-8">
+            <div className="pointer-events-auto max-w-4xl flex flex-col gap-6 md:gap-8 w-full">
                 {renderContent(true)}
             </div>
         </div>
@@ -185,17 +194,17 @@ export default function HomeHero({
   }
 
   // 2. ESET: STACK LAYOUT (Hagyományos)
-  // Itt nincs különbség mobil/desktop viselkedésben struktúrálisan
   return (
     <section className="bg-white">
       {/* Kép sáv */}
-      <div className="relative w-full aspect-[4/3] md:aspect-[3822/1254] max-h-[600px] overflow-hidden bg-neutral-100">
-        <ImageSlider />
+      {/* JAVÍTÁS 2: Itt is aspect-video a mobilhoz és object-contain a sliderben */}
+      <div className="relative w-full aspect-video md:aspect-[3822/1254] max-h-[600px] overflow-hidden bg-neutral-50">
+        <ImageSlider isStackMobile={true} />
       </div>
 
       {/* Tartalom sáv */}
       <div className={`px-6 py-16 md:py-24 ${getAlignClasses(align)}`}>
-         <div className="max-w-4xl flex flex-col gap-6">
+         <div className="max-w-4xl flex flex-col gap-6 w-full">
             {renderContent(false)}
          </div>
       </div>
