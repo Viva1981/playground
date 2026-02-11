@@ -24,3 +24,13 @@ export type EventRow = {
   restaurant_id: string | null; // ÚJ MEZŐ
   restaurants?: Restaurant | null; // Ha lekérjük a hozzá tartozó éttermet is
 };
+// app/lib/types.ts vagy a komponens teteje
+
+export type HeroSettings = {
+  layout: 'overlay' | 'stack'; // 'overlay': Kép a háttérben, 'stack': Kép alatt/felett a szöveg
+  align: 
+    | 'top-left' | 'top-center' | 'top-right' 
+    | 'center-left' | 'center-center' | 'center-right' 
+    | 'bottom-left' | 'bottom-center' | 'bottom-right';
+  overlay_opacity: number; // 0-100 közötti érték
+};
