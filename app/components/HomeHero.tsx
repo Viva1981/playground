@@ -72,12 +72,9 @@ export default function HomeHero({
 
   // --- KOMPONENSEK RENDERELÉSE ---
   const renderContent = (isOverlayModeOnDesktop: boolean) => {
-    // Alapértelmezett színek (ha nincs customContentColor)
-    // Overlay módban: fehér szöveg. Stack módban: sötét szöveg.
     const defaultTitleColor = isOverlayModeOnDesktop ? "md:text-white text-neutral-900" : "text-neutral-900";
     const defaultBodyColor = isOverlayModeOnDesktop ? "md:text-neutral-100 text-neutral-600" : "text-neutral-600";
     
-    // Gombok alapértelmezett stílusa (ha nincs customContentColor)
     const defaultBtnPrimary = isOverlayModeOnDesktop 
         ? "md:bg-white md:text-black bg-black text-white" 
         : "bg-black text-white";
@@ -86,7 +83,6 @@ export default function HomeHero({
         ? "md:border-white md:text-white border-neutral-300 text-black"
         : "border-neutral-300 bg-white text-black";
 
-    // Gombok elrendezése
     let buttonJustifyClass = "justify-center"; 
     if (isOverlayModeOnDesktop) {
         if (align.includes('left')) buttonJustifyClass = "md:justify-start justify-center";
@@ -176,7 +172,8 @@ export default function HomeHero({
     return (
       <section className="flex flex-col md:block md:relative w-full bg-white md:bg-black md:h-[700px]">
         {/* Kép Konténer */}
-        <div className="relative w-full aspect-video md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
+        {/* JAVÍTÁS 1: aspect-[3/1] a 3:1 képarányhoz mobilon */}
+        <div className="relative w-full aspect-[3/1] md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
              <ImageSlider isStackMobile={true} />
              {/* Sötétítés */}
              <div 
@@ -193,8 +190,9 @@ export default function HomeHero({
                 h-auto md:h-full 
                 pointer-events-none md:pointer-events-none
                 ${getAlignClasses(align)}
+                md:!bg-transparent 
             `}
-            // Mobilon ha van háttérszín, azt itt alkalmazzuk. Desktopon az overlay miatt átlátszó.
+            // JAVÍTÁS 2: A md:!bg-transparent a className-ben felülírja ezt desktopon
             style={{ backgroundColor: customBgColor ? customBgColor : undefined }}
         >
             <div className={`pointer-events-auto max-w-4xl flex flex-col gap-6 md:gap-8 w-full`}>
@@ -209,9 +207,10 @@ export default function HomeHero({
   return (
     <section 
         className="bg-white"
-        style={{ backgroundColor: customBgColor }} // Háttérszín alkalmazása az egész szekcióra
+        style={{ backgroundColor: customBgColor }} 
     >
-      <div className="relative w-full aspect-video md:aspect-[3822/1254] max-h-[600px] overflow-hidden bg-neutral-50">
+      {/* JAVÍTÁS 1: Itt is aspect-[3/1] a mobilhoz */}
+      <div className="relative w-full aspect-[3/1] md:aspect-[3822/1254] max-h-[600px] overflow-hidden bg-neutral-50">
         <ImageSlider isStackMobile={true} />
       </div>
 
