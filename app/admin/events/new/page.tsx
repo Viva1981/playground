@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
 
@@ -11,90 +11,117 @@ export default function NewEventPage() {
   const [slug, setSlug] = useState("");
   const [startsAt, setStartsAt] = useState("");
   const [summary, setSummary] = useState("");
+  // ÚJ: Étterem választáshoz
+  const [restaurantId, setRestaurantId] = useState<string>(""); 
+  const [restaurants, setRestaurants] = useState<any[]>([]);
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function save() {
-    setSaving(true);
-    setError(null);
+  // Betöltjük az éttermeket, hogy lehessen választani
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("restaurants")
+        .select("id, name")
+        .eq("is_active", true)
+        .order("name");
+      if (data) setRestaurants(data);
+    })();
+  }, []);
 
-    const { data, error } = await supabase
-      .from("events")
-      .insert({
-        title,
-        slug,
-        starts_at: new Date(startsAt).toISOString(),
-        summary,
-        is_published: false,
-      })
-      .select("id")
-      .single();
-
-    setSaving(false);
-
-    if (error || !data) {
-      setError(error?.message ?? "Nem sikerült menteni.");
+  async function create() {
+    if (!title || !slug || !startsAt) {
+      alert("Töltsd ki a kötelező mezőket!");
       return;
     }
 
-    router.replace(`/admin/events/${data.id}`);
+    setSaving(true);
+    const { error } = await supabase.from("events").insert({
+      title,
+      slug,
+      starts_at: new Date(startsAt).toISOString(),
+      summary,
+      is_published: false, // Alapból vázlat
+      restaurant_id: restaurantId || null, // Itt mentjük el a kapcsolatot!
+    });
+
+    if (!error) {
+      router.push("/admin/events");
+      router.refresh();
+    } else {
+      alert("Hiba: " + error.message);
+      setSaving(false);
+    }
   }
 
   return (
     <main className="p-6">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="text-2xl font-bold">Új esemény</h1>
+      <div className="mx-auto max-w-xl">
+        <h1 className="text-2xl font-bold mb-6">Új esemény</h1>
+        
+        <div className="grid gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Esemény címe</label>
+            <input
+              className="w-full rounded-xl border p-3"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Pl. Valentin napi vacsora"
+            />
+          </div>
 
-        <div className="mt-8 grid gap-4">
-          <input
-            placeholder="Cím"
-            className="rounded-xl border p-3"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              setSlug(
-                e.target.value
-                  .toLowerCase()
-                  .replace(/[^a-z0-9]+/g, "-")
-                  .replace(/(^-|-$)/g, "")
-              );
-            }}
-          />
+          <div>
+            <label className="block text-sm font-medium mb-1">URL (slug)</label>
+            <input
+              className="w-full rounded-xl border p-3"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="valentin-nap-2026"
+            />
+          </div>
 
-          <input
-            placeholder="Slug"
-            className="rounded-xl border p-3"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-          />
+          {/* ÚJ: Étterem választó */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Melyik étterem?</label>
+            <select
+              className="w-full rounded-xl border p-3 bg-white"
+              value={restaurantId}
+              onChange={(e) => setRestaurantId(e.target.value)}
+            >
+              <option value="">-- Válassz éttermet (opcionális) --</option>
+              {restaurants.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <input
-            type="datetime-local"
-            className="rounded-xl border p-3"
-            value={startsAt}
-            onChange={(e) => setStartsAt(e.target.value)}
-          />
+          <div>
+            <label className="block text-sm font-medium mb-1">Kezdés időpontja</label>
+            <input
+              type="datetime-local"
+              className="w-full rounded-xl border p-3"
+              value={startsAt}
+              onChange={(e) => setStartsAt(e.target.value)}
+            />
+          </div>
 
-          <textarea
-            placeholder="Rövid leírás"
-            className="rounded-xl border p-3 min-h-[120px]"
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-          />
-
-          {error && (
-            <div className="rounded-xl bg-red-50 text-red-700 p-3 text-sm">
-              {error}
-            </div>
-          )}
+          <div>
+            <label className="block text-sm font-medium mb-1">Rövid leírás</label>
+            <textarea
+              className="w-full rounded-xl border p-3 min-h-[100px]"
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+            />
+          </div>
 
           <button
-            onClick={save}
+            onClick={create}
             disabled={saving}
-            className="rounded-xl bg-black text-white p-4"
+            className="rounded-xl bg-black text-white px-6 py-3 mt-2"
           >
-            {saving ? "Mentés…" : "Létrehozás"}
+            {saving ? "Mentés..." : "Létrehozás"}
           </button>
         </div>
       </div>
