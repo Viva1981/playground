@@ -1,5 +1,6 @@
-import { EventListItem } from "@/app/lib/getUpcomingEvents";
+import Link from "next/link";
 import Image from "next/image";
+import { EventListItem } from "@/app/lib/getUpcomingEvents";
 
 function formatHuDate(iso: string) {
   const d = new Date(iso);
@@ -15,7 +16,7 @@ export default function HomeEvents({ events }: { events: EventListItem[] }) {
   if (!events?.length) return null;
 
   return (
-    <section id="events" className="px-6 py-24">
+    <section id="events" className="px-6 py-24 bg-white">
       <div className="mx-auto max-w-6xl">
         <div className="flex items-end justify-between gap-6 mb-8">
           <div>
@@ -24,14 +25,17 @@ export default function HomeEvents({ events }: { events: EventListItem[] }) {
               A Vis Eat Miskolc partnereinek programjai.
             </p>
           </div>
-          <a className="text-sm underline underline-offset-4" href="/events">
-            Összes
-          </a>
+          <Link 
+            href="/events" 
+            className="text-sm font-medium underline underline-offset-4 hover:text-amber-600 transition-colors"
+          >
+            Összes megtekintése
+          </Link>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {events.map((e) => (
-            <a
+            <Link
               key={e.id}
               href={`/events/${e.slug}`}
               className="group flex flex-col overflow-hidden rounded-2xl border bg-white transition hover:shadow-lg"
@@ -44,6 +48,7 @@ export default function HomeEvents({ events }: { events: EventListItem[] }) {
                     alt={e.title}
                     fill
                     className="object-cover transition duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-neutral-400">
@@ -52,7 +57,7 @@ export default function HomeEvents({ events }: { events: EventListItem[] }) {
                 )}
                 
                 {/* Dátum badge a képen */}
-                <div className="absolute top-3 left-3 rounded-lg bg-white/90 backdrop-blur px-3 py-1 text-sm font-bold shadow-sm">
+                <div className="absolute top-3 left-3 rounded-lg bg-white/95 backdrop-blur px-3 py-1 text-sm font-bold shadow-sm text-gray-900">
                   {formatHuDate(e.starts_at)}
                 </div>
               </div>
@@ -66,7 +71,7 @@ export default function HomeEvents({ events }: { events: EventListItem[] }) {
                   </div>
                 )}
                 
-                <h3 className="text-xl font-bold leading-tight text-neutral-900 mb-2">
+                <h3 className="text-xl font-bold leading-tight text-neutral-900 mb-2 group-hover:text-amber-700 transition-colors">
                   {e.title}
                 </h3>
                 
@@ -76,7 +81,7 @@ export default function HomeEvents({ events }: { events: EventListItem[] }) {
                   </p>
                 )}
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
