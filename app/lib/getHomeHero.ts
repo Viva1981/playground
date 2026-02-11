@@ -1,29 +1,31 @@
 import { createClient } from "@supabase/supabase-js";
 
+// Cache tiltása a szerver komponenseknél
+import { unstable_noStore as noStore } from "next/cache";
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export type HomeHeroSection = {
+export type HomeHeroData = {
   title: string | null;
   body: string | null;
   cta_label: string | null;
   cta_url: string | null;
+  // ÚJ MEZŐK:
+  cta_label_2: string | null;
+  cta_url_2: string | null;
 };
 
-export async function getHomeHero(): Promise<HomeHeroSection | null> {
-  const { data, error } = await supabase
+export async function getHomeHero(): Promise<HomeHeroData | null> {
+  noStore();
+  
+  const { data } = await supabase
     .from("page_sections")
-    .select("title, body, cta_label, cta_url")
+    .select("*")
     .eq("key", "home_hero")
-    .eq("is_active", true)
-    .maybeSingle();
+    .single();
 
-  if (error) {
-    console.error("getHomeHero error:", error.message);
-    return null;
-  }
-
-  return data ?? null;
+  return data;
 }

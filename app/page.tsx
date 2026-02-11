@@ -17,11 +17,14 @@ export default async function HomePage() {
     <main>
       {hero ? (
         <HomeHero
-          title={hero.title}
-          body={hero.body}
-          ctaLabel={hero.cta_label}
-          ctaUrl={hero.cta_url}
-        />
+  title={hero.title}
+  body={hero.body}
+  ctaLabel={hero.cta_label}
+  ctaUrl={hero.cta_url}
+  // Átadjuk az újakat is:
+  ctaLabel2={hero.cta_label_2}
+  ctaUrl2={hero.cta_url_2}
+/>
       ) : null}
 
       {about ? <HomeAbout title={about.title} body={about.body} /> : null}
