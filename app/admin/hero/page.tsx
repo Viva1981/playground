@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useState, ChangeEvent } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
-import Image from "next/image";
+import type { HeroSettings, HeroComponentType } from "@/app/lib/getHomeHero"; // Importáljuk a típusokat
 
-// Típusok (lokálisan, hogy egyszerű legyen másolni)
-type HeroSettings = {
-    layout: 'overlay' | 'stack';
-    align: string;
-    overlay_opacity: number;
+// Segéd a címkékhez
+const COMPONENT_LABELS: Record<HeroComponentType, string> = {
+    title: "Főcím",
+    body: "Szöveg",
+    buttons: "Gombok"
 };
 
 export default function AdminHeroPage() {
@@ -15,7 +15,7 @@ export default function AdminHeroPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Szöveges adatok
+  // Mezők
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [ctaLabel, setCtaLabel] = useState("");
@@ -23,12 +23,12 @@ export default function AdminHeroPage() {
   const [ctaLabel2, setCtaLabel2] = useState("");
   const [ctaUrl2, setCtaUrl2] = useState("");
 
-  // Képek és Beállítások
   const [mediaPaths, setMediaPaths] = useState<string[]>([]);
   const [settings, setSettings] = useState<HeroSettings>({
       layout: 'overlay',
       align: 'center-center',
-      overlay_opacity: 50
+      overlay_opacity: 50,
+      components_order: ['title', 'body', 'buttons'] // Alapértelmezett sorrend
   });
 
   useEffect(() => {
@@ -46,55 +46,46 @@ export default function AdminHeroPage() {
         setCtaUrl(data.cta_url || "");
         setCtaLabel2(data.cta_label_2 || "");
         setCtaUrl2(data.cta_url_2 || "");
-        
-        // Képek betöltése (array)
         setMediaPaths(data.media_paths || []);
         
-        // Beállítások betöltése (JSONB)
         if (data.settings) {
-            setSettings(prev => ({ ...prev, ...data.settings }));
+            // Biztosítjuk, hogy a settings objektum összeolvadjon a default-tal, ha valami hiányozna
+            setSettings(prev => ({ 
+                ...prev, 
+                ...data.settings,
+                // Ha a régi DB adatban még nincs components_order, adjuk hozzá a defaultot
+                components_order: data.settings.components_order || ['title', 'body', 'buttons']
+            }));
         }
       }
       setLoading(false);
     })();
   }, []);
 
-  // --- KÉPFELTÖLTÉS LOGIKA ---
+  // --- KÉPFELTÖLTÉS ---
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
-    
-    // Max 10 kép ellenőrzés
     if (mediaPaths.length + e.target.files.length > 10) {
         alert("Maximum 10 kép tölthető fel!");
         return;
     }
-
     setUploading(true);
     const newPaths: string[] = [];
-
     try {
         for (const file of Array.from(e.target.files)) {
             const fileExt = file.name.split(".").pop();
             const fileName = `hero-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
             const filePath = `hero/${fileName}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from("public-media")
-                .upload(filePath, file);
-
+            const { error: uploadError } = await supabase.storage.from("public-media").upload(filePath, file);
             if (uploadError) throw uploadError;
             newPaths.push(filePath);
         }
-        
-        // Hozzáadjuk a meglévőkhöz
         setMediaPaths(prev => [...prev, ...newPaths]);
-
     } catch (error) {
-        console.error("Upload error:", error);
+        console.error(error);
         alert("Hiba a feltöltés során!");
     } finally {
         setUploading(false);
-        // Reset input value
         e.target.value = "";
     }
   };
@@ -103,42 +94,45 @@ export default function AdminHeroPage() {
       setMediaPaths(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
+  // --- SORREND MÓDOSÍTÁS ---
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+      const newOrder = [...(settings.components_order || ['title', 'body', 'buttons'])];
+      if (direction === 'up' && index > 0) {
+          [newOrder[index], newOrder[index - 1]] = [newOrder[index - 1], newOrder[index]];
+      } else if (direction === 'down' && index < newOrder.length - 1) {
+          [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+      }
+      setSettings({ ...settings, components_order: newOrder });
+  };
+
   // --- MENTÉS ---
   async function save() {
     setSaving(true);
     const { error } = await supabase
       .from("page_sections")
       .update({
-        title,
-        body,
-        cta_label: ctaLabel,
-        cta_url: ctaUrl,
-        cta_label_2: ctaLabel2,
-        cta_url_2: ctaUrl2,
-        media_paths: mediaPaths, // Array mentése
-        settings: settings // JSONB mentése
+        title, body,
+        cta_label: ctaLabel, cta_url: ctaUrl,
+        cta_label_2: ctaLabel2, cta_url_2: ctaUrl2,
+        media_paths: mediaPaths,
+        settings: settings
       })
       .eq("key", "home_hero");
     
     setSaving(false);
-    if (error) {
-        console.error(error);
-        alert("Hiba mentéskor!");
-    } else {
-        alert("Sikeres mentés!");
-    }
+    if (error) alert("Hiba mentéskor!");
+    else alert("Sikeres mentés!");
   }
 
-  // --- HELPER A STORAGE URL-HEZ ---
   const getStorageUrl = (path: string) => 
     `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${path}`;
 
   if (loading) return <div className="p-6">Betöltés...</div>;
 
   return (
-    <main className="p-6 max-w-4xl mx-auto pb-32">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Hero szekció szerkesztése</h1>
+    <main className="p-6 max-w-5xl mx-auto pb-32">
+      <div className="flex justify-between items-center mb-6 sticky top-0 bg-white/80 backdrop-blur z-20 py-4 border-b">
+        <h1 className="text-2xl font-bold">Hero szerkesztése</h1>
         <button
           onClick={save}
           disabled={saving}
@@ -148,35 +142,24 @@ export default function AdminHeroPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* BAL OSZLOP: TARTALOM */}
         <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Szöveges tartalom</h2>
-                
                 <div className="mb-4">
                     <label className="block text-sm font-medium mb-1">Főcím</label>
-                    <input
-                        className="w-full border p-3 rounded-lg"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
+                    <input className="w-full border p-3 rounded-lg" value={title} onChange={(e) => setTitle(e.target.value)} />
                 </div>
-
                 <div className="mb-4">
                     <label className="block text-sm font-medium mb-1">Szöveg</label>
-                    <textarea
-                        className="w-full border p-3 rounded-lg min-h-[100px]"
-                        value={body}
-                        onChange={(e) => setBody(e.target.value)}
-                    />
+                    <textarea className="w-full border p-3 rounded-lg min-h-[100px]" value={body} onChange={(e) => setBody(e.target.value)} />
                 </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                  <h2 className="text-lg font-semibold mb-4">Gombok</h2>
-                 {/* ELSŐDLEGES GOMB */}
                  <div className="mb-4 pb-4 border-b">
                     <h3 className="text-sm font-bold text-neutral-500 mb-2 uppercase">Elsődleges (Fekete)</h3>
                     <div className="grid grid-cols-2 gap-3">
@@ -184,7 +167,6 @@ export default function AdminHeroPage() {
                         <input className="border p-2 rounded" placeholder="URL" value={ctaUrl} onChange={e => setCtaUrl(e.target.value)} />
                     </div>
                  </div>
-                 {/* MÁSODLAGOS GOMB */}
                  <div>
                     <h3 className="text-sm font-bold text-neutral-500 mb-2 uppercase">Másodlagos (Keretes)</h3>
                     <div className="grid grid-cols-2 gap-3">
@@ -195,103 +177,88 @@ export default function AdminHeroPage() {
             </div>
         </div>
 
-        {/* JOBB OSZLOP: MÉDIA ÉS MEGJELENÉS */}
+        {/* JOBB OSZLOP: KÉPEK ÉS BEÁLLÍTÁSOK */}
         <div className="space-y-6">
             
-            {/* KÉPKEZELŐ */}
             <div className="bg-white p-6 rounded-xl border shadow-sm">
-                <h2 className="text-lg font-semibold mb-4">Képek / Slideshow</h2>
+                <h2 className="text-lg font-semibold mb-4">Képek</h2>
                 <div className="mb-4">
                     <label className="block w-full p-4 border-2 border-dashed rounded-xl text-center cursor-pointer hover:bg-neutral-50 transition">
-                        <span className="text-sm font-medium text-neutral-600">
-                            {uploading ? "Feltöltés..." : "+ Képek hozzáadása (Max 10)"}
-                        </span>
+                        <span className="text-sm font-medium text-neutral-600">{uploading ? "Feltöltés..." : "+ Képek (Max 10)"}</span>
                         <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
                     </label>
                 </div>
-
-                {/* Kép lista */}
                 <div className="grid grid-cols-3 gap-2">
                     {mediaPaths.map((path, idx) => (
                         <div key={idx} className="relative group aspect-video bg-neutral-100 rounded overflow-hidden">
                             <img src={getStorageUrl(path)} className="w-full h-full object-cover" alt="" />
-                            <button 
-                                onClick={() => removeImage(idx)}
-                                className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition text-xs"
-                            >
-                                🗑️
-                            </button>
+                            <button onClick={() => removeImage(idx)} className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition text-xs">🗑️</button>
                             <span className="absolute bottom-1 left-1 bg-black/50 text-white text-[10px] px-1 rounded">{idx + 1}</span>
                         </div>
                     ))}
                 </div>
-                <p className="text-xs text-neutral-500 mt-2">Több kép esetén 5mp-es slideshow indul.</p>
             </div>
 
-            {/* MEGJELENÉS BEÁLLÍTÁSOK */}
             <div className="bg-white p-6 rounded-xl border shadow-sm">
-                <h2 className="text-lg font-semibold mb-4">Megjelenés</h2>
+                <h2 className="text-lg font-semibold mb-4">Megjelenés & Sorrend</h2>
 
-                {/* Layout Választó */}
+                {/* Layout */}
                 <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2">Elrendezés Típusa</label>
+                    <label className="block text-sm font-medium mb-2">Desktop Elrendezés (Mobilon mindig Stack)</label>
                     <div className="grid grid-cols-2 gap-2">
-                        <button 
-                            onClick={() => setSettings({...settings, layout: 'overlay'})}
-                            className={`p-3 border rounded-lg text-sm text-center ${settings.layout === 'overlay' ? 'bg-black text-white border-black' : 'bg-white hover:bg-neutral-50'}`}
-                        >
-                            Háttérkép (Overlay)
-                        </button>
-                        <button 
-                            onClick={() => setSettings({...settings, layout: 'stack'})}
-                            className={`p-3 border rounded-lg text-sm text-center ${settings.layout === 'stack' ? 'bg-black text-white border-black' : 'bg-white hover:bg-neutral-50'}`}
-                        >
-                            Kép a tartalom felett
-                        </button>
+                        <button onClick={() => setSettings({...settings, layout: 'overlay'})} className={`p-3 border rounded-lg text-sm ${settings.layout === 'overlay' ? 'bg-black text-white border-black' : 'bg-white'}`}>Háttérkép</button>
+                        <button onClick={() => setSettings({...settings, layout: 'stack'})} className={`p-3 border rounded-lg text-sm ${settings.layout === 'stack' ? 'bg-black text-white border-black' : 'bg-white'}`}>Kép alatt/felett</button>
                     </div>
                 </div>
 
-                {/* Sötétítés csúszka (Csak Overlay esetén releváns) */}
+                {/* Sötétítés */}
                 {settings.layout === 'overlay' && (
                     <div className="mb-6">
                         <label className="block text-sm font-medium mb-1">Háttér sötétítés: {settings.overlay_opacity}%</label>
-                        <input 
-                            type="range" min="0" max="90" step="10"
-                            value={settings.overlay_opacity}
-                            onChange={(e) => setSettings({...settings, overlay_opacity: Number(e.target.value)})}
-                            className="w-full"
-                        />
+                        <input type="range" min="0" max="90" step="10" value={settings.overlay_opacity} onChange={(e) => setSettings({...settings, overlay_opacity: Number(e.target.value)})} className="w-full" />
                     </div>
                 )}
 
-                {/* Pozíció Mátrix (9 pont) */}
+                {/* SORREND SZERKESZTŐ (ÚJ) */}
+                <div className="mb-6">
+                    <label className="block text-sm font-medium mb-2">Tartalom Sorrendje</label>
+                    <div className="flex flex-col gap-2">
+                        {(settings.components_order || ['title', 'body', 'buttons']).map((item, index) => (
+                            <div key={item} className="flex items-center justify-between p-3 bg-neutral-50 border rounded-lg">
+                                <span className="font-medium text-sm">{COMPONENT_LABELS[item]}</span>
+                                <div className="flex gap-1">
+                                    <button 
+                                        onClick={() => moveItem(index, 'up')} 
+                                        disabled={index === 0}
+                                        className="p-1 hover:bg-neutral-200 rounded disabled:opacity-30"
+                                    >
+                                        ⬆️
+                                    </button>
+                                    <button 
+                                        onClick={() => moveItem(index, 'down')} 
+                                        disabled={index === 2}
+                                        className="p-1 hover:bg-neutral-200 rounded disabled:opacity-30"
+                                    >
+                                        ⬇️
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Igazítás */}
                 <div>
-                    <label className="block text-sm font-medium mb-2">Tartalom Igazítása</label>
+                    <label className="block text-sm font-medium mb-2">Igazítás</label>
                     <div className="w-32 mx-auto grid grid-cols-3 gap-2 p-2 bg-neutral-100 rounded-lg">
-                        {['top-left', 'top-center', 'top-right', 
-                          'center-left', 'center-center', 'center-right', 
-                          'bottom-left', 'bottom-center', 'bottom-right'].map((pos) => (
-                            <button
-                                key={pos}
-                                onClick={() => setSettings({...settings, align: pos})}
-                                className={`w-8 h-8 rounded border ${
-                                    settings.align === pos 
-                                    ? 'bg-black border-black' 
-                                    : 'bg-white border-neutral-300 hover:border-black'
-                                }`}
-                                title={pos}
-                            >
+                        {['top-left', 'top-center', 'top-right', 'center-left', 'center-center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'].map((pos) => (
+                            <button key={pos} onClick={() => setSettings({...settings, align: pos})} className={`w-8 h-8 rounded border ${settings.align === pos ? 'bg-black border-black' : 'bg-white hover:border-black'}`}>
                                 <div className={`w-2 h-2 rounded-full mx-auto ${settings.align === pos ? 'bg-white' : 'bg-neutral-300'}`} />
                             </button>
                         ))}
                     </div>
-                    <div className="text-center text-xs text-neutral-500 mt-2">
-                        {settings.align}
-                    </div>
                 </div>
-
             </div>
-
         </div>
       </div>
     </main>
