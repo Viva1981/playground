@@ -1,16 +1,9 @@
-type EventListItem = {
-  id: string;
-  title: string;
-  slug: string;
-  starts_at: string;
-  summary: string | null;
-  cover_path: string | null; // Ezt hozzáadtam
-};
+import { EventListItem } from "@/app/lib/getUpcomingEvents";
+import Image from "next/image";
 
 function formatHuDate(iso: string) {
   const d = new Date(iso);
   return d.toLocaleString("hu-HU", {
-    year: "numeric",
     month: "long",
     day: "numeric",
     hour: "2-digit",
@@ -23,47 +16,66 @@ export default function HomeEvents({ events }: { events: EventListItem[] }) {
 
   return (
     <section id="events" className="px-6 py-24">
-      <div className="mx-auto max-w-4xl">
-        <div className="flex items-end justify-between gap-6">
+      <div className="mx-auto max-w-6xl">
+        <div className="flex items-end justify-between gap-6 mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-              Események
-            </h2>
-            <p className="mt-2 text-sm text-neutral-600">
-              Közelgő programok.
+            <h2 className="text-3xl font-bold tracking-tight">Események</h2>
+            <p className="mt-2 text-neutral-600">
+              A Vis Eat Miskolc partnereinek programjai.
             </p>
           </div>
-
           <a className="text-sm underline underline-offset-4" href="/events">
             Összes
           </a>
         </div>
 
-        <div className="mt-8 grid gap-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {events.map((e) => (
             <a
               key={e.id}
               href={`/events/${e.slug}`}
-              className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
+              className="group flex flex-col overflow-hidden rounded-2xl border bg-white transition hover:shadow-lg"
             >
-              {/* Kép beillesztve ide: */}
-              {e.cover_path ? (
-                <img
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${e.cover_path}`}
-                  alt={e.title}
-                  className="mb-3 rounded-lg object-cover w-full h-[200px]"
-                />
-              ) : null}
-
-              <div className="text-sm text-neutral-600">
-                {formatHuDate(e.starts_at)}
-              </div>
-              <div className="mt-1 text-lg font-semibold">{e.title}</div>
-              {e.summary ? (
-                <div className="mt-2 text-sm text-neutral-700 max-w-2xl">
-                  {e.summary}
+              {/* Kép konténer */}
+              <div className="relative h-48 w-full overflow-hidden bg-neutral-100">
+                {e.cover_path ? (
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${e.cover_path}`}
+                    alt={e.title}
+                    fill
+                    className="object-cover transition duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-neutral-400">
+                    Nincs kép
+                  </div>
+                )}
+                
+                {/* Dátum badge a képen */}
+                <div className="absolute top-3 left-3 rounded-lg bg-white/90 backdrop-blur px-3 py-1 text-sm font-bold shadow-sm">
+                  {formatHuDate(e.starts_at)}
                 </div>
-              ) : null}
+              </div>
+
+              {/* Tartalom */}
+              <div className="flex flex-1 flex-col p-5">
+                {/* ÉTTEREM NEVE (Ha van) */}
+                {e.restaurants && (
+                  <div className="mb-2 text-xs font-bold uppercase tracking-wider text-amber-600">
+                    📍 {e.restaurants.name}
+                  </div>
+                )}
+                
+                <h3 className="text-xl font-bold leading-tight text-neutral-900 mb-2">
+                  {e.title}
+                </h3>
+                
+                {e.summary && (
+                  <p className="text-sm text-neutral-600 line-clamp-2">
+                    {e.summary}
+                  </p>
+                )}
+              </div>
             </a>
           ))}
         </div>

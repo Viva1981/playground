@@ -1,11 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
-import { unstable_noStore as noStore } from "next/cache"; // Ezt importáljuk a cache tiltáshoz
+import { unstable_noStore as noStore } from "next/cache";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+// Bővített típus: benne van az étterem neve és slugja
 export type EventListItem = {
   id: string;
   title: string;
@@ -13,27 +14,28 @@ export type EventListItem = {
   starts_at: string;
   summary: string | null;
   cover_path: string | null;
+  restaurants: {
+    name: string;
+    slug: string;
+  } | null;
 };
 
-// Felemeltem a limit alapértelmezését 6-ról 12-re, hogy biztosan beleférjenek
 export async function getUpcomingEvents(
   limit: number = 12
 ): Promise<EventListItem[]> {
-  // 1. LÉPÉS: Ez a parancs közli a Next.js-szel, hogy TILOS cache-elni ennek a függvénynek az eredményét.
-  // Minden egyes oldalbetöltéskor friss adatot fog kérni a Supabase-től.
-  noStore();
+  noStore(); // Cache tiltása, mindig friss adat
 
-  // Mai nap éjfél meghatározása
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const filterDateIso = today.toISOString();
 
+  // A SELECT-ben a "restaurants(name, slug)" kéri le a kapcsolt adatot
   const { data, error } = await supabase
     .from("events")
-    .select("id, title, slug, starts_at, summary, cover_path")
+    .select("id, title, slug, starts_at, summary, cover_path, restaurants(name, slug)")
     .eq("is_published", true)
     .gte("starts_at", filterDateIso)
-    .order("starts_at", { ascending: true }) // A legkorábbi esemény van legelöl
+    .order("starts_at", { ascending: true })
     .limit(limit);
 
   if (error) {
@@ -41,5 +43,7 @@ export async function getUpcomingEvents(
     return [];
   }
 
-  return data ?? [];
+  // TypeScript hack: A Supabase visszatérése tömb lehet, de mi tudjuk, hogy 1 étterem van.
+  // A fenti típusdefinícióval ez így kompatibilis lesz a komponenssel.
+  return (data as any) ?? [];
 }
