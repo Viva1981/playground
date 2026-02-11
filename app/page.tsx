@@ -29,7 +29,7 @@ export default async function HomePage() {
         />
       ) : null}
 
-      {about ? <HomeAbout title={about.title} body={about.body} /> : null}
+      {about ? <HomeAbout title={about.title} body={about.body} settings={about.settings} /> : null}
 
       <HomeEvents events={events} />
     </main>
