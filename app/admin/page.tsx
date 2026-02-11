@@ -95,7 +95,15 @@ export default function AdminDashboardPage() {
   <div className="text-sm text-neutral-600">Kezelés</div>
   <div className="mt-1 text-lg font-semibold">Események</div>
 </a>
-
+<a
+  href="/admin/restaurants"
+  className="block rounded-xl border bg-white p-6 shadow-sm hover:border-black transition"
+>
+  <div className="text-lg font-semibold">Éttermek</div>
+  <div className="text-sm text-neutral-600">
+    Partnerek kezelése, adatok, képek.
+  </div>
+</a>
         </div>
       </div>
     </main>
