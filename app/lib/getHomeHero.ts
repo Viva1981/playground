@@ -12,10 +12,14 @@ export type HeroComponentType = 'title' | 'body' | 'buttons';
 
 export type HeroSettings = {
   layout: 'overlay' | 'stack';
-  align: string; // pl. 'center-center'
+  align: string;
   overlay_opacity: number;
-  components_order?: HeroComponentType[]; // ÚJ: Sorrend tárolása
+  components_order?: HeroComponentType[];
+  // ÚJ SZÍN BEÁLLÍTÁSOK:
+  content_color?: string;      // Szöveg és gombok színe (pl. #e43c65)
+  background_color?: string;   // Háttérszín (csak Stack nézethez)
 };
+
 
 export type HomeHeroData = {
   title: string | null;

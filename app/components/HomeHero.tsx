@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { HeroSettings, HeroComponentType } from "@/app/lib/getHomeHero";
 
-// Segédfüggvény a Supabase Storage URL generáláshoz
 const getStorageUrl = (path: string) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
@@ -36,8 +35,11 @@ export default function HomeHero({
   const layout = settings?.layout || "overlay";
   const align = settings?.align || "center-center";
   const opacity = settings?.overlay_opacity ?? 50;
-  // Alapértelmezett sorrend
   const order: HeroComponentType[] = settings?.components_order || ['title', 'body', 'buttons'];
+
+  // --- ÚJ: SZÍNEK ---
+  const customContentColor = settings?.content_color || undefined;
+  const customBgColor = settings?.background_color || undefined;
 
   // --- SLIDESHOW LOGIKA ---
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -52,8 +54,6 @@ export default function HomeHero({
   }, [images.length]);
 
   // --- HELPEREK ---
-  
-  // Szövegigazítás osztályok (A konténerre vonatkozik)
   const getAlignClasses = (alignStr: string) => {
     const base = "flex flex-col gap-6 "; 
     switch (alignStr) {
@@ -70,25 +70,25 @@ export default function HomeHero({
     }
   };
 
-  // --- KOMPONENSEK RENDERELÉSE SORREND SZERINT ---
+  // --- KOMPONENSEK RENDERELÉSE ---
   const renderContent = (isOverlayModeOnDesktop: boolean) => {
-    const textColorTitle = isOverlayModeOnDesktop ? "md:text-white text-neutral-900" : "text-neutral-900";
-    const textColorBody = isOverlayModeOnDesktop ? "md:text-neutral-100 text-neutral-600" : "text-neutral-600";
+    // Alapértelmezett színek (ha nincs customContentColor)
+    // Overlay módban: fehér szöveg. Stack módban: sötét szöveg.
+    const defaultTitleColor = isOverlayModeOnDesktop ? "md:text-white text-neutral-900" : "text-neutral-900";
+    const defaultBodyColor = isOverlayModeOnDesktop ? "md:text-neutral-100 text-neutral-600" : "text-neutral-600";
     
-    const btnPrimaryClass = isOverlayModeOnDesktop 
-        ? "md:bg-white md:text-black md:hover:bg-neutral-200 bg-black text-white hover:bg-neutral-800"
-        : "bg-black text-white hover:bg-neutral-800";
-
-    const btnSecondaryClass = isOverlayModeOnDesktop
-        ? "md:border-white md:text-white md:hover:bg-white md:hover:text-black border-neutral-300 text-black hover:bg-neutral-50 hover:border-black"
-        : "border-neutral-300 bg-white text-black hover:bg-neutral-50 hover:border-black";
-
-    // JAVÍTÁS 1: Gombok igazítása
-    // Mobilon mindig 'justify-center'. Desktopon az 'align' beállítástól függ.
-    let buttonJustifyClass = "justify-center"; // Default mobil (center)
+    // Gombok alapértelmezett stílusa (ha nincs customContentColor)
+    const defaultBtnPrimary = isOverlayModeOnDesktop 
+        ? "md:bg-white md:text-black bg-black text-white" 
+        : "bg-black text-white";
     
+    const defaultBtnSecondary = isOverlayModeOnDesktop
+        ? "md:border-white md:text-white border-neutral-300 text-black"
+        : "border-neutral-300 bg-white text-black";
+
+    // Gombok elrendezése
+    let buttonJustifyClass = "justify-center"; 
     if (isOverlayModeOnDesktop) {
-        // Desktop nézetben figyeljük az align beállítást
         if (align.includes('left')) buttonJustifyClass = "md:justify-start justify-center";
         else if (align.includes('right')) buttonJustifyClass = "md:justify-end justify-center";
         else buttonJustifyClass = "md:justify-center justify-center";
@@ -96,13 +96,21 @@ export default function HomeHero({
 
     const components = {
         title: title ? (
-            <h1 key="title" className={`text-4xl md:text-6xl font-extrabold tracking-tight leading-tight ${isOverlayModeOnDesktop ? 'md:drop-shadow-sm' : ''} ${textColorTitle}`}>
+            <h1 
+                key="title" 
+                className={`text-4xl md:text-6xl font-extrabold tracking-tight leading-tight ${isOverlayModeOnDesktop ? 'md:drop-shadow-sm' : ''} ${!customContentColor ? defaultTitleColor : ''}`}
+                style={{ color: customContentColor }}
+            >
                 {title}
             </h1>
         ) : null,
         
         body: body ? (
-            <p key="body" className={`text-lg md:text-xl leading-relaxed max-w-2xl ${textColorBody}`}>
+            <p 
+                key="body" 
+                className={`text-lg md:text-xl leading-relaxed max-w-2xl ${!customContentColor ? defaultBodyColor : ''}`}
+                style={{ color: customContentColor }}
+            >
                 {body}
             </p>
         ) : null,
@@ -110,12 +118,20 @@ export default function HomeHero({
         buttons: (ctaLabel || ctaLabel2) ? (
             <div key="buttons" className={`flex flex-wrap gap-4 pt-2 w-full ${buttonJustifyClass}`}>
                 {ctaLabel && ctaUrl && (
-                    <a href={ctaUrl} className={`rounded-full px-8 py-3 text-sm font-semibold transition ${btnPrimaryClass}`}>
+                    <a 
+                        href={ctaUrl} 
+                        className={`rounded-full px-8 py-3 text-sm font-semibold transition hover:opacity-80 ${!customContentColor ? defaultBtnPrimary : ''}`}
+                        style={customContentColor ? { backgroundColor: customContentColor, color: '#ffffff' } : undefined}
+                    >
                         {ctaLabel}
                     </a>
                 )}
                 {ctaLabel2 && ctaUrl2 && (
-                    <a href={ctaUrl2} className={`rounded-full border px-8 py-3 text-sm font-semibold transition ${btnSecondaryClass}`}>
+                    <a 
+                        href={ctaUrl2} 
+                        className={`rounded-full border px-8 py-3 text-sm font-semibold transition hover:opacity-70 ${!customContentColor ? defaultBtnSecondary : ''}`}
+                        style={customContentColor ? { borderColor: customContentColor, color: customContentColor } : undefined}
+                    >
                         {ctaLabel2}
                     </a>
                 )}
@@ -126,10 +142,6 @@ export default function HomeHero({
     return order.map(key => components[key]);
   };
 
-  // --- KÉP MEGJELENÍTŐ ---
-  // JAVÍTÁS 2: Object-fit kezelés
-  // isStackMobile: Ha true, akkor mobilon vagyunk és a kép külön van (nem overlay).
-  // Ilyenkor object-contain-t használunk, hogy ne vágja le a szélét.
   const ImageSlider = ({ isStackMobile = false }: { isStackMobile?: boolean }) => (
     <>
       {images.length > 0 ? (
@@ -144,7 +156,6 @@ export default function HomeHero({
               src={getStorageUrl(path)}
               alt="Hero image"
               fill
-              // Mobilon (isStackMobile) 'contain', hogy kiférjen a felirat. Desktopon 'cover' a teljes kitöltésért.
               className={isStackMobile ? "object-contain md:object-cover" : "object-cover"}
               priority={idx === 0}
             />
@@ -164,12 +175,10 @@ export default function HomeHero({
   if (layout === "overlay") {
     return (
       <section className="flex flex-col md:block md:relative w-full bg-white md:bg-black md:h-[700px]">
-        
         {/* Kép Konténer */}
-        {/* JAVÍTÁS 2: aspect-[4/3] helyett aspect-video (szélesebb), így kevésbé kell kicsinyíteni a széles képet */}
         <div className="relative w-full aspect-video md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
              <ImageSlider isStackMobile={true} />
-             {/* Sötétítés CSAK Desktopon */}
+             {/* Sötétítés */}
              <div 
                 className="hidden md:block absolute inset-0 bg-black pointer-events-none transition-opacity duration-500" 
                 style={{ opacity: opacity / 100 }} 
@@ -177,15 +186,18 @@ export default function HomeHero({
         </div>
 
         {/* Tartalom Konténer */}
-        <div className={`
-            relative md:absolute md:inset-0 
-            px-6 py-12 md:p-12 
-            bg-white md:bg-transparent 
-            h-auto md:h-full 
-            pointer-events-none md:pointer-events-none
-            ${getAlignClasses(align)}
-        `}>
-            <div className="pointer-events-auto max-w-4xl flex flex-col gap-6 md:gap-8 w-full">
+        <div 
+            className={`
+                relative md:absolute md:inset-0 
+                px-6 py-12 md:p-12 
+                h-auto md:h-full 
+                pointer-events-none md:pointer-events-none
+                ${getAlignClasses(align)}
+            `}
+            // Mobilon ha van háttérszín, azt itt alkalmazzuk. Desktopon az overlay miatt átlátszó.
+            style={{ backgroundColor: customBgColor ? customBgColor : undefined }}
+        >
+            <div className={`pointer-events-auto max-w-4xl flex flex-col gap-6 md:gap-8 w-full`}>
                 {renderContent(true)}
             </div>
         </div>
@@ -193,16 +205,16 @@ export default function HomeHero({
     );
   }
 
-  // 2. ESET: STACK LAYOUT (Hagyományos)
+  // 2. ESET: STACK LAYOUT
   return (
-    <section className="bg-white">
-      {/* Kép sáv */}
-      {/* JAVÍTÁS 2: Itt is aspect-video a mobilhoz és object-contain a sliderben */}
+    <section 
+        className="bg-white"
+        style={{ backgroundColor: customBgColor }} // Háttérszín alkalmazása az egész szekcióra
+    >
       <div className="relative w-full aspect-video md:aspect-[3822/1254] max-h-[600px] overflow-hidden bg-neutral-50">
         <ImageSlider isStackMobile={true} />
       </div>
 
-      {/* Tartalom sáv */}
       <div className={`px-6 py-16 md:py-24 ${getAlignClasses(align)}`}>
          <div className="max-w-4xl flex flex-col gap-6 w-full">
             {renderContent(false)}

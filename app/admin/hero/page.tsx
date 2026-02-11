@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useState, ChangeEvent } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
-import type { HeroSettings, HeroComponentType } from "@/app/lib/getHomeHero"; // Importáljuk a típusokat
+import type { HeroSettings, HeroComponentType } from "@/app/lib/getHomeHero";
 
-// Segéd a címkékhez
 const COMPONENT_LABELS: Record<HeroComponentType, string> = {
     title: "Főcím",
     body: "Szöveg",
@@ -28,7 +27,9 @@ export default function AdminHeroPage() {
       layout: 'overlay',
       align: 'center-center',
       overlay_opacity: 50,
-      components_order: ['title', 'body', 'buttons'] // Alapértelmezett sorrend
+      components_order: ['title', 'body', 'buttons'],
+      content_color: "",
+      background_color: ""
   });
 
   useEffect(() => {
@@ -49,12 +50,13 @@ export default function AdminHeroPage() {
         setMediaPaths(data.media_paths || []);
         
         if (data.settings) {
-            // Biztosítjuk, hogy a settings objektum összeolvadjon a default-tal, ha valami hiányozna
             setSettings(prev => ({ 
                 ...prev, 
                 ...data.settings,
-                // Ha a régi DB adatban még nincs components_order, adjuk hozzá a defaultot
-                components_order: data.settings.components_order || ['title', 'body', 'buttons']
+                components_order: data.settings.components_order || ['title', 'body', 'buttons'],
+                // Ha még nincs szín az adatbázisban, üres stringet adunk
+                content_color: data.settings.content_color || "",
+                background_color: data.settings.background_color || ""
             }));
         }
       }
@@ -62,7 +64,6 @@ export default function AdminHeroPage() {
     })();
   }, []);
 
-  // --- KÉPFELTÖLTÉS ---
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     if (mediaPaths.length + e.target.files.length > 10) {
@@ -94,7 +95,6 @@ export default function AdminHeroPage() {
       setMediaPaths(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
-  // --- SORREND MÓDOSÍTÁS ---
   const moveItem = (index: number, direction: 'up' | 'down') => {
       const newOrder = [...(settings.components_order || ['title', 'body', 'buttons'])];
       if (direction === 'up' && index > 0) {
@@ -105,7 +105,6 @@ export default function AdminHeroPage() {
       setSettings({ ...settings, components_order: newOrder });
   };
 
-  // --- MENTÉS ---
   async function save() {
     setSaving(true);
     const { error } = await supabase
@@ -144,7 +143,7 @@ export default function AdminHeroPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* BAL OSZLOP: TARTALOM */}
+        {/* BAL OSZLOP */}
         <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Szöveges tartalom</h2>
@@ -177,9 +176,8 @@ export default function AdminHeroPage() {
             </div>
         </div>
 
-        {/* JOBB OSZLOP: KÉPEK ÉS BEÁLLÍTÁSOK */}
+        {/* JOBB OSZLOP */}
         <div className="space-y-6">
-            
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Képek</h2>
                 <div className="mb-4">
@@ -193,7 +191,6 @@ export default function AdminHeroPage() {
                         <div key={idx} className="relative group aspect-video bg-neutral-100 rounded overflow-hidden">
                             <img src={getStorageUrl(path)} className="w-full h-full object-cover" alt="" />
                             <button onClick={() => removeImage(idx)} className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition text-xs">🗑️</button>
-                            <span className="absolute bottom-1 left-1 bg-black/50 text-white text-[10px] px-1 rounded">{idx + 1}</span>
                         </div>
                     ))}
                 </div>
@@ -202,7 +199,65 @@ export default function AdminHeroPage() {
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Megjelenés & Sorrend</h2>
 
-                {/* Layout */}
+                {/* SZÍNEK (ÚJ) */}
+                <div className="mb-6 p-4 bg-neutral-50 rounded-lg border">
+                    <h3 className="text-sm font-bold text-neutral-700 mb-3 uppercase">Egyedi Színek</h3>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Tartalom Szín */}
+                        <div>
+                            <label className="block text-xs font-semibold mb-1">Tartalom (Szöveg/Gomb)</label>
+                            <div className="flex items-center gap-2">
+                                <input 
+                                    type="color" 
+                                    value={settings.content_color || '#000000'} 
+                                    onChange={(e) => setSettings({...settings, content_color: e.target.value})}
+                                    className="w-10 h-10 border rounded cursor-pointer"
+                                />
+                                <input 
+                                    type="text"
+                                    placeholder="#000000"
+                                    value={settings.content_color || ''}
+                                    onChange={(e) => setSettings({...settings, content_color: e.target.value})}
+                                    className="w-full border p-2 rounded text-sm uppercase"
+                                />
+                            </div>
+                            <button 
+                                onClick={() => setSettings({...settings, content_color: ""})}
+                                className="text-xs text-red-500 mt-1 underline"
+                            >
+                                Visszaállítás alapra
+                            </button>
+                        </div>
+
+                        {/* Háttérszín */}
+                        <div>
+                            <label className="block text-xs font-semibold mb-1">Háttérszín (Kép alatt)</label>
+                            <div className="flex items-center gap-2">
+                                <input 
+                                    type="color" 
+                                    value={settings.background_color || '#ffffff'} 
+                                    onChange={(e) => setSettings({...settings, background_color: e.target.value})}
+                                    className="w-10 h-10 border rounded cursor-pointer"
+                                />
+                                <input 
+                                    type="text"
+                                    placeholder="#ffffff"
+                                    value={settings.background_color || ''}
+                                    onChange={(e) => setSettings({...settings, background_color: e.target.value})}
+                                    className="w-full border p-2 rounded text-sm uppercase"
+                                />
+                            </div>
+                            <button 
+                                onClick={() => setSettings({...settings, background_color: ""})}
+                                className="text-xs text-red-500 mt-1 underline"
+                            >
+                                Visszaállítás alapra
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="mb-6">
                     <label className="block text-sm font-medium mb-2">Desktop Elrendezés (Mobilon mindig Stack)</label>
                     <div className="grid grid-cols-2 gap-2">
@@ -211,7 +266,6 @@ export default function AdminHeroPage() {
                     </div>
                 </div>
 
-                {/* Sötétítés */}
                 {settings.layout === 'overlay' && (
                     <div className="mb-6">
                         <label className="block text-sm font-medium mb-1">Háttér sötétítés: {settings.overlay_opacity}%</label>
@@ -219,7 +273,6 @@ export default function AdminHeroPage() {
                     </div>
                 )}
 
-                {/* SORREND SZERKESZTŐ (ÚJ) */}
                 <div className="mb-6">
                     <label className="block text-sm font-medium mb-2">Tartalom Sorrendje</label>
                     <div className="flex flex-col gap-2">
@@ -227,27 +280,14 @@ export default function AdminHeroPage() {
                             <div key={item} className="flex items-center justify-between p-3 bg-neutral-50 border rounded-lg">
                                 <span className="font-medium text-sm">{COMPONENT_LABELS[item]}</span>
                                 <div className="flex gap-1">
-                                    <button 
-                                        onClick={() => moveItem(index, 'up')} 
-                                        disabled={index === 0}
-                                        className="p-1 hover:bg-neutral-200 rounded disabled:opacity-30"
-                                    >
-                                        ⬆️
-                                    </button>
-                                    <button 
-                                        onClick={() => moveItem(index, 'down')} 
-                                        disabled={index === 2}
-                                        className="p-1 hover:bg-neutral-200 rounded disabled:opacity-30"
-                                    >
-                                        ⬇️
-                                    </button>
+                                    <button onClick={() => moveItem(index, 'up')} disabled={index === 0} className="p-1 hover:bg-neutral-200 rounded disabled:opacity-30">⬆️</button>
+                                    <button onClick={() => moveItem(index, 'down')} disabled={index === 2} className="p-1 hover:bg-neutral-200 rounded disabled:opacity-30">⬇️</button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Igazítás */}
                 <div>
                     <label className="block text-sm font-medium mb-2">Igazítás</label>
                     <div className="w-32 mx-auto grid grid-cols-3 gap-2 p-2 bg-neutral-100 rounded-lg">
