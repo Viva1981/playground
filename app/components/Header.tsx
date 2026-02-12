@@ -1,44 +1,23 @@
-import Link from "next/link";
-import Image from "next/image";
+// app/components/Header.tsx
+import { getHomeSection } from "@/app/lib/getHomeSection";
+import HeaderClient from "./HeaderClient";
+import type { HeaderSettings } from "@/app/lib/types";
 
-export default function Header() {
-  return (
-    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
-      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-        {/* LOGO - Klikkelhető, a főoldalra visz */}
-        <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-          <div className="relative w-10 h-10 overflow-hidden rounded-full border border-gray-200">
-            <Image
-              src="/logo.jpg"
-              alt="Vis Eat Miskolc Logo"
-              fill
-              className="object-cover"
-              sizes="40px"
-              priority
-            />
-          </div>
-          <span className="font-bold text-lg tracking-tight text-gray-900 hidden sm:block">
-            Vis Eat Miskolc
-          </span>
-        </Link>
+export default async function Header() {
+  const data = await getHomeSection("global_header");
+  
+  // Típus kényszerítés, mert a getHomeSection generic
+  const settings = (data?.settings as HeaderSettings) || null;
+  
+  // Logo URL összeállítása
+  let logoUrl = null;
+  if (data?.media_paths && data.media_paths.length > 0) {
+      logoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${data.media_paths[0]}`;
+  } else {
+      // Fallback logo, ha nincs feltöltve semmi (pl. a public mappából)
+      // Ha szeretnéd, hogy üres legyen, akkor null.
+      logoUrl = "/logo.jpg"; 
+  }
 
-        {/* NAVIGÁCIÓ */}
-        <nav className="flex items-center gap-4">
-          <Link
-            href="/#events"
-            className="text-sm font-medium text-gray-600 hover:text-black hover:bg-gray-50 px-3 py-2 rounded-md transition-all"
-          >
-            Események
-          </Link>
-          
-          <Link
-            href="/restaurants"
-            className="px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-lg transition-colors shadow-sm"
-          >
-            Éttermek
-          </Link>
-        </nav>
-      </div>
-    </header>
-  );
+  return <HeaderClient settings={settings} logoUrl={logoUrl} />;
 }

@@ -34,3 +34,14 @@ export type HeroSettings = {
     | 'bottom-left' | 'bottom-center' | 'bottom-right';
   overlay_opacity: number; // 0-100 közötti érték
 };
+
+export type MenuItem = {
+  label: string;
+  url: string;
+};
+
+export type HeaderSettings = {
+  background_color?: string; // Header háttér
+  content_color?: string;    // Ikonok és szöveg színe
+  menu_items?: MenuItem[];   // Dinamikus menüpontok
+};
