@@ -1,37 +1,50 @@
+// app/page.tsx
 import HomeHero from "@/app/components/HomeHero";
 import HomeAbout from "@/app/components/HomeAbout";
-import HomeEvents from "@/app/components/HomeEvents";
-
+import HomeEvents from "@/app/components/HomeEvents"; 
 import { getHomeHero } from "@/app/lib/getHomeHero";
 import { getHomeSection } from "@/app/lib/getHomeSection";
-import { getUpcomingEvents } from "@/app/lib/getUpcomingEvents";
+import type { AboutSettings } from "@/app/lib/types";
 
+// Fontos: mivel adatbázisból dolgozunk, ne cache-eljen agresszívan
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const hero = await getHomeHero();
-  const about = await getHomeSection("home_about");
-  const events = await getUpcomingEvents(6);
+export default async function Home() {
+  // Párhuzamos adatlekérés
+  // FIGYELEM: Az eseményeket (getUpcomingEvents) INNEN KIVETTÜK,
+  // mert a <HomeEvents /> komponens már intézi magának belül!
+  const [hero, about] = await Promise.all([
+    getHomeHero(),
+    getHomeSection("home_about"),
+  ]);
 
   return (
     <main>
-      {hero ? (
-        <HomeHero
-          title={hero.title}
-          body={hero.body}
-          ctaLabel={hero.cta_label}
-          ctaUrl={hero.cta_url}
-          ctaLabel2={hero.cta_label_2}
-          ctaUrl2={hero.cta_url_2}
-          // Új propok átadása a komponensnek
-          mediaPaths={hero.media_paths}
-          settings={hero.settings}
+      {/* HERO SZEKCIÓ */}
+      <HomeHero
+        title={hero?.title ?? null}
+        body={hero?.body ?? null}
+        ctaLabel={hero?.cta_label ?? null}
+        ctaUrl={hero?.cta_url ?? null}
+        ctaLabel2={hero?.cta_label_2 ?? null}
+        ctaUrl2={hero?.cta_url_2 ?? null}
+        mediaPaths={hero?.media_paths ?? []}
+        settings={hero?.settings}
+      />
+
+      {/* ABOUT SZEKCIÓ */}
+      {about ? (
+        <HomeAbout
+          title={about.title}
+          body={about.body}
+          // Típus kényszerítés, ha szükséges, de a types.ts közösítése miatt jónak kell lennie
+          settings={about.settings as AboutSettings}
         />
       ) : null}
 
-      {about ? <HomeAbout title={about.title} body={about.body} settings={about.settings} /> : null}
-
-      <HomeEvents events={events} />
+      {/* EVENTS SZEKCIÓ - JAVÍTVA: Nincs prop átadás! */}
+      <HomeEvents />
+      
     </main>
   );
 }
