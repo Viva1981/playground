@@ -62,3 +62,9 @@ export type HeaderSettings = {
   site_title?: string; // ÚJ MEZŐ: Az oldal címe szövegesen
   menu_items?: MenuItem[];
 };
+
+// --- HOME EVENTS SZEKCIÓ ---
+export type EventsSectionSettings = {
+  background_color?: string;
+  content_color?: string;
+};

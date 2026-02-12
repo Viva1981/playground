@@ -102,6 +102,14 @@ export default function AdminDashboardPage() {
             <div className="mt-1 text-lg font-semibold">About / Vision</div>
           </a>
 
+          <a
+            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
+            href="/admin/home-events"
+          >
+            <div className="text-sm text-neutral-600">Főoldal</div>
+            <div className="mt-1 text-lg font-semibold">Home Események (Design)</div>
+          </a>
+
           {/* --- TARTALOM KEZELÉS --- */}
 
           <a
