@@ -1,4 +1,4 @@
-import type { AboutSettings, AboutComponentType } from "@/app/lib/getHomeSection";
+import type { AboutSettings, AboutComponentType } from "@/app/lib/types";
 
 type Props = {
   title?: string | null;

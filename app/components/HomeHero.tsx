@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import type { HeroSettings, HeroComponentType } from "@/app/lib/getHomeHero";
+import type { HeroSettings, HeroComponentType } from "@/app/lib/types";
 
 const getStorageUrl = (path: string) => {
   if (!path) return "";
