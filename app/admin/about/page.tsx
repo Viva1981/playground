@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
-import type { AboutSettings, AboutComponentType } from "@/app/lib/getHomeSection";
+import type { AboutSettings, AboutComponentType } from "@/app/lib/types";
 
 export const dynamic = "force-dynamic";
 // Segéd a címkékhez

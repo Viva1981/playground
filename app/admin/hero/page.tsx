@@ -1,7 +1,9 @@
+// app/admin/hero/page.tsx
 "use client";
 import { useEffect, useState, ChangeEvent } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
-import type { HeroSettings, HeroComponentType } from "@/app/lib/getHomeHero";
+// JAVÍTVA: A Hero típusokat importáljuk, nem az About-ot
+import type { HeroSettings, HeroComponentType } from "@/app/lib/types";
 
 const COMPONENT_LABELS: Record<HeroComponentType, string> = {
     title: "Főcím",
@@ -23,6 +25,8 @@ export default function AdminHeroPage() {
   const [ctaUrl2, setCtaUrl2] = useState("");
 
   const [mediaPaths, setMediaPaths] = useState<string[]>([]);
+  
+  // Kezdeti állapot típushelyesen
   const [settings, setSettings] = useState<HeroSettings>({
       layout: 'overlay',
       align: 'center-center',
@@ -50,13 +54,14 @@ export default function AdminHeroPage() {
         setMediaPaths(data.media_paths || []);
         
         if (data.settings) {
+            // Biztonságos casting és merge
+            const dbSettings = data.settings as HeroSettings;
             setSettings(prev => ({ 
                 ...prev, 
-                ...data.settings,
-                components_order: data.settings.components_order || ['title', 'body', 'buttons'],
-                // Ha még nincs szín az adatbázisban, üres stringet adunk
-                content_color: data.settings.content_color || "",
-                background_color: data.settings.background_color || ""
+                ...dbSettings,
+                components_order: dbSettings.components_order || ['title', 'body', 'buttons'],
+                content_color: dbSettings.content_color || "",
+                background_color: dbSettings.background_color || ""
             }));
         }
       }
@@ -125,6 +130,13 @@ export default function AdminHeroPage() {
 
   const getStorageUrl = (path: string) => 
     `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${path}`;
+
+  // Típusdefiníció az igazításokhoz a mapeléshez
+  const alignments: HeroSettings['align'][] = [
+    'top-left', 'top-center', 'top-right', 
+    'center-left', 'center-center', 'center-right', 
+    'bottom-left', 'bottom-center', 'bottom-right'
+  ];
 
   if (loading) return <div className="p-6">Betöltés...</div>;
 
@@ -199,7 +211,7 @@ export default function AdminHeroPage() {
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Megjelenés & Sorrend</h2>
 
-                {/* SZÍNEK (ÚJ) */}
+                {/* SZÍNEK */}
                 <div className="mb-6 p-4 bg-neutral-50 rounded-lg border">
                     <h3 className="text-sm font-bold text-neutral-700 mb-3 uppercase">Egyedi Színek</h3>
                     
@@ -291,7 +303,7 @@ export default function AdminHeroPage() {
                 <div>
                     <label className="block text-sm font-medium mb-2">Igazítás</label>
                     <div className="w-32 mx-auto grid grid-cols-3 gap-2 p-2 bg-neutral-100 rounded-lg">
-                        {['top-left', 'top-center', 'top-right', 'center-left', 'center-center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'].map((pos) => (
+                        {alignments.map((pos) => (
                             <button key={pos} onClick={() => setSettings({...settings, align: pos})} className={`w-8 h-8 rounded border ${settings.align === pos ? 'bg-black border-black' : 'bg-white hover:border-black'}`}>
                                 <div className={`w-2 h-2 rounded-full mx-auto ${settings.align === pos ? 'bg-white' : 'bg-neutral-300'}`} />
                             </button>
