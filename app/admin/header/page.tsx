@@ -9,13 +9,14 @@ export default function AdminHeaderPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Logo (media_paths[0])
+  // Logo
   const [logoPath, setLogoPath] = useState<string | null>(null);
   
   // Settings
   const [settings, setSettings] = useState<HeaderSettings>({
       background_color: "#ffffff",
       content_color: "#000000",
+      site_title: "", // Kezdeti érték
       menu_items: []
   });
 
@@ -28,17 +29,17 @@ export default function AdminHeaderPage() {
         .single();
 
       if (data) {
-        // Logó betöltése (az első kép a tömbben)
         if (data.media_paths && data.media_paths.length > 0) {
             setLogoPath(data.media_paths[0]);
         }
         
         if (data.settings) {
+            const dbSettings = data.settings as HeaderSettings;
             setSettings(prev => ({ 
                 ...prev, 
-                ...data.settings,
-                // Biztosítjuk, hogy legyen array, ha null lenne
-                menu_items: data.settings.menu_items || []
+                ...dbSettings,
+                site_title: dbSettings.site_title || "", // Betöltés
+                menu_items: dbSettings.menu_items || []
             }));
         }
       }
@@ -46,7 +47,7 @@ export default function AdminHeaderPage() {
     })();
   }, []);
 
-  // --- Képfeltöltés (Logo) ---
+  // --- Képfeltöltés ---
   const handleLogoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     setUploading(true);
@@ -60,7 +61,7 @@ export default function AdminHeaderPage() {
         const { error: uploadError } = await supabase.storage.from("public-media").upload(filePath, file);
         if (uploadError) throw uploadError;
 
-        setLogoPath(filePath); // Csak egy logónk van, lecseréljük
+        setLogoPath(filePath); 
     } catch (error) {
         console.error(error);
         alert("Hiba a feltöltés során!");
@@ -72,7 +73,7 @@ export default function AdminHeaderPage() {
 
   const removeLogo = () => setLogoPath(null);
 
-  // --- Menüpontok kezelése ---
+  // --- Menüpontok ---
   const addMenuItem = () => {
       setSettings({
           ...settings,
@@ -94,7 +95,6 @@ export default function AdminHeaderPage() {
   // --- Mentés ---
   async function save() {
     setSaving(true);
-    // A media_paths tömbbe mentjük a logót
     const mediaToSave = logoPath ? [logoPath] : [];
 
     const { error } = await supabase
@@ -130,23 +130,40 @@ export default function AdminHeaderPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* BAL OSZLOP: Megjelenés & Logo */}
+        {/* BAL OSZLOP */}
         <div className="space-y-6">
-            {/* LOGO */}
+            
+            {/* LOGO & CÍM */}
             <div className="bg-white p-6 rounded-xl border shadow-sm">
-                <h2 className="text-lg font-semibold mb-4">Logó</h2>
-                {!logoPath ? (
-                    <label className="block w-full p-8 border-2 border-dashed rounded-xl text-center cursor-pointer hover:bg-neutral-50 transition">
-                        <span className="text-sm font-medium text-neutral-600">{uploading ? "Feltöltés..." : "+ Logó feltöltése"}</span>
-                        <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={uploading} />
-                    </label>
-                ) : (
-                    <div className="relative group w-full max-w-[200px] aspect-square bg-neutral-100 rounded-lg overflow-hidden border mx-auto">
-                        <img src={getStorageUrl(logoPath)} className="w-full h-full object-contain p-2" alt="Logo" />
-                        <button onClick={removeLogo} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition text-xs">🗑️</button>
-                    </div>
-                )}
-                <p className="text-xs text-gray-500 mt-2 text-center">Ha nincs kép feltöltve, a szöveges "Vis Eat Miskolc" jelenik meg.</p>
+                <h2 className="text-lg font-semibold mb-4">Logó és Cím</h2>
+                
+                {/* Logo feltöltés */}
+                <div className="mb-6">
+                    {!logoPath ? (
+                        <label className="block w-full p-8 border-2 border-dashed rounded-xl text-center cursor-pointer hover:bg-neutral-50 transition">
+                            <span className="text-sm font-medium text-neutral-600">{uploading ? "Feltöltés..." : "+ Logó feltöltése"}</span>
+                            <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={uploading} />
+                        </label>
+                    ) : (
+                        <div className="relative group w-full max-w-[200px] aspect-square bg-neutral-100 rounded-lg overflow-hidden border mx-auto mb-2">
+                            <img src={getStorageUrl(logoPath)} className="w-full h-full object-contain p-2" alt="Logo" />
+                            <button onClick={removeLogo} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition text-xs">🗑️</button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Oldal címe (ÚJ RÉSZ) */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Oldal Címe (Logó mellett)</label>
+                    <input 
+                        type="text" 
+                        placeholder="pl. Vis Eat Miskolc (Hagyd üresen, ha nem kell)" 
+                        value={settings.site_title || ""}
+                        onChange={(e) => setSettings({...settings, site_title: e.target.value})}
+                        className="w-full border p-3 rounded-lg"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Ha üresen hagyod, csak a logó jelenik meg.</p>
+                </div>
             </div>
 
             {/* SZÍNEK */}

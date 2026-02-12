@@ -59,5 +59,6 @@ export type MenuItem = {
 export type HeaderSettings = {
   background_color?: string;
   content_color?: string;
+  site_title?: string; // ÚJ MEZŐ: Az oldal címe szövegesen
   menu_items?: MenuItem[];
 };

@@ -16,6 +16,8 @@ export default function HeaderClient({ settings, logoUrl }: Props) {
 
   const bgColor = settings?.background_color || "#ffffff";
   const contentColor = settings?.content_color || "#000000";
+  // Itt olvassuk ki a címet
+  const siteTitle = settings?.site_title || null;
   const menuItems = settings?.menu_items || [];
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -29,7 +31,7 @@ export default function HeaderClient({ settings, logoUrl }: Props) {
       >
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           
-          {/* LOGO */}
+          {/* LOGO + CÍM */}
           <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity" onClick={closeMenu}>
             {logoUrl ? (
               <div className="relative w-12 h-12 overflow-hidden rounded-full border border-gray-100">
@@ -43,16 +45,19 @@ export default function HeaderClient({ settings, logoUrl }: Props) {
                 />
               </div>
             ) : null}
-            <span 
-                className="font-bold text-lg tracking-tight hidden sm:block"
-                style={{ color: contentColor }}
-            >
-              Vis Eat Miskolc
-            </span>
+            
+            {/* CSAK AKKOR JELENIK MEG, HA VAN KITÖLTVE CÍM */}
+            {siteTitle && (
+                <span 
+                    className="font-bold text-lg tracking-tight hidden sm:block"
+                    style={{ color: contentColor }}
+                >
+                  {siteTitle}
+                </span>
+            )}
           </Link>
 
-          {/* HAMBURGER ICON (Desktopon is ez lesz a kérésed szerint, de általában desktopon ki szokták írni a menüt. 
-              Ha szeretnéd, hogy desktopon látszódjanak a linkek, szólj. Most "Mobile-first" mindenhol hamburger lesz a kérés alapján.) */}
+          {/* HAMBURGER ICON */}
           <button 
             onClick={toggleMenu}
             className="p-2 -mr-2 focus:outline-none"
@@ -72,7 +77,7 @@ export default function HeaderClient({ settings, logoUrl }: Props) {
         className={`fixed inset-0 z-40 bg-white/95 backdrop-blur-md transition-transform duration-500 ease-in-out flex flex-col items-center justify-center ${
             isOpen ? "translate-y-0" : "-translate-y-full"
         }`}
-        style={{ backgroundColor: bgColor }} // Az overlay is örökli a háttérszínt, vagy legyen fix? Most örökli.
+        style={{ backgroundColor: bgColor }}
       >
         <nav className="flex flex-col items-center gap-8 text-center">
             {menuItems.map((item, idx) => (
@@ -86,9 +91,6 @@ export default function HeaderClient({ settings, logoUrl }: Props) {
                     {item.label}
                 </Link>
             ))}
-
-            {/* Admin által nem szerkeszthető, fix extra gombok (opcionális) */}
-            {/* Pl. ha be van jelentkezve admin, itt megjelenhetne egy link az admin felületre */}
         </nav>
       </div>
     </>
