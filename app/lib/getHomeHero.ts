@@ -1,25 +1,13 @@
 // app/lib/getHomeHero.ts
-
 import { createClient } from "@supabase/supabase-js";
 import { unstable_noStore as noStore } from "next/cache";
+// IMPORTÁLJUK a közös típust!
+import type { HeroSettings } from "./types";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
-export type HeroComponentType = 'title' | 'body' | 'buttons';
-
-export type HeroSettings = {
-  layout: 'overlay' | 'stack';
-  align: string;
-  overlay_opacity: number;
-  components_order?: HeroComponentType[];
-  // ÚJ SZÍN BEÁLLÍTÁSOK:
-  content_color?: string;      // Szöveg és gombok színe (pl. #e43c65)
-  background_color?: string;   // Háttérszín (csak Stack nézethez)
-};
-
 
 export type HomeHeroData = {
   title: string | null;
@@ -29,7 +17,7 @@ export type HomeHeroData = {
   cta_label_2: string | null;
   cta_url_2: string | null;
   media_paths: string[] | null;
-  settings: HeroSettings | null;
+  settings: HeroSettings | null; // Itt már a szigorú típust használjuk
 };
 
 export async function getHomeHero(): Promise<HomeHeroData | null> {
@@ -41,5 +29,17 @@ export async function getHomeHero(): Promise<HomeHeroData | null> {
     .eq("key", "home_hero")
     .single();
 
-  return data;
+  if (!data) return null;
+
+  return {
+    title: data.title,
+    body: data.body,
+    cta_label: data.cta_label,
+    cta_url: data.cta_url,
+    cta_label_2: data.cta_label_2,
+    cta_url_2: data.cta_url_2,
+    media_paths: data.media_paths,
+    // Kényszerítjük a típust, mert a DB-ből JSONB (any) jön
+    settings: (data.settings as unknown as HeroSettings) || null
+  };
 }

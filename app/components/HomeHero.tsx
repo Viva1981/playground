@@ -1,3 +1,4 @@
+// app/components/HomeHero.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -53,27 +54,20 @@ export default function HomeHero({
     return () => clearInterval(interval);
   }, [images.length]);
 
-  // --- POZÍCIÓ ÉS IGAZÍTÁS LOGIKA (JAVÍTVA) ---
-  // Egy objektumban adjuk vissza a szükséges osztályokat, hogy minden szinkronban legyen
+  // --- POZÍCIÓ ÉS IGAZÍTÁS LOGIKA ---
   const getPositionClasses = (alignStr: string) => {
-    // Alapértelmezett MOBIL nézet: Mindig középre rendezett, flex oszlop
     const mobileBase = "flex flex-col justify-center items-center text-center";
-    
-    // Desktop logikák (md: prefix-szel)
-    // 1. A konténer elhelyezése a rácsban (justify/items)
-    // 2. A szöveg igazítása (text-left/center/right)
-    // 3. A gombok igazítása (justify-start/center/end)
     
     let desktopContainer = "";
     let desktopText = "";
     let desktopButtonAlign = "";
 
-    // Függőleges pozíció
+    // Függőleges
     if (alignStr.startsWith("top")) desktopContainer += "md:justify-start ";
     else if (alignStr.startsWith("bottom")) desktopContainer += "md:justify-end ";
     else desktopContainer += "md:justify-center ";
 
-    // Vízszintes pozíció + Szöveg igazítás + Gomb igazítás
+    // Vízszintes
     if (alignStr.includes("left")) {
         desktopContainer += "md:items-start ";
         desktopText = "md:text-left";
@@ -90,7 +84,7 @@ export default function HomeHero({
 
     return {
         container: `${mobileBase} ${desktopContainer} ${desktopText}`,
-        buttonAlign: `justify-center ${desktopButtonAlign}` // Mobilon center, Desktopon változó
+        buttonAlign: `justify-center ${desktopButtonAlign}`
     };
   };
 
@@ -109,7 +103,8 @@ export default function HomeHero({
         ? "md:border-white md:text-white border-neutral-300 text-black"
         : "border-neutral-300 bg-white text-black";
 
-    const components = {
+    // A kulcsok típusa HeroComponentType kell legyen
+    const components: Record<HeroComponentType, React.ReactNode> = {
         title: title ? (
             <h1 
                 key="title" 
@@ -186,7 +181,6 @@ export default function HomeHero({
 
   // --- FŐ RENDER LOGIKA ---
   
-  // 1. ESET: OVERLAY LAYOUT (Desktopon)
   if (layout === "overlay") {
     return (
       <section className="flex flex-col md:block md:relative w-full bg-white md:bg-black md:h-[700px]">
@@ -212,11 +206,6 @@ export default function HomeHero({
             `}
             style={{ backgroundColor: customBgColor ? customBgColor : undefined }}
         >
-            {/* 
-               Belső tartalom doboz:
-               - max-w-3xl: Hogy ne folyjon szét
-               - w-full: Hogy kitöltse a teret a max szélességig
-            */}
             <div className="pointer-events-auto w-full max-w-3xl flex flex-col gap-6 md:gap-8">
                 {renderContent(true)}
             </div>
@@ -225,7 +214,7 @@ export default function HomeHero({
     );
   }
 
-  // 2. ESET: STACK LAYOUT
+  // STACK LAYOUT
   return (
     <section 
         className="bg-white"
