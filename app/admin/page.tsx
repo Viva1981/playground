@@ -1,3 +1,4 @@
+// app/admin/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -73,37 +74,52 @@ export default function AdminDashboardPage() {
           </button>
         </div>
 
-        <div className="mt-8 grid gap-4">
+        <div className="mt-8 grid gap-4 grid-cols-1 md:grid-cols-2">
+          
+          {/* --- GLOBÁLIS BEÁLLÍTÁSOK --- */}
+          
           <a
-            className="rounded-2xl border p-5 hover:bg-neutral-50"
+            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
+            href="/admin/header"
+          >
+            <div className="text-sm text-neutral-600">Globális</div>
+            <div className="mt-1 text-lg font-semibold">Fejléc (Header)</div>
+          </a>
+
+          <a
+            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
             href="/admin/hero"
           >
-            <div className="text-sm text-neutral-600">Szerkesztő</div>
-            <div className="mt-1 text-lg font-semibold">Home Hero</div>
+            <div className="text-sm text-neutral-600">Főoldal</div>
+            <div className="mt-1 text-lg font-semibold">Hero Szekció</div>
           </a>
+
           <a
-  className="rounded-2xl border p-5 hover:bg-neutral-50"
-  href="/admin/about"
->
-  <div className="text-sm text-neutral-600">Szerkesztő</div>
-  <div className="mt-1 text-lg font-semibold">Home About / Vision</div>
-</a>
-<a
-  className="rounded-2xl border p-5 hover:bg-neutral-50"
-  href="/admin/events"
->
-  <div className="text-sm text-neutral-600">Kezelés</div>
-  <div className="mt-1 text-lg font-semibold">Események</div>
-</a>
-<a
-  href="/admin/restaurants"
-  className="block rounded-xl border bg-white p-6 shadow-sm hover:border-black transition"
->
-  <div className="text-lg font-semibold">Éttermek</div>
-  <div className="text-sm text-neutral-600">
-    Partnerek kezelése, adatok, képek.
-  </div>
-</a>
+            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
+            href="/admin/about"
+          >
+            <div className="text-sm text-neutral-600">Főoldal</div>
+            <div className="mt-1 text-lg font-semibold">About / Vision</div>
+          </a>
+
+          {/* --- TARTALOM KEZELÉS --- */}
+
+          <a
+            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
+            href="/admin/events"
+          >
+            <div className="text-sm text-neutral-600">Tartalom</div>
+            <div className="mt-1 text-lg font-semibold">Események</div>
+          </a>
+
+          <a
+            href="/admin/restaurants"
+            className="rounded-2xl border p-5 hover:bg-neutral-50 transition md:col-span-2 bg-neutral-900 text-white hover:bg-neutral-800"
+          >
+             <div className="text-sm opacity-80">Adatbázis</div>
+             <div className="mt-1 text-lg font-semibold">Éttermek & Partnerek</div>
+          </a>
+          
         </div>
       </div>
     </main>
