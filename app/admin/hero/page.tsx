@@ -33,7 +33,8 @@ export default function AdminHeroPage() {
       overlay_opacity: 50,
       components_order: ['title', 'body', 'buttons'],
       content_color: "",
-      background_color: ""
+      background_color: "",
+      primary_button_text_color: ""
   });
 
   useEffect(() => {
@@ -61,7 +62,8 @@ export default function AdminHeroPage() {
                 ...dbSettings,
                 components_order: dbSettings.components_order || ['title', 'body', 'buttons'],
                 content_color: dbSettings.content_color || "",
-                background_color: dbSettings.background_color || ""
+                background_color: dbSettings.background_color || "",
+                primary_button_text_color: dbSettings.primary_button_text_color || ""
             }));
         }
       }
@@ -181,9 +183,32 @@ export default function AdminHeroPage() {
                  <h2 className="text-lg font-semibold mb-4">Gombok</h2>
                  <div className="mb-4 pb-4 border-b">
                     <h3 className="text-sm font-bold text-neutral-500 mb-2 uppercase">Elsődleges (Fekete)</h3>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3 mb-3">
                         <input className="border p-2 rounded" placeholder="Felirat" value={ctaLabel} onChange={e => setCtaLabel(e.target.value)} />
                         <input className="border p-2 rounded" placeholder="URL" value={ctaUrl} onChange={e => setCtaUrl(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1">Gomb szövegszíne</label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="color" 
+                          value={settings.primary_button_text_color || '#000000'} 
+                          onChange={(e) => setSettings({...settings, primary_button_text_color: e.target.value})}
+                          className="w-10 h-10 border rounded cursor-pointer"
+                        />
+                        <input 
+                          type="text"
+                          value={settings.primary_button_text_color || ''}
+                          onChange={(e) => setSettings({...settings, primary_button_text_color: e.target.value})}
+                          className="w-full border p-2 rounded text-sm uppercase"
+                        />
+                      </div>
+                      <button 
+                        onClick={() => setSettings({...settings, primary_button_text_color: ""})}
+                        className="text-xs text-red-500 mt-1 underline"
+                      >
+                        Alaphelyzet
+                      </button>
                     </div>
                  </div>
                  <div>

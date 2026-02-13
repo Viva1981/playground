@@ -131,7 +131,10 @@ export default function HomeHero({
                     <a 
                         href={ctaUrl} 
                         className={`rounded-full px-8 py-3 text-sm font-semibold transition hover:opacity-80 ${!customContentColor ? defaultBtnPrimary : ''}`}
-                        style={customContentColor ? { backgroundColor: customContentColor, color: '#ffffff' } : undefined}
+                        style={customContentColor ? { 
+                          backgroundColor: customContentColor, 
+                          color: settings?.primary_button_text_color || '#000000' 
+                        } : undefined}
                     >
                         {ctaLabel}
                     </a>

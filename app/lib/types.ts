@@ -39,6 +39,7 @@ export type HeroSettings = {
   components_order?: HeroComponentType[];
   content_color?: string;
   background_color?: string;
+  primary_button_text_color?: string;
 };
 
 // --- ABOUT SZEKCIÓ (EZ HIÁNYZOTT AZ EXPORTBÓL) ---
