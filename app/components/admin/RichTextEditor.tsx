@@ -1,7 +1,7 @@
 // app/components/admin/RichTextEditor.tsx
 "use client";
 
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 
 interface RichTextEditorProps {
   value: string;
