@@ -1,3 +1,31 @@
+  async function deleteGalleryImage(imgPath: string) {
+    if (!event) return;
+    if (!confirm("Biztosan törlöd ezt a galéria képet?")) return;
+    setGalleryUploading(true);
+    setError(null);
+    // 1. Storage törlés
+    const { error: storageError } = await supabase.storage
+      .from("public-media")
+      .remove([imgPath]);
+    if (storageError) {
+      setError("Kép törlése sikertelen: " + storageError.message);
+      setGalleryUploading(false);
+      return;
+    }
+    // 2. gallery_paths frissítés
+    const newGallery = (event.gallery_paths ?? []).filter((p) => p !== imgPath);
+    const { error: dbError } = await supabase
+      .from("events")
+      .update({ gallery_paths: newGallery })
+      .eq("id", event.id);
+    if (dbError) {
+      setError("Adatbázis frissítés sikertelen: " + dbError.message);
+      setGalleryUploading(false);
+      return;
+    }
+    setEvent({ ...event, gallery_paths: newGallery });
+    setGalleryUploading(false);
+  }
 "use client";
 
 import { useEffect, useState, use } from "react";
@@ -295,6 +323,17 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                       fill
                       className="object-cover"
                     />
+                    {/* X törlés gomb */}
+                    <button
+                      type="button"
+                      onClick={() => deleteGalleryImage(imgPath)}
+                      className="absolute top-1 right-1 z-10 bg-white bg-opacity-80 rounded-full w-7 h-7 flex items-center justify-center text-red-600 border border-red-200 shadow hover:bg-red-100 transition"
+                      style={{ fontSize: '1rem', lineHeight: 1 }}
+                      disabled={galleryUploading}
+                      title="Kép törlése"
+                    >
+                      ×
+                    </button>
                   </div>
                 ))}
               </div>
