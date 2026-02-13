@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 // Frissített típus
+import { v4 as uuidv4 } from "uuid";
 type EventRow = {
   id: string;
   title: string;
@@ -14,7 +15,8 @@ type EventRow = {
   summary: string | null;
   is_published: boolean;
   cover_path: string | null;
-  restaurant_id: string | null; // ÚJ MEZŐ
+  restaurant_id: string | null;
+  gallery_paths?: string[]; // ÚJ MEZŐ
 };
 
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -22,6 +24,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
   const { id } = use(params);
 
   const [event, setEvent] = useState<EventRow | null>(null);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [restaurants, setRestaurants] = useState<any[]>([]); // Étterem lista
   
   const [loading, setLoading] = useState(true);
@@ -75,7 +78,8 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
         starts_at: event.starts_at,
         summary: event.summary,
         is_published: event.is_published,
-        restaurant_id: event.restaurant_id, // Mentjük a választott éttermet
+        restaurant_id: event.restaurant_id,
+        gallery_paths: event.gallery_paths ?? [],
       })
       .eq("id", event.id);
 
@@ -86,6 +90,30 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
     } else {
       alert("Sikeres mentés!");
     }
+  }
+
+  async function uploadGalleryImages(files: FileList) {
+    if (!event) return;
+    setGalleryUploading(true);
+    setError(null);
+    const newPaths: string[] = [];
+    for (const file of Array.from(files)) {
+      const ext = file.name.split('.').pop();
+      const uuid = uuidv4();
+      const filePath = `events/${event.id}/gallery/${uuid}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("public-media")
+        .upload(filePath, file, { upsert: true });
+      if (uploadError) {
+        setError(uploadError.message);
+        setGalleryUploading(false);
+        return;
+      }
+      newPaths.push(filePath);
+    }
+    // Frissítjük a state-et
+    setEvent((prev) => prev ? { ...prev, gallery_paths: [...(prev.gallery_paths ?? []), ...newPaths] } : prev);
+    setGalleryUploading(false);
   }
 
   async function uploadCover(file: File) {
@@ -240,6 +268,37 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
               }}
             />
             {uploading && <div className="mt-2 text-sm text-neutral-600">Feltöltés folyamatban…</div>}
+          </div>
+
+          {/* Galéria szekció */}
+          <div className="rounded-xl border p-4 bg-neutral-50">
+            <div className="text-sm font-medium mb-2">Galéria</div>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={galleryUploading}
+              onChange={(e) => {
+                const files = e.target.files;
+                if (files && files.length > 0) uploadGalleryImages(files);
+              }}
+            />
+            {galleryUploading && <div className="mt-2 text-sm text-neutral-600">Feltöltés folyamatban…</div>}
+            {/* Preview grid */}
+            {event.gallery_paths && event.gallery_paths.length > 0 && (
+              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                {event.gallery_paths.map((imgPath, idx) => (
+                  <div key={imgPath} className="relative w-full aspect-square rounded-lg overflow-hidden border">
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${imgPath}`}
+                      alt={`Galéria kép ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {error && (
