@@ -1,3 +1,26 @@
+// HTML normalizáló segédfüggvény
+function normalizeHtml(html: string): string {
+  // 1. Remove all inline style attributes
+  html = html.replace(/ style="[^"]*"/gi, "");
+
+  // 2. Replace <div><br></div> with <br>
+  html = html.replace(/<div><br\s*\/?>\s*<\/div>/gi, "<br>");
+
+  // 3. Replace consecutive </div><div> with <br> or <p>
+  html = html.replace(/<\/div>\s*<div>/gi, "<br>");
+
+  // 4. Optionally, wrap top-level <div> blocks as <p>
+  html = html.replace(/<div>(.*?)<\/div>/gi, function(_, content) {
+    // If content is not just <br>, wrap as <p>
+    if (/^\s*<br\s*\/?>\s*$/.test(content)) return "<br>";
+    return `<p>${content}</p>`;
+  });
+
+  // 5. Remove empty <p></p>
+  html = html.replace(/<p>\s*<\/p>/gi, "");
+
+  return html;
+}
 // app/components/admin/RichTextEditor.tsx
 "use client";
 
@@ -33,7 +56,9 @@ export default function RichTextEditor({
 
   const handleChange = useCallback(() => {
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      const rawHtml = editorRef.current.innerHTML;
+      const normalized = normalizeHtml(rawHtml);
+      onChange(normalized);
     }
   }, [onChange]);
 
