@@ -62,10 +62,11 @@ export default async function EventDetailPage({ params }: Props) {
 )}
 
         {/* LEÍRÁS */}
-        {event.body ? (
-          <SafeHtml html={event.body} className="prose prose-neutral prose-lg max-w-none" tag="div" />
-        ) : (
-          event.summary && <p className="text-neutral-600 text-lg mb-12">{event.summary}</p>
+        {event.body && (
+          <div
+            className="prose prose-neutral max-w-none text-neutral-800 [&_p]:mb-4 [&_br]:block"
+            dangerouslySetInnerHTML={{ __html: event.body ?? "" }}
+          />
         )}
 
         {/* GALÉRIA */}
