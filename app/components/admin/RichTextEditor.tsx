@@ -1,3 +1,5 @@
+
+"use client";
 // HTML normalizáló segédfüggvény
 function normalizeHtml(html: string): string {
   // 1. Remove all inline style attributes
@@ -21,8 +23,6 @@ function normalizeHtml(html: string): string {
 
   return html;
 }
-// app/components/admin/RichTextEditor.tsx
-"use client";
 
 import { useRef, useCallback, useEffect, useState } from "react";
 
