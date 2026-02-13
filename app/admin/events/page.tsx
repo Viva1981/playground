@@ -47,12 +47,20 @@ export default function AdminEventsPage() {
       <div className="mx-auto max-w-4xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Események</h1>
-          <a
-            href="/admin/events/new"
-            className="rounded-xl bg-black text-white px-4 py-2 text-sm"
-          >
-            Új esemény
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href="/admin/events/new"
+              className="rounded-xl bg-black text-white px-4 py-2 text-sm"
+            >
+              Új esemény
+            </a>
+            <a
+              href="/admin"
+              className="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-50"
+            >
+              Vissza
+            </a>
+          </div>
         </div>
 
         <div className="mt-8 grid gap-3">

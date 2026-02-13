@@ -25,8 +25,13 @@ export default function AdminRestaurantsPage() {
     <main className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">Éttermek</h1>
-        <div className="flex gap-4">
-          <Link href="/admin" className="text-sm underline py-2">Vissza</Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/admin"
+            className="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-50"
+          >
+            Vissza
+          </Link>
           <Link
             href="/admin/restaurants/new"
             className="bg-black text-white px-4 py-2 rounded-lg text-sm"
