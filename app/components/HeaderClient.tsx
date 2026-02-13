@@ -4,6 +4,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import SafeInlineHtml from "./common/SafeInlineHtml";
 import type { HeaderSettings } from "@/app/lib/types";
 
 type Props = {
@@ -48,12 +49,12 @@ export default function HeaderClient({ settings, logoUrl }: Props) {
             
             {/* CSAK AKKOR JELENIK MEG, HA VAN KITÖLTVE CÍM */}
             {siteTitle && (
-                <span 
-                    className="font-bold text-lg tracking-tight hidden sm:block"
-                    style={{ color: contentColor }}
-                >
-                  {siteTitle}
-                </span>
+                <SafeInlineHtml
+                  html={siteTitle}
+                  className="font-bold text-lg tracking-tight hidden sm:block"
+                  tag="span"
+                  style={{ color: contentColor }}
+                />
             )}
           </Link>
 
@@ -86,9 +87,12 @@ export default function HeaderClient({ settings, logoUrl }: Props) {
                     href={item.url}
                     onClick={closeMenu}
                     className="text-2xl font-bold hover:scale-110 transition-transform"
-                    style={{ color: contentColor }}
                 >
-                    {item.label}
+                    <SafeInlineHtml 
+                        html={item.label} 
+                        tag="span"
+                        style={{ color: contentColor }}
+                    />
                 </Link>
             ))}
         </nav>
