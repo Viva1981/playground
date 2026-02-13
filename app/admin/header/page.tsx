@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState, ChangeEvent } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
+import RichTextEditor from "@/app/components/admin/RichTextEditor";
 import type { HeaderSettings, MenuItem } from "@/app/lib/types";
 
 export default function AdminHeaderPage() {
@@ -163,12 +164,11 @@ export default function AdminHeaderPage() {
                 {/* Oldal címe (ÚJ RÉSZ) */}
                 <div>
                     <label className="block text-sm font-medium mb-1">Oldal Címe (Logó mellett)</label>
-                    <input 
-                        type="text" 
-                        placeholder="pl. Vis Eat Miskolc (Hagyd üresen, ha nem kell)" 
+                    <RichTextEditor
                         value={settings.site_title || ""}
-                        onChange={(e) => setSettings({...settings, site_title: e.target.value})}
-                        className="w-full border p-3 rounded-lg"
+                        onChange={(val) => setSettings({...settings, site_title: val})}
+                        placeholder="pl. Vis Eat Miskolc (Hagyd üresen, ha nem kell)"
+                        minHeight="60px"
                     />
                     <p className="text-xs text-gray-500 mt-1">Ha üresen hagyod, csak a logó jelenik meg.</p>
                 </div>

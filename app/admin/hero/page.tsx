@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState, ChangeEvent } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
+import RichTextEditor from "@/app/components/admin/RichTextEditor";
 // JAVÍTVA: A Hero típusokat importáljuk, nem az About-ot
 import type { HeroSettings, HeroComponentType } from "@/app/lib/types";
 
@@ -171,11 +172,21 @@ export default function AdminHeroPage() {
                 <h2 className="text-lg font-semibold mb-4">Szöveges tartalom</h2>
                 <div className="mb-4">
                     <label className="block text-sm font-medium mb-1">Főcím</label>
-                    <input className="w-full border p-3 rounded-lg" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <RichTextEditor 
+                        value={title} 
+                        onChange={setTitle}
+                        placeholder="Főcím..."
+                        minHeight="80px"
+                    />
                 </div>
                 <div className="mb-4">
                     <label className="block text-sm font-medium mb-1">Szöveg</label>
-                    <textarea className="w-full border p-3 rounded-lg min-h-[100px]" value={body} onChange={(e) => setBody(e.target.value)} />
+                    <RichTextEditor 
+                        value={body} 
+                        onChange={setBody}
+                        placeholder="Leírás..."
+                        minHeight="150px"
+                    />
                 </div>
             </div>
 

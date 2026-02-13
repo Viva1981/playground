@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
 import AdminPageHeader from "@/app/components/AdminPageHeader";
+import RichTextEditor from "@/app/components/admin/RichTextEditor";
 import type { AboutSettings, AboutComponentType } from "@/app/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -176,12 +177,22 @@ export default function AdminAboutEditorPage() {
             <div className="space-y-6">
                 <div className="rounded-2xl border p-5 bg-white">
                     <label className="block text-sm font-medium">Cím</label>
-                    <input className="mt-1 w-full rounded-xl border p-3 outline-none" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <RichTextEditor 
+                        value={title} 
+                        onChange={setTitle}
+                        placeholder="Cím..."
+                        minHeight="80px"
+                    />
                 </div>
 
                 <div className="rounded-2xl border p-5 bg-white">
                     <label className="block text-sm font-medium">Szöveg</label>
-                    <textarea className="mt-1 w-full rounded-xl border p-3 outline-none min-h-[200px]" value={body} onChange={(e) => setBody(e.target.value)} />
+                    <RichTextEditor 
+                        value={body} 
+                        onChange={setBody}
+                        placeholder="Tartalmi szöveg..."
+                        minHeight="200px"
+                    />
                 </div>
 
                 <div className="rounded-2xl border p-5 bg-white flex items-center justify-between">

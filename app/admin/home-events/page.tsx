@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
+import RichTextEditor from "@/app/components/admin/RichTextEditor";
 import type { EventsSectionSettings } from "@/app/lib/types";
 
 export default function AdminHomeEventsPage() {
@@ -84,20 +85,20 @@ export default function AdminHomeEventsPage() {
           <h2 className="text-lg font-semibold mb-4">Szövegek</h2>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Címsor</label>
-            <input
-              className="w-full border p-3 rounded-lg"
+            <RichTextEditor
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={setTitle}
               placeholder="pl. Események"
+              minHeight="80px"
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Alcím / Leírás</label>
-            <textarea
-              className="w-full border p-3 rounded-lg min-h-[80px]"
+            <RichTextEditor
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={setBody}
               placeholder="Rövid leírás a szekció alatt..."
+              minHeight="120px"
             />
           </div>
         </div>

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
+import RichTextEditor from "@/app/components/admin/RichTextEditor";
 import type { RolunkSettings } from "@/app/lib/types";
 
 export default function AdminRolunkPage() {
@@ -108,27 +109,24 @@ export default function AdminRolunkPage() {
 
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Oldal címe</label>
-              <input
-                className="w-full border p-3 rounded-lg"
+              <RichTextEditor
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={setTitle}
                 placeholder="pl. Rólunk"
+                minHeight="80px"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Másédzs (fő szöveg)
+                Üzenetek (fő szöveg)
               </label>
-              <textarea
-                className="w-full border p-3 rounded-lg min-h-[200px]"
+              <RichTextEditor
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={setBody}
                 placeholder="Írj ide egy bemutatkozó szöveget..."
+                minHeight="200px"
               />
-              <p className="text-xs text-neutral-500 mt-1">
-                Támogatók: több bekezdés, sortörések megmaradnak
-              </p>
             </div>
           </div>
         </div>
