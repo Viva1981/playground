@@ -213,190 +213,121 @@ export default function EditEventPage({
   if (loading) return <div className="p-6 text-sm">Betöltés…</div>;
   if (!event) return <div className="p-6 text-sm text-red-600">{error}</div>;
 
- return (
-  <main className="p-6">
-    <div className="mx-auto max-w-3xl">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Esemény szerkesztése</h1>
-        <a href="/admin/events" className="text-sm underline">
-          Vissza
-        </a>
-      </div>
-
-      <div className="mt-8 grid gap-4">
-
-        {/* Cím */}
-        <div>
-          <label className="text-sm font-medium">Cím</label>
-          <input
-            className="w-full rounded-xl border p-3 mt-1"
-            value={event.title}
-            onChange={(e) => setEvent({ ...event, title: e.target.value })}
-          />
+  return (
+    <main className="p-6">
+      <div className="mx-auto max-w-3xl">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Esemény szerkesztése</h1>
+          <a href="/admin/events" className="text-sm underline">
+            Vissza
+          </a>
         </div>
 
-        {/* Slug */}
-        <div>
-          <label className="text-sm font-medium">Slug</label>
-          <input
-            className="w-full rounded-xl border p-3 mt-1"
-            value={event.slug}
-            onChange={(e) => setEvent({ ...event, slug: e.target.value })}
-          />
-        </div>
+        <div className="mt-8 grid gap-4">
 
-        {/* Étterem */}
-        <div>
-          <label className="text-sm font-medium">Étterem (Szervező)</label>
-          <select
-            className="w-full rounded-xl border p-3 mt-1 bg-white"
-            value={event.restaurant_id || ""}
-            onChange={(e) =>
-              setEvent({
-                ...event,
-                restaurant_id: e.target.value || null,
-              })
-            }
-          >
-            <option value="">-- Nincs étterem kiválasztva --</option>
-            {restaurants.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div>
+            <label className="text-sm font-medium">Cím</label>
+            <input
+              className="w-full rounded-xl border p-3 mt-1"
+              value={event.title}
+              onChange={(e) => setEvent({ ...event, title: e.target.value })}
+            />
+          </div>
 
-        {/* Időpont */}
-        <div>
-          <label className="text-sm font-medium">Időpont</label>
-          <input
-            type="datetime-local"
-            className="w-full rounded-xl border p-3 mt-1"
-            value={event.starts_at.slice(0, 16)}
-            onChange={(e) =>
-              setEvent({
-                ...event,
-                starts_at: new Date(e.target.value).toISOString(),
-              })
-            }
-          />
-        </div>
+          <div>
+            <label className="text-sm font-medium">Slug</label>
+            <input
+              className="w-full rounded-xl border p-3 mt-1"
+              value={event.slug}
+              onChange={(e) => setEvent({ ...event, slug: e.target.value })}
+            />
+          </div>
 
-        {/* Rövid leírás */}
-        <div>
-          <label className="text-sm font-medium">Rövid leírás</label>
-          <textarea
-            className="w-full rounded-xl border p-3 mt-1 min-h-[120px]"
-            value={event.summary ?? ""}
-            onChange={(e) =>
-              setEvent({ ...event, summary: e.target.value })
-            }
-          />
-        </div>
+          <div>
+            <label className="text-sm font-medium">Rövid leírás</label>
+            <textarea
+              className="w-full rounded-xl border p-3 mt-1 min-h-[120px]"
+              value={event.summary ?? ""}
+              onChange={(e) =>
+                setEvent({ ...event, summary: e.target.value })
+              }
+            />
+          </div>
 
-        {/* Publikus */}
-        <label className="flex items-center gap-3 py-2">
-          <input
-            type="checkbox"
-            checked={event.is_published}
-            onChange={(e) =>
-              setEvent({
-                ...event,
-                is_published: e.target.checked,
-              })
-            }
-          />
-          Publikus (megjelenik az oldalon)
-        </label>
+          <label className="flex items-center gap-3 py-2">
+            <input
+              type="checkbox"
+              checked={event.is_published}
+              onChange={(e) =>
+                setEvent({
+                  ...event,
+                  is_published: e.target.checked,
+                })
+              }
+            />
+            Publikus
+          </label>
 
-        {/* Borítókép */}
-        <div className="rounded-xl border p-4 bg-neutral-50">
-          <div className="text-sm font-medium mb-2">Borítókép</div>
+          {/* Galéria */}
+          <div className="rounded-xl border p-4 bg-neutral-50">
+            <div className="text-sm font-medium mb-2">Galéria</div>
 
-          {event.cover_path && (
-            <div className="mb-3 relative w-full h-[200px] rounded-lg overflow-hidden border">
-              <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
-                alt="Borítókép"
-                fill
-                className="object-cover"
-              />
-            </div>
-          )}
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={galleryUploading}
+              onChange={(e) => {
+                const files = e.target.files;
+                if (files && files.length > 0)
+                  uploadGalleryImages(files);
+              }}
+            />
 
-          <input
-            type="file"
-            accept="image/*"
-            disabled={uploading}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) uploadCover(file);
-            }}
-          />
-        </div>
-
-        {/* Galéria */}
-        <div className="rounded-xl border p-4 bg-neutral-50">
-          <div className="text-sm font-medium mb-2">Galéria</div>
-
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            disabled={galleryUploading}
-            onChange={(e) => {
-              const files = e.target.files;
-              if (files && files.length > 0)
-                uploadGalleryImages(files);
-            }}
-          />
-
-          {event.gallery_paths && event.gallery_paths.length > 0 && (
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-              {event.gallery_paths.map((imgPath, idx) => (
-                <div
-                  key={imgPath}
-                  className="relative w-full aspect-square rounded-lg overflow-hidden border"
-                >
-                  <Image
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${imgPath}`}
-                    alt={`Galéria kép ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => deleteGalleryImage(imgPath)}
-                    className="absolute top-1 right-1 bg-white rounded-full w-7 h-7 flex items-center justify-center text-red-600 border"
-                    disabled={galleryUploading}
+            {event.gallery_paths && event.gallery_paths.length > 0 && (
+              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                {event.gallery_paths.map((imgPath) => (
+                  <div
+                    key={imgPath}
+                    className="relative w-full aspect-square rounded-lg overflow-hidden border"
                   >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${imgPath}`}
+                      alt="Galéria kép"
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => deleteGalleryImage(imgPath)}
+                      className="absolute top-1 right-1 bg-white rounded-full w-7 h-7 flex items-center justify-center text-red-600 border"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {/* Gombok */}
-        <div className="flex gap-3 pt-4">
-          <button
-            onClick={save}
-            disabled={saving}
-            className="rounded-xl bg-black text-white px-6 py-3"
-          >
-            {saving ? "Mentés…" : "Mentés"}
-          </button>
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={save}
+              disabled={saving}
+              className="rounded-xl bg-black text-white px-6 py-3"
+            >
+              {saving ? "Mentés…" : "Mentés"}
+            </button>
 
-          <button
-            onClick={remove}
-            className="rounded-xl border px-6 py-3 text-red-600"
-          >
-            Törlés
-          </button>
+            <button
+              onClick={remove}
+              className="rounded-xl border px-6 py-3 text-red-600"
+            >
+              Törlés
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </main>
-);
+    </main>
+  );
+}
