@@ -119,13 +119,21 @@ export default function AdminHeaderPage() {
     <main className="p-6 max-w-5xl mx-auto pb-32">
       <div className="flex justify-between items-center mb-6 sticky top-0 bg-white/80 backdrop-blur z-20 py-4 border-b">
         <h1 className="text-2xl font-bold">Header szerkesztése</h1>
-        <button
-          onClick={save}
-          disabled={saving}
-          className="bg-black text-white px-6 py-2 rounded-full font-bold hover:bg-neutral-800 disabled:opacity-50"
-        >
-          {saving ? "Mentés..." : "Módosítások mentése"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={save}
+            disabled={saving}
+            className="bg-black text-white px-6 py-2 rounded-full font-bold hover:bg-neutral-800 disabled:opacity-50"
+          >
+            {saving ? "Mentés..." : "Módosítások mentése"}
+          </button>
+          <a
+            href="/admin"
+            className="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-50"
+          >
+            Vissza
+          </a>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
+import AdminPageHeader from "@/app/components/AdminPageHeader";
 import type { AboutSettings, AboutComponentType } from "@/app/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -164,13 +165,10 @@ export default function AdminAboutEditorPage() {
   return (
     <main className="min-h-screen p-6 pb-32">
       <div className="mx-auto max-w-4xl">
-        <div className="flex items-start justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">Home About / Vision</h1>
-            <p className="mt-1 text-sm text-neutral-600">A főoldal bemutatkozó szövege.</p>
-          </div>
-          <a className="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-50" href="/admin">Vissza</a>
-        </div>
+        <AdminPageHeader
+          title="Home About / Vision"
+          subtitle="A főoldal bemutatkozó szövege."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
