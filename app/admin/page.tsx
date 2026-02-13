@@ -110,6 +110,14 @@ export default function AdminDashboardPage() {
             <div className="mt-1 text-lg font-semibold">Home Események (Design)</div>
           </a>
 
+          <a
+            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
+            href="/admin/rolunk"
+          >
+            <div className="text-sm text-neutral-600">Globális</div>
+            <div className="mt-1 text-lg font-semibold">Rólunk oldal</div>
+          </a>
+
           {/* --- TARTALOM KEZELÉS --- */}
 
           <a

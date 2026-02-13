@@ -68,3 +68,12 @@ export type EventsSectionSettings = {
   background_color?: string;
   content_color?: string;
 };
+
+// --- RÓLUNK / ABOUT US SZEKCIÓ ---
+export type RolunkSettings = {
+  title?: string;
+  content?: string;
+  image_url?: string;
+  bg_color?: string;
+  text_color?: string;
+};
