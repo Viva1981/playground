@@ -63,7 +63,7 @@ export default async function EventDetailPage({ params }: Props) {
 
         {/* LEÍRÁS */}
         {event.body && (
-          <SafeHtml html={event.body ?? ""} className="prose prose-neutral max-w-none mt-8" />
+          <SafeHtml html={event.body ?? ""} className="prose prose-neutral max-w-none" />
         )}
 
         {/* GALÉRIA */}
