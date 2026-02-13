@@ -1,41 +1,11 @@
+"use client";
 
-  "use client";
-  import { useEffect, useState, use } from "react";
-  // Galéria törlés függvény
-  async function deleteGalleryImage(imgPath: string) {
-    if (!event) return;
-    if (!confirm("Biztosan törlöd ezt a galéria képet?")) return;
-    setGalleryUploading(true);
-    setError(null);
-    // 1. Storage törlés
-    const { error: storageError } = await supabase.storage
-      .from("public-media")
-      .remove([imgPath]);
-    if (storageError) {
-      setError("Kép törlése sikertelen: " + storageError.message);
-      setGalleryUploading(false);
-      return;
-    }
-    // 2. gallery_paths frissítés
-    const newGallery = (event.gallery_paths ?? []).filter((p) => p !== imgPath);
-    const { error: dbError } = await supabase
-      .from("events")
-      .update({ gallery_paths: newGallery })
-      .eq("id", event.id);
-    if (dbError) {
-      setError("Adatbázis frissítés sikertelen: " + dbError.message);
-      setGalleryUploading(false);
-      return;
-    }
-    setEvent({ ...event, gallery_paths: newGallery });
-    setGalleryUploading(false);
-  }
+import { useEffect, useState, use } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
-// Frissített típus
 import { v4 as uuidv4 } from "uuid";
+
 type EventRow = {
   id: string;
   title: string;
@@ -45,17 +15,20 @@ type EventRow = {
   is_published: boolean;
   cover_path: string | null;
   restaurant_id: string | null;
-  gallery_paths?: string[]; // ÚJ MEZŐ
+  gallery_paths?: string[];
 };
 
-export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditEventPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
   const { id } = use(params);
 
   const [event, setEvent] = useState<EventRow | null>(null);
   const [galleryUploading, setGalleryUploading] = useState(false);
-  const [restaurants, setRestaurants] = useState<any[]>([]); // Étterem lista
-  
+  const [restaurants, setRestaurants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,14 +42,12 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
         return;
       }
 
-      // 1. Lekérjük az eseményt
       const { data: eventData, error } = await supabase
         .from("events")
         .select("*")
         .eq("id", id)
         .single<EventRow>();
 
-      // 2. Lekérjük az éttermeket
       const { data: restData } = await supabase
         .from("restaurants")
         .select("id, name")
@@ -125,23 +96,72 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
     if (!event) return;
     setGalleryUploading(true);
     setError(null);
+
     const newPaths: string[] = [];
+
     for (const file of Array.from(files)) {
-      const ext = file.name.split('.').pop();
+      const ext = file.name.split(".").pop();
       const uuid = uuidv4();
       const filePath = `events/${event.id}/gallery/${uuid}.${ext}`;
+
       const { error: uploadError } = await supabase.storage
         .from("public-media")
         .upload(filePath, file, { upsert: true });
+
       if (uploadError) {
         setError(uploadError.message);
         setGalleryUploading(false);
         return;
       }
+
       newPaths.push(filePath);
     }
-    // Frissítjük a state-et
-    setEvent((prev) => prev ? { ...prev, gallery_paths: [...(prev.gallery_paths ?? []), ...newPaths] } : prev);
+
+    setEvent((prev) =>
+      prev
+        ? {
+            ...prev,
+            gallery_paths: [...(prev.gallery_paths ?? []), ...newPaths],
+          }
+        : prev
+    );
+
+    setGalleryUploading(false);
+  }
+
+  async function deleteGalleryImage(imgPath: string) {
+    if (!event) return;
+    if (!confirm("Biztosan törlöd ezt a galéria képet?")) return;
+
+    setGalleryUploading(true);
+    setError(null);
+
+    const { error: storageError } = await supabase.storage
+      .from("public-media")
+      .remove([imgPath]);
+
+    if (storageError) {
+      setError("Kép törlése sikertelen: " + storageError.message);
+      setGalleryUploading(false);
+      return;
+    }
+
+    const newGallery = (event.gallery_paths ?? []).filter(
+      (p) => p !== imgPath
+    );
+
+    const { error: dbError } = await supabase
+      .from("events")
+      .update({ gallery_paths: newGallery })
+      .eq("id", event.id);
+
+    if (dbError) {
+      setError("Adatbázis frissítés sikertelen: " + dbError.message);
+      setGalleryUploading(false);
+      return;
+    }
+
+    setEvent({ ...event, gallery_paths: newGallery });
     setGalleryUploading(false);
   }
 
@@ -172,6 +192,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
     } else {
       setEvent({ ...event, cover_path: filePath });
     }
+
     setUploading(false);
   }
 
@@ -197,111 +218,17 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Esemény szerkesztése</h1>
-          <a href="/admin/events" className="text-sm underline">Vissza</a>
+          <a href="/admin/events" className="text-sm underline">
+            Vissza
+          </a>
         </div>
 
         <div className="mt-8 grid gap-4">
-          <div>
-            <label className="text-sm font-medium">Cím</label>
-            <input
-              className="w-full rounded-xl border p-3 mt-1"
-              value={event.title}
-              onChange={(e) => setEvent({ ...event, title: e.target.value })}
-            />
-          </div>
 
-          <div>
-            <label className="text-sm font-medium">Slug</label>
-            <input
-              className="w-full rounded-xl border p-3 mt-1"
-              value={event.slug}
-              onChange={(e) => setEvent({ ...event, slug: e.target.value })}
-            />
-          </div>
-
-          {/* ÉTTEREM VÁLASZTÓ */}
-          <div>
-            <label className="text-sm font-medium">Étterem (Szervező)</label>
-            <select
-              className="w-full rounded-xl border p-3 mt-1 bg-white"
-              value={event.restaurant_id || ""}
-              onChange={(e) => setEvent({ ...event, restaurant_id: e.target.value || null })}
-            >
-              <option value="">-- Nincs étterem kiválasztva --</option>
-              {restaurants.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">Időpont</label>
-            <input
-              type="datetime-local"
-              className="w-full rounded-xl border p-3 mt-1"
-              value={event.starts_at.slice(0, 16)}
-              onChange={(e) =>
-                setEvent({
-                  ...event,
-                  starts_at: new Date(e.target.value).toISOString(),
-                })
-              }
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">Leírás</label>
-            <textarea
-              className="w-full rounded-xl border p-3 mt-1 min-h-[120px]"
-              value={event.summary ?? ""}
-              onChange={(e) => setEvent({ ...event, summary: e.target.value })}
-            />
-          </div>
-
-          <label className="flex items-center gap-3 py-2">
-            <input
-              type="checkbox"
-              checked={event.is_published}
-              onChange={(e) =>
-                setEvent({
-                  ...event,
-                  is_published: e.target.checked,
-                })
-              }
-            />
-            Publikus (megjelenik az oldalon)
-          </label>
-
-          {/* Borítókép feltöltés */}
-          <div className="rounded-xl border p-4 bg-neutral-50">
-            <div className="text-sm font-medium mb-2">Borítókép</div>
-            {event.cover_path ? (
-              <div className="mb-3 relative w-full h-[200px] rounded-lg overflow-hidden border">
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
-                  alt="Borítókép"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            ) : null}
-            <input
-              type="file"
-              accept="image/*"
-              disabled={uploading}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) uploadCover(file);
-              }}
-            />
-            {uploading && <div className="mt-2 text-sm text-neutral-600">Feltöltés folyamatban…</div>}
-          </div>
-
-          {/* Galéria szekció */}
+          {/* Galéria */}
           <div className="rounded-xl border p-4 bg-neutral-50">
             <div className="text-sm font-medium mb-2">Galéria</div>
+
             <input
               type="file"
               accept="image/*"
@@ -312,26 +239,31 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                 if (files && files.length > 0) uploadGalleryImages(files);
               }}
             />
-            {galleryUploading && <div className="mt-2 text-sm text-neutral-600">Feltöltés folyamatban…</div>}
-            {/* Preview grid */}
+
+            {galleryUploading && (
+              <div className="mt-2 text-sm text-neutral-600">
+                Feltöltés folyamatban…
+              </div>
+            )}
+
             {event.gallery_paths && event.gallery_paths.length > 0 && (
               <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
                 {event.gallery_paths.map((imgPath, idx) => (
-                  <div key={imgPath} className="relative w-full aspect-square rounded-lg overflow-hidden border">
+                  <div
+                    key={imgPath}
+                    className="relative w-full aspect-square rounded-lg overflow-hidden border"
+                  >
                     <Image
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${imgPath}`}
                       alt={`Galéria kép ${idx + 1}`}
                       fill
                       className="object-cover"
                     />
-                    {/* X törlés gomb */}
                     <button
                       type="button"
                       onClick={() => deleteGalleryImage(imgPath)}
                       className="absolute top-1 right-1 z-10 bg-white bg-opacity-80 rounded-full w-7 h-7 flex items-center justify-center text-red-600 border border-red-200 shadow hover:bg-red-100 transition"
-                      style={{ fontSize: '1rem', lineHeight: 1 }}
                       disabled={galleryUploading}
-                      title="Kép törlése"
                     >
                       ×
                     </button>
@@ -341,28 +273,6 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
             )}
           </div>
 
-          {error && (
-            <div className="rounded-xl bg-red-50 text-red-700 p-3 text-sm">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={save}
-              disabled={saving}
-              className="rounded-xl bg-black text-white px-6 py-3"
-            >
-              {saving ? "Mentés…" : "Mentés"}
-            </button>
-
-            <button
-              onClick={remove}
-              className="rounded-xl border px-6 py-3 text-red-600 hover:bg-red-50"
-            >
-              Törlés
-            </button>
-          </div>
         </div>
       </div>
     </main>
