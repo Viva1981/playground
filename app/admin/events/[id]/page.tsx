@@ -1,32 +1,33 @@
+
+  "use client";
   async function deleteGalleryImage(imgPath: string) {
-    if (!event) return;
-    if (!confirm("Biztosan törlöd ezt a galéria képet?")) return;
-    setGalleryUploading(true);
-    setError(null);
-    // 1. Storage törlés
-    const { error: storageError } = await supabase.storage
-      .from("public-media")
-      .remove([imgPath]);
-    if (storageError) {
-      setError("Kép törlése sikertelen: " + storageError.message);
+      if (!event) return;
+      if (!confirm("Biztosan törlöd ezt a galéria képet?")) return;
+      setGalleryUploading(true);
+      setError(null);
+      // 1. Storage törlés
+      const { error: storageError } = await supabase.storage
+        .from("public-media")
+        .remove([imgPath]);
+      if (storageError) {
+        setError("Kép törlése sikertelen: " + storageError.message);
+        setGalleryUploading(false);
+        return;
+      }
+      // 2. gallery_paths frissítés
+      const newGallery = (event.gallery_paths ?? []).filter((p) => p !== imgPath);
+      const { error: dbError } = await supabase
+        .from("events")
+        .update({ gallery_paths: newGallery })
+        .eq("id", event.id);
+      if (dbError) {
+        setError("Adatbázis frissítés sikertelen: " + dbError.message);
+        setGalleryUploading(false);
+        return;
+      }
+      setEvent({ ...event, gallery_paths: newGallery });
       setGalleryUploading(false);
-      return;
     }
-    // 2. gallery_paths frissítés
-    const newGallery = (event.gallery_paths ?? []).filter((p) => p !== imgPath);
-    const { error: dbError } = await supabase
-      .from("events")
-      .update({ gallery_paths: newGallery })
-      .eq("id", event.id);
-    if (dbError) {
-      setError("Adatbázis frissítés sikertelen: " + dbError.message);
-      setGalleryUploading(false);
-      return;
-    }
-    setEvent({ ...event, gallery_paths: newGallery });
-    setGalleryUploading(false);
-  }
-"use client";
 
 import { useEffect, useState, use } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
