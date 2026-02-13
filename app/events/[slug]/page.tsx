@@ -50,17 +50,16 @@ export default async function EventDetailPage({ params }: Props) {
           📅 {formatHuDate(event.starts_at)}
         </div>
 
-        {/* COVER */}
         {coverUrl && (
-          <div className="mb-10 relative w-full h-[400px] rounded-2xl overflow-hidden border">
-            <Image
-              src={coverUrl}
-              alt={event.title}
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
+  <div className="mb-10 w-full aspect-[16/9] bg-black relative">
+    <Image
+      src={coverUrl}
+      alt={event.title}
+      fill
+      className="object-contain"
+    />
+  </div>
+)}
 
         {/* LEÍRÁS */}
         {event.summary && (
