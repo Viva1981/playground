@@ -1,7 +1,7 @@
 // app/components/admin/RichTextEditor.tsx
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect } from "react";
 
 interface RichTextEditorProps {
   value: string;
@@ -17,7 +17,6 @@ export default function RichTextEditor({
   minHeight = "200px",
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const [isPreview, setIsPreview] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -98,43 +97,7 @@ export default function RichTextEditor({
 
         <div className="w-px bg-neutral-300 mx-1"></div>
 
-        {/* Headings */}
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleCommand("formatBlock", "<h2>");
-          }}
-          className="px-3 py-1 rounded hover:bg-neutral-200 font-bold text-sm transition"
-          title="H2 Cím"
-        >
-          H2
-        </button>
-
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleCommand("formatBlock", "<h3>");
-          }}
-          className="px-3 py-1 rounded hover:bg-neutral-200 font-bold text-sm transition"
-          title="H3 Alcím"
-        >
-          H3
-        </button>
-
-        <div className="w-px bg-neutral-300 mx-1"></div>
-
-        {/* Lists and links */}
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleCommand("insertUnorderedList");
-          }}
-          className="px-3 py-1 rounded hover:bg-neutral-200 text-sm transition"
-          title="Felsorolás"
-        >
-          • Lista
-        </button>
-
+        {/* Link */}
         <button
           onMouseDown={(e) => {
             e.preventDefault();
@@ -159,39 +122,20 @@ export default function RichTextEditor({
         >
           ✕ törlés
         </button>
-
-        <div className="ml-auto flex gap-2">
-          {/* Preview toggle */}
-          <button
-            onClick={() => setIsPreview(!isPreview)}
-            className="px-3 py-1 rounded hover:bg-neutral-200 text-sm transition"
-            title="Előnézet"
-          >
-            {isPreview ? "✏️ Szerkesztés" : "👁️ Preview"}
-          </button>
-        </div>
       </div>
 
-      {/* Editor / Preview */}
-      {isPreview ? (
-        <div
-          className="p-4 bg-white prose prose-sm max-w-none overflow-auto"
-          style={{ minHeight, maxHeight: "400px" }}
-          dangerouslySetInnerHTML={{ __html: value }}
-        />
-      ) : (
-        <div
-          ref={editorRef}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={handleChange}
-          onBlur={handleChange}
-          onKeyDown={handleKeyDown}
-          className="p-4 bg-white outline-none text-sm overflow-auto focus:ring-0"
-          style={{ minHeight, maxHeight: "400px" }}
-          data-placeholder={placeholder}
-        />
-      )}
+      {/* Editor */}
+      <div
+        ref={editorRef}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={handleChange}
+        onBlur={handleChange}
+        onKeyDown={handleKeyDown}
+        className="p-4 bg-white outline-none text-sm overflow-auto focus:ring-0"
+        style={{ minHeight, maxHeight: "400px" }}
+        data-placeholder={placeholder}
+      />
     </div>
   );
 }

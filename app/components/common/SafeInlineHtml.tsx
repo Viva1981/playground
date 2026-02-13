@@ -27,7 +27,7 @@ export default function SafeInlineHtml({
     // Custom DOMPurify config: csak inline elemek
     const config = DOMPurify.sanitize(html, {
       ALLOWED_TAGS: [
-        "b", "strong", "i", "em", "u", "span", "a", "br"
+        "b", "strong", "i", "em", "u", "a", "span"
       ],
       ALLOWED_ATTR: ["href", "title", "target"],
       KEEP_CONTENT: true,
