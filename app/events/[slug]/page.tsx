@@ -1,6 +1,7 @@
 import { supabase } from "@/app/utils/supabaseClient";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import SafeHtml from "@/app/components/common/SafeHtml";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,9 @@ export default async function EventDetailPage({ params }: Props) {
           <div className="prose prose-neutral max-w-none mb-12">
             <p>{event.summary}</p>
           </div>
+        )}
+        {event.body && (
+          <SafeHtml html={event.body ?? ""} className="prose prose-neutral max-w-none mt-8" />
         )}
 
         {/* GALÉRIA */}

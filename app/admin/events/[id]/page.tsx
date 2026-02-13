@@ -5,6 +5,7 @@ import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
+import RichTextEditor from "@/app/components/admin/RichTextEditor";
 
 type EventRow = {
   id: string;
@@ -12,6 +13,7 @@ type EventRow = {
   slug: string;
   starts_at: string;
   summary: string | null;
+  body: string | null;
   is_published: boolean;
   cover_path: string | null;
   restaurant_id: string | null;
@@ -70,6 +72,7 @@ export default function EditEventPage({
         title: event.title,
         slug: event.slug,
         summary: event.summary,
+        body: event.body,
         is_published: event.is_published,
         gallery_paths: event.gallery_paths ?? [],
       })
@@ -213,6 +216,14 @@ export default function EditEventPage({
           }
           placeholder="Rövid leírás"
         />
+        {/* Body RichTextEditor */}
+        <div>
+          <div className="font-medium mb-1">Részletes leírás</div>
+          <RichTextEditor
+            value={event.body ?? ""}
+            onChange={(value) => setEvent({ ...event, body: value })}
+          />
+        </div>
 
         <label className="flex gap-2 items-center">
           <input
