@@ -1,5 +1,4 @@
 // app/rolunk/page.tsx
-import SafeHtml from "@/app/components/common/SafeHtml";
 import { getRolunkSection } from "@/app/lib/getRolunkSection";
 import { Metadata } from "next";
 
@@ -54,10 +53,9 @@ export default async function RolunkPage() {
           )}
 
           {/* SZÖVEG */}
-          <SafeHtml
-            html={body}
-            tag="div"
-            className="prose prose-sm max-w-none"
+          <div
+            className="prose prose-neutral max-w-none text-neutral-800 [&_p]:mb-4 [&_br]:block"
+            dangerouslySetInnerHTML={{ __html: body ?? "" }}
             style={{ color: textColor }}
           />
         </article>
