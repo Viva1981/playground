@@ -1,4 +1,5 @@
 // app/rolunk/page.tsx
+import SafeHtml from "@/app/components/common/SafeHtml";
 import { getRolunkSection } from "@/app/lib/getRolunkSection";
 import { Metadata } from "next";
 
@@ -29,12 +30,12 @@ export default async function RolunkPage() {
         style={{ backgroundColor: bgColor }}
       >
         <div className="mx-auto max-w-4xl text-center">
-          <h1
+          <SafeHtml
+            html={title}
+            tag="h1"
             className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight"
             style={{ color: textColor }}
-          >
-            {title}
-          </h1>
+          />
         </div>
       </div>
 
@@ -53,14 +54,12 @@ export default async function RolunkPage() {
           )}
 
           {/* SZÖVEG */}
-          <div
-            className="prose prose-lg max-w-none"
+          <SafeHtml
+            html={body}
+            tag="div"
+            className="prose prose-sm max-w-none"
             style={{ color: textColor }}
-          >
-            <p className="whitespace-pre-wrap text-base md:text-lg leading-relaxed">
-              {body}
-            </p>
-          </div>
+          />
         </article>
       </div>
     </main>

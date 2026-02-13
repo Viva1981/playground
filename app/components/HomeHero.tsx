@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import SafeHtml from "./common/SafeHtml";
 import type { HeroSettings, HeroComponentType } from "@/app/lib/types";
 
 const getStorageUrl = (path: string) => {
@@ -106,23 +107,23 @@ export default function HomeHero({
     // A kulcsok típusa HeroComponentType kell legyen
     const components: Record<HeroComponentType, React.ReactNode> = {
         title: title ? (
-            <h1 
-                key="title" 
-                className={`text-4xl md:text-6xl font-extrabold tracking-tight leading-tight ${isOverlayModeOnDesktop ? 'md:drop-shadow-sm' : ''} ${!customContentColor ? defaultTitleColor : ''}`}
-                style={{ color: customContentColor }}
-            >
-                {title}
-            </h1>
+            <SafeHtml
+              key="title" 
+              html={title}
+              tag="h1"
+              className={`text-4xl md:text-6xl font-extrabold tracking-tight leading-tight ${isOverlayModeOnDesktop ? 'md:drop-shadow-sm' : ''} ${!customContentColor ? defaultTitleColor : ''}`}
+              style={{ color: customContentColor }}
+            />
         ) : null,
         
         body: body ? (
-            <p 
-                key="body" 
-                className={`text-lg md:text-xl leading-relaxed ${!customContentColor ? defaultBodyColor : ''}`}
-                style={{ color: customContentColor }}
-            >
-                {body}
-            </p>
+            <SafeHtml
+              key="body" 
+              html={body}
+              tag="p"
+              className={`text-lg md:text-xl leading-relaxed ${!customContentColor ? defaultBodyColor : ''}`}
+              style={{ color: customContentColor }}
+            />
         ) : null,
         
         buttons: (ctaLabel || ctaLabel2) ? (

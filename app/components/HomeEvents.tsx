@@ -1,6 +1,7 @@
 // app/components/HomeEvents.tsx
 import Image from "next/image";
 import Link from "next/link";
+import SafeHtml from "./common/SafeHtml";
 import { getUpcomingEvents } from "@/app/lib/getUpcomingEvents";
 import { getHomeSection } from "@/app/lib/getHomeSection";
 import type { EventsSectionSettings } from "@/app/lib/types";
@@ -39,10 +40,18 @@ export default async function HomeEvents() {
         
         {/* DINAMIKUS FEJLÉC */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">{title}</h2>
-          <p className="text-lg opacity-80">
-            {body}
-          </p>
+          <SafeHtml
+            html={title}
+            tag="h2"
+            className="text-3xl md:text-4xl font-bold mb-4"
+            style={{ color: contentColor }}
+          />
+          <SafeHtml
+            html={body}
+            tag="p"
+            className="text-lg opacity-80"
+            style={{ color: contentColor }}
+          />
         </div>
 
         {/* ESEMÉNY LISTA */}

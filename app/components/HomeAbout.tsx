@@ -1,3 +1,4 @@
+import SafeHtml from "./common/SafeHtml";
 import type { AboutSettings, AboutComponentType } from "@/app/lib/types";
 
 type Props = {
@@ -14,26 +15,26 @@ export default function HomeAbout({ title, body, settings }: Props) {
   const customContentColor = settings?.content_color || undefined;
   const customBgColor = settings?.background_color || undefined;
 
-  // --- RENDERELÉS SORREND SZERINT ---
+  // --- KOMPONENSEK RENDERELÉSE ---
   const components = {
     title: title ? (
-      <h2 
+      <SafeHtml
         key="title" 
+        html={title}
+        tag="h2"
         className={`text-2xl md:text-3xl font-semibold tracking-tight ${!customContentColor ? 'text-black' : ''}`}
         style={{ color: customContentColor }}
-      >
-        {title}
-      </h2>
+      />
     ) : null,
 
     body: body ? (
-      <p 
+      <SafeHtml
         key="body" 
-        className={`text-lg leading-relaxed ${!customContentColor ? 'text-neutral-700' : ''}`}
+        html={body}
+        tag="div"
+        className={`text-lg leading-relaxed prose prose-sm max-w-none ${!customContentColor ? 'text-neutral-700' : ''}`}
         style={{ color: customContentColor }}
-      >
-        {body}
-      </p>
+      />
     ) : null
   };
 
