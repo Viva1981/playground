@@ -1,3 +1,4 @@
+import SafeHtml from "./common/SafeHtml";
 
 import RichText from "@/components/RichText";
 import type { AboutSettings, AboutComponentType } from "@/app/lib/types";
