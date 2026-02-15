@@ -4,6 +4,7 @@ import Image from "next/image";
 
 import RichText from "@/components/RichText";
 import RestaurantGalleryClient from "@/app/components/RestaurantGalleryClient";
+import { formatEventDateLabel } from "@/app/lib/formatEventDateLabel";
 
 export const dynamic = "force-dynamic";
 
@@ -13,30 +14,24 @@ type Props = {
 
 type EventRow = {
   title: string;
-  starts_at: string;
+  starts_at: string | null;
+  schedule_type?: "datetime" | "date_range" | "undated" | null;
+  starts_on?: string | null;
+  ends_on?: string | null;
+  date_label?: string | null;
   body: string | null;
   cover_path: string | null;
   gallery_paths: string[] | null;
 };
 
-function formatHuDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleString("hu-HU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 export default async function EventDetailPage({ params }: Props) {
   const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
 
   const { data: event } = await supabase
     .from("events")
-    .select("title, starts_at, body, cover_path, gallery_paths")
-    .eq("slug", slug)
+    .select("title, starts_at, schedule_type, starts_on, ends_on, date_label, body, cover_path, gallery_paths")
+    .eq("slug", decodedSlug)
     .eq("is_published", true)
     .single<EventRow>();
 
@@ -61,7 +56,7 @@ export default async function EventDetailPage({ params }: Props) {
       <div className="mx-auto max-w-4xl px-6 py-12">
         <h1 className="text-3xl md:text-5xl font-bold mb-4">{event.title}</h1>
 
-        <div className="text-neutral-600 mb-8">{formatHuDate(event.starts_at)}</div>
+        <div className="text-neutral-600 mb-8">{formatEventDateLabel(event)}</div>
 
         {coverUrl && (
           <div className="mb-10 w-full aspect-[2/1] bg-white relative">

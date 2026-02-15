@@ -1,20 +1,11 @@
 // app/events/page.tsx
 import { getUpcomingEvents } from "@/app/lib/getUpcomingEvents";
+import { formatEventDateLabel } from "@/app/lib/formatEventDateLabel";
 import Link from "next/link";
 import Image from "next/image";
 
 // Frissítés kényszerítése (hogy mindig lássuk az új eventeket)
 export const dynamic = "force-dynamic";
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("hu-HU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 export default async function EventsPage() {
   const events = await getUpcomingEvents();
@@ -61,7 +52,7 @@ export default async function EventsPage() {
                             </span>
                         )}
                         <span className="text-xs font-medium text-neutral-500">
-                            {formatDate(event.starts_at)}
+                            {formatEventDateLabel(event)}
                         </span>
                    </div>
                   
