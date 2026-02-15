@@ -104,12 +104,15 @@ export default async function EventDetailPage({ params }: Props) {
         }))
     : [];
 
+  const dateLabel = formatEventDateLabel(event);
+  const showDate = dateLabel.toLowerCase() !== "idopont hamarosan";
+
   return (
     <main className="min-h-screen pb-20 bg-white">
       <div className="mx-auto max-w-4xl px-6 py-12">
         <h1 className="text-3xl md:text-5xl font-bold mb-4">{event.title}</h1>
 
-        <div className="text-neutral-600 mb-8">{formatEventDateLabel(event)}</div>
+        {showDate && <div className="text-neutral-600 mb-8">{dateLabel}</div>}
 
         {coverUrl && (
           <div className="mb-10 w-full aspect-[2/1] bg-white relative">

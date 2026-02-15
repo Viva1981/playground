@@ -51,6 +51,13 @@ export default async function HomeEvents() {
     return "Program";
   };
 
+  const shouldShowDate = (event: (typeof sortedEvents)[number]) => {
+    return formatEventDateLabel(event).toLowerCase() !== "idopont hamarosan";
+  };
+  const getDateLabel = (event: (typeof sortedEvents)[number]) => {
+    return shouldShowDate(event) ? formatEventDateLabel(event) : null;
+  };
+
   return (
     <section className="py-10 md:py-14" style={{ backgroundColor: bgColor, color: contentColor }}>
       <div className="container mx-auto px-6">
@@ -89,7 +96,7 @@ export default async function HomeEvents() {
                           Kiemelt
                         </span>
                         <span className="text-xs font-medium text-neutral-500">
-                          {formatEventDateLabel(featuredEvent)}
+                          {getDateLabel(featuredEvent)}
                         </span>
                       </div>
                       <h3 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-3">
@@ -128,7 +135,7 @@ export default async function HomeEvents() {
                           <span className="text-xs font-semibold bg-neutral-100 text-neutral-700 px-2 py-1 rounded-full">
                             Beszámoló
                           </span>
-                          <span className="text-xs text-neutral-500">{formatEventDateLabel(event)}</span>
+                          <span className="text-xs text-neutral-500">{getDateLabel(event)}</span>
                         </div>
                         <h4 className="text-lg font-bold text-neutral-900 mb-2">{event.title}</h4>
                         {event.summary && (
@@ -173,7 +180,7 @@ export default async function HomeEvents() {
                           </span>
                         </div>
                         <span className="text-xs font-medium text-neutral-500 whitespace-nowrap">
-                          {formatEventDateLabel(event)}
+                          {getDateLabel(event)}
                         </span>
                       </div>
                       <h3 className="text-xl font-bold text-neutral-900 mb-2 group-hover:text-neutral-700 transition-colors">
