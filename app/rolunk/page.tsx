@@ -1,3 +1,4 @@
+import SafeHtml from "@/app/components/common/SafeHtml";
 // app/rolunk/page.tsx
 import { getRolunkSection } from "@/app/lib/getRolunkSection";
 import { Metadata } from "next";
