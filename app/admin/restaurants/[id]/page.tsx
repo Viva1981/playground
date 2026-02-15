@@ -51,6 +51,8 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
   const [coverUploading, setCoverUploading] = useState(false);
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [draggedGalleryPath, setDraggedGalleryPath] = useState<string | null>(null);
+  const [dropTargetPath, setDropTargetPath] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -97,6 +99,38 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
     });
 
     return true;
+  }
+
+  function reorderGalleryPaths(paths: string[], draggedPath: string, targetPath: string) {
+    const fromIndex = paths.indexOf(draggedPath);
+    const toIndex = paths.indexOf(targetPath);
+    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return paths;
+
+    const next = [...paths];
+    const [moved] = next.splice(fromIndex, 1);
+    next.splice(toIndex, 0, moved);
+    return next;
+  }
+
+  async function moveGalleryImage(draggedPath: string, targetPath: string) {
+    if (!restaurant || draggedPath === targetPath) return;
+    if (galleryUploading || deleting) return;
+
+    const current = getGalleryPaths(restaurant);
+    const next = reorderGalleryPaths(current, draggedPath, targetPath);
+    if (next === current) return;
+
+    setGalleryUploading(true);
+    try {
+      const ok = await updateGalleryInDb(next);
+      if (!ok) throw new Error("A galeria sorrend mentese sikertelen.");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Hiba a galeria sorrendezes soran.");
+    } finally {
+      setGalleryUploading(false);
+      setDraggedGalleryPath(null);
+      setDropTargetPath(null);
+    }
   }
 
   async function save() {
@@ -397,12 +431,40 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
             disabled={galleryUploading || deleting || !galleryField || galleryPaths.length >= 10}
             onChange={(e) => e.target.files && uploadGallery(e.target.files)}
           />
-          {galleryUploading && <span className="text-sm text-blue-600 ml-2">Feltoltes...</span>}
+          {galleryUploading && <span className="text-sm text-blue-600 ml-2">Feltoltes / mentes...</span>}
+          {galleryPaths.length > 1 && (
+            <p className="mt-2 text-xs text-neutral-500">
+              Tipp: huzd at a kepeket drag-and-drop modon a kivant sorrendhez.
+            </p>
+          )}
 
           {galleryPaths.length > 0 && (
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
               {galleryPaths.map((path) => (
-                <div key={path} className="relative aspect-square rounded-lg overflow-hidden border bg-neutral-100">
+                <div
+                  key={path}
+                  draggable={!galleryUploading && !deleting}
+                  onDragStart={() => setDraggedGalleryPath(path)}
+                  onDragEnd={() => {
+                    setDraggedGalleryPath(null);
+                    setDropTargetPath(null);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (draggedGalleryPath && draggedGalleryPath !== path) {
+                      setDropTargetPath(path);
+                    }
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (draggedGalleryPath && draggedGalleryPath !== path) {
+                      void moveGalleryImage(draggedGalleryPath, path);
+                    }
+                  }}
+                  className={`relative aspect-square rounded-lg overflow-hidden border bg-neutral-100 cursor-move ${
+                    draggedGalleryPath === path ? "opacity-60" : ""
+                  } ${dropTargetPath === path ? "ring-2 ring-black/40" : ""}`}
+                >
                   <Image
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${path}`}
                     alt="Galeria"
