@@ -43,7 +43,7 @@ export default async function EventsPage() {
                 className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
               >
                 {/* KÉP */}
-                <div className="relative aspect-video bg-neutral-200">
+                <div className="relative aspect-[2/1] bg-neutral-200">
                   {event.cover_path ? (
                     <Image
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}

@@ -52,12 +52,12 @@ export default async function EventDetailPage({ params }: Props) {
         </div>
 
         {coverUrl && (
-  <div className="mb-10 w-full aspect-[16/9] bg-black relative">
+  <div className="mb-10 w-full aspect-[2/1] bg-black relative">
     <Image
       src={coverUrl}
       alt={event.title}
       fill
-      className="object-contain"
+      className="object-cover"
     />
   </div>
 )}
