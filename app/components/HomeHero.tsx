@@ -1,10 +1,8 @@
-import SafeHtml from "./common/SafeHtml";
-// app/components/HomeHero.tsx
-"use client";
 
+"use client";
+import SafeHtml from "./common/SafeHtml";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
 import RichText from "@/components/RichText";
 import type { HeroSettings, HeroComponentType } from "@/app/lib/types";
 
