@@ -1,5 +1,4 @@
+@import "./prose-fix.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import "./prose-fix.css";
