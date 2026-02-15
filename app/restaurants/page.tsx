@@ -1,18 +1,34 @@
-import { supabase } from "@/app/utils/supabaseClient";
+﻿import { supabase } from "@/app/utils/supabaseClient";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
 
-// Hogy mindig friss adatot mutasson (ha új étterem kerül be)
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Éttermek | Vis Eat Miskolc",
-  description: "Miskolc legjobb éttermei, gasztro helyei és partnereink egy helyen.",
+  title: "Ettermek | Vis Eat Miskolc",
+  description: "Miskolc legjobb ettermei, gasztro helyei es partnereink egy helyen.",
 };
 
+function MapPinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 21s-6-5.7-6-10a6 6 0 1 1 12 0c0 4.3-6 10-6 10Z" />
+      <circle cx="12" cy="11" r="2.5" />
+    </svg>
+  );
+}
+
 export default async function RestaurantsPage() {
-  // Lekérjük az aktív éttermeket ABC sorrendben
   const { data: restaurants } = await supabase
     .from("restaurants")
     .select("id, name, slug, address, cover_path")
@@ -21,21 +37,18 @@ export default async function RestaurantsPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Lista / Grid */}
       <div className="px-6 py-10 md:py-14 mx-auto max-w-6xl">
         <div className="mb-6">
           <Link
             href="/"
             className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium hover:bg-neutral-50"
           >
-            ← Vissza a főoldalra
+            ← Vissza a fooldalra
           </Link>
         </div>
 
         {!restaurants || restaurants.length === 0 ? (
-          <div className="text-center text-neutral-500 py-10">
-            Jelenleg nincs megjeleníthető étterem.
-          </div>
+          <div className="text-center text-neutral-500 py-10">Jelenleg nincs megjelenitheto etterem.</div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {restaurants.map((place) => (
@@ -44,7 +57,6 @@ export default async function RestaurantsPage() {
                 href={`/restaurants/${place.slug}`}
                 className="group flex flex-col overflow-hidden rounded-2xl border bg-white transition hover:shadow-xl hover:-translate-y-1"
               >
-                {/* Kép Konténer */}
                 <div className="relative w-full aspect-[2/1] overflow-hidden bg-neutral-100">
                   {place.cover_path ? (
                     <Image
@@ -55,20 +67,17 @@ export default async function RestaurantsPage() {
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-neutral-400">
-                      <span className="text-sm">Nincs kép</span>
+                      <span className="text-sm">Nincs kep</span>
                     </div>
                   )}
                 </div>
 
-                {/* Szöveges rész */}
                 <div className="flex flex-1 flex-col p-6">
-                  <h2 className="text-xl font-bold text-neutral-900 mb-2 group-hover:text-black">
-                    {place.name}
-                  </h2>
-                  
+                  <h2 className="text-xl font-bold text-neutral-900 mb-2 group-hover:text-black">{place.name}</h2>
+
                   {place.address && (
                     <div className="flex items-start gap-2 text-sm text-neutral-500 mb-3">
-                      <span>📍</span>
+                      <MapPinIcon className="h-4 w-4 mt-0.5 shrink-0" />
                       <span>{place.address}</span>
                     </div>
                   )}
