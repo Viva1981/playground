@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 import RichTextEditor from "@/app/components/admin/RichTextEditor";
+import { deleteEventAssets, deletePaths } from "@/app/utils/adminMediaClient";
 
 type EventRow = {
   id: string;
@@ -91,7 +92,9 @@ export default function EditEventPage({
     if (!event) return;
 
     setCoverUploading(true);
+    setError(null);
 
+    const previousCoverPath = event.cover_path;
     const ext = file.name.split(".").pop();
     const filePath = `events/${event.id}/cover.${ext}`;
 
@@ -105,16 +108,59 @@ export default function EditEventPage({
       return;
     }
 
+    if (previousCoverPath && previousCoverPath !== filePath) {
+      try {
+        await deletePaths([previousCoverPath]);
+      } catch (deleteErr) {
+        await deletePaths([filePath]).catch(() => undefined);
+        const message =
+          deleteErr instanceof Error ? deleteErr.message : "A korábbi borítókép törlése sikertelen.";
+        setError(message);
+        setCoverUploading(false);
+        return;
+      }
+    }
+
     const { error: dbError } = await supabase
       .from("events")
       .update({ cover_path: filePath })
       .eq("id", event.id);
 
-    if (!dbError) {
-      setEvent({ ...event, cover_path: filePath });
+    if (dbError) {
+      if (previousCoverPath !== filePath) {
+        await deletePaths([filePath]).catch(() => undefined);
+      }
+      setError(dbError.message);
+      setCoverUploading(false);
+      return;
     }
 
+    setEvent({ ...event, cover_path: filePath });
     setCoverUploading(false);
+  }
+
+  async function deleteCover() {
+    if (!event?.cover_path) return;
+    if (!confirm("Biztosan törlöd a borítóképet?")) return;
+
+    setCoverUploading(true);
+    setError(null);
+
+    try {
+      await deletePaths([event.cover_path]);
+
+      const { error: dbError } = await supabase
+        .from("events")
+        .update({ cover_path: null })
+        .eq("id", event.id);
+
+      if (dbError) throw new Error(dbError.message);
+      setEvent({ ...event, cover_path: null });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Hiba a borítókép törlése során.");
+    } finally {
+      setCoverUploading(false);
+    }
   }
 
   async function uploadGalleryImages(files: FileList) {
@@ -158,28 +204,48 @@ export default function EditEventPage({
     if (!confirm("Biztosan törlöd ezt a képet?")) return;
 
     setGalleryUploading(true);
+    setError(null);
 
-    await supabase.storage.from("public-media").remove([path]);
+    try {
+      await deletePaths([path]);
 
-    const newGallery = (event.gallery_paths ?? []).filter(
-      (p) => p !== path
-    );
+      const newGallery = (event.gallery_paths ?? []).filter(
+        (p) => p !== path
+      );
 
-    await supabase
-      .from("events")
-      .update({ gallery_paths: newGallery })
-      .eq("id", event.id);
+      const { error: dbError } = await supabase
+        .from("events")
+        .update({ gallery_paths: newGallery })
+        .eq("id", event.id);
 
-    setEvent({ ...event, gallery_paths: newGallery });
-    setGalleryUploading(false);
+      if (dbError) throw new Error(dbError.message);
+      setEvent({ ...event, gallery_paths: newGallery });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Hiba a galéria törlése során.");
+    } finally {
+      setGalleryUploading(false);
+    }
   }
 
   async function removeEvent() {
     if (!event) return;
     if (!confirm("Biztosan törlöd az eseményt?")) return;
 
-    await supabase.from("events").delete().eq("id", event.id);
-    router.replace("/admin/events");
+    setSaving(true);
+    setError(null);
+
+    try {
+      await deleteEventAssets(event.id);
+
+      const { error: dbError } = await supabase.from("events").delete().eq("id", event.id);
+      if (dbError) throw new Error(dbError.message);
+
+      router.replace("/admin/events");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Hiba az esemény törlése során.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (loading) return <div className="p-6">Betöltés…</div>;
@@ -249,13 +315,26 @@ export default function EditEventPage({
               />
             </div>
           )}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) =>
-              e.target.files && uploadCover(e.target.files[0])
-            }
-          />
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              type="file"
+              accept="image/*"
+              disabled={coverUploading || saving}
+              onChange={(e) =>
+                e.target.files && uploadCover(e.target.files[0])
+              }
+            />
+            {event.cover_path && (
+              <button
+                type="button"
+                onClick={deleteCover}
+                disabled={coverUploading || saving}
+                className="border px-3 py-1.5 rounded text-red-600 disabled:opacity-50"
+              >
+                Borítókép törlése
+              </button>
+            )}
+          </div>
         </div>
 
         {/* GALÉRIA */}
@@ -265,6 +344,7 @@ export default function EditEventPage({
             type="file"
             multiple
             accept="image/*"
+            disabled={galleryUploading || saving}
             onChange={(e) =>
               e.target.files && uploadGalleryImages(e.target.files)
             }
@@ -284,7 +364,8 @@ export default function EditEventPage({
                 />
                 <button
                   onClick={() => deleteGalleryImage(path)}
-                  className="absolute top-1 right-1 bg-white rounded-full w-6 h-6 text-red-600"
+                  disabled={galleryUploading || saving}
+                  className="absolute top-1 right-1 bg-white rounded-full w-6 h-6 text-red-600 disabled:opacity-50"
                 >
                   ×
                 </button>
@@ -296,16 +377,18 @@ export default function EditEventPage({
         <div className="flex gap-3">
           <button
             onClick={save}
+            disabled={saving || galleryUploading || coverUploading}
             className="bg-black text-white px-6 py-3 rounded"
           >
-            Mentés
+            {saving ? "Mentés..." : "Mentés"}
           </button>
 
           <button
             onClick={removeEvent}
+            disabled={saving || galleryUploading || coverUploading}
             className="border px-6 py-3 rounded text-red-600"
           >
-            Törlés
+            {saving ? "Folyamatban..." : "Törlés"}
           </button>
         </div>
       </div>

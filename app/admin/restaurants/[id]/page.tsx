@@ -2,15 +2,27 @@
 
 import { useEffect, useState, use } from "react"; // Next 15+ miatt use() kell a params-hoz
 import { supabase } from "@/app/utils/supabaseClient";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import { deletePaths } from "@/app/utils/adminMediaClient";
+
+type RestaurantRow = {
+  id: string;
+  name: string;
+  slug: string;
+  address: string | null;
+  phone: string | null;
+  website: string | null;
+  description: string | null;
+  is_active: boolean;
+  cover_path: string | null;
+};
 
 export default function EditRestaurantPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter();
   // Next.js 16-ban a params Promise, ki kell csomagolni:
   const { id } = use(params);
 
-  const [restaurant, setRestaurant] = useState<any>(null);
+  const [restaurant, setRestaurant] = useState<RestaurantRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -21,7 +33,7 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
         .from("restaurants")
         .select("*")
         .eq("id", id)
-        .single();
+        .single<RestaurantRow>();
       setRestaurant(data);
       setLoading(false);
     })();
@@ -47,6 +59,7 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
 
   async function uploadCover(file: File) {
     setUploading(true);
+    const previousCoverPath = restaurant.cover_path as string | null;
     const fileExt = file.name.split(".").pop();
     const filePath = `restaurants/${id}/cover.${fileExt}`;
 
@@ -54,14 +67,63 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
       .from("public-media")
       .upload(filePath, file, { upsert: true });
 
-    if (!uploadError) {
-      await supabase
-        .from("restaurants")
-        .update({ cover_path: filePath })
-        .eq("id", id);
-      setRestaurant({ ...restaurant, cover_path: filePath });
+    if (uploadError) {
+      setUploading(false);
+      alert(uploadError.message);
+      return;
     }
+
+    if (previousCoverPath && previousCoverPath !== filePath) {
+      try {
+        await deletePaths([previousCoverPath]);
+      } catch (deleteErr) {
+        await deletePaths([filePath]).catch(() => undefined);
+        const message =
+          deleteErr instanceof Error ? deleteErr.message : "A korábbi borítókép törlése sikertelen.";
+        setUploading(false);
+        alert(message);
+        return;
+      }
+    }
+
+    const { error: dbError } = await supabase
+      .from("restaurants")
+      .update({ cover_path: filePath })
+      .eq("id", id);
+
+    if (dbError) {
+      if (previousCoverPath !== filePath) {
+        await deletePaths([filePath]).catch(() => undefined);
+      }
+      setUploading(false);
+      alert(dbError.message);
+      return;
+    }
+
+    setRestaurant({ ...restaurant, cover_path: filePath });
     setUploading(false);
+  }
+
+  async function deleteCover() {
+    if (!restaurant?.cover_path) return;
+    if (!confirm("Biztosan törlöd a borítóképet?")) return;
+
+    setUploading(true);
+    try {
+      await deletePaths([restaurant.cover_path]);
+
+      const { error: dbError } = await supabase
+        .from("restaurants")
+        .update({ cover_path: null })
+        .eq("id", id);
+
+      if (dbError) throw new Error(dbError.message);
+      setRestaurant({ ...restaurant, cover_path: null });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Hiba a borítókép törlése során.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   if (loading) return <div className="p-6">Betöltés...</div>;
@@ -71,7 +133,7 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
     <main className="p-6 max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Étterem szerkesztése</h1>
-        <a href="/admin/restaurants" className="text-sm underline">Vissza</a>
+        <Link href="/admin/restaurants" className="text-sm underline">Vissza</Link>
       </div>
 
       <div className="grid gap-4 bg-white p-6 rounded-xl border shadow-sm">
@@ -151,6 +213,16 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
             disabled={uploading}
             onChange={(e) => e.target.files?.[0] && uploadCover(e.target.files[0])}
           />
+          {restaurant.cover_path && (
+            <button
+              type="button"
+              disabled={uploading}
+              onClick={deleteCover}
+              className="ml-3 border px-3 py-1.5 rounded text-red-600 disabled:opacity-50"
+            >
+              Borítókép törlése
+            </button>
+          )}
           {uploading && <span className="text-sm text-blue-600 ml-2">Feltöltés...</span>}
         </div>
 

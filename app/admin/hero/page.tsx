@@ -5,6 +5,7 @@ import { supabase } from "@/app/utils/supabaseClient";
 import RichTextEditor from "@/app/components/admin/RichTextEditor";
 // JAVÍTVA: A Hero típusokat importáljuk, nem az About-ot
 import type { HeroSettings, HeroComponentType } from "@/app/lib/types";
+import { deleteByDiff, deletePaths } from "@/app/utils/adminMediaClient";
 
 const COMPONENT_LABELS: Record<HeroComponentType, string> = {
     title: "Főcím",
@@ -26,6 +27,7 @@ export default function AdminHeroPage() {
   const [ctaUrl2, setCtaUrl2] = useState("");
 
   const [mediaPaths, setMediaPaths] = useState<string[]>([]);
+  const [initialMediaPaths, setInitialMediaPaths] = useState<string[]>([]);
   
   // Kezdeti állapot típushelyesen
   const [settings, setSettings] = useState<HeroSettings>({
@@ -54,6 +56,7 @@ export default function AdminHeroPage() {
         setCtaLabel2(data.cta_label_2 || "");
         setCtaUrl2(data.cta_url_2 || "");
         setMediaPaths(data.media_paths || []);
+        setInitialMediaPaths(data.media_paths || []);
         
         if (data.settings) {
             // Biztonságos casting és merge
@@ -99,7 +102,20 @@ export default function AdminHeroPage() {
     }
   };
 
-  const removeImage = (indexToRemove: number) => {
+  const removeImage = async (indexToRemove: number) => {
+      const pathToRemove = mediaPaths[indexToRemove];
+      if (!pathToRemove) return;
+
+      if (!initialMediaPaths.includes(pathToRemove)) {
+        try {
+          await deletePaths([pathToRemove]);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Hiba a képtörlés során.";
+          alert(message);
+          return;
+        }
+      }
+
       setMediaPaths(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
@@ -115,20 +131,31 @@ export default function AdminHeroPage() {
 
   async function save() {
     setSaving(true);
-    const { error } = await supabase
-      .from("page_sections")
-      .update({
-        title, body,
-        cta_label: ctaLabel, cta_url: ctaUrl,
-        cta_label_2: ctaLabel2, cta_url_2: ctaUrl2,
-        media_paths: mediaPaths,
-        settings: settings
-      })
-      .eq("key", "home_hero");
-    
-    setSaving(false);
-    if (error) alert("Hiba mentéskor!");
-    else alert("Sikeres mentés!");
+    try {
+      await deleteByDiff(initialMediaPaths, mediaPaths);
+
+      const { error } = await supabase
+        .from("page_sections")
+        .update({
+          title, body,
+          cta_label: ctaLabel, cta_url: ctaUrl,
+          cta_label_2: ctaLabel2, cta_url_2: ctaUrl2,
+          media_paths: mediaPaths,
+          settings: settings
+        })
+        .eq("key", "home_hero");
+
+      if (error) alert("Hiba mentéskor!");
+      else {
+        setInitialMediaPaths(mediaPaths);
+        alert("Sikeres mentés!");
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Hiba a képtörlés során.";
+      alert(message);
+    } finally {
+      setSaving(false);
+    }
   }
 
   const getStorageUrl = (path: string) => 

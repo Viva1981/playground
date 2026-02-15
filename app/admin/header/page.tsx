@@ -4,6 +4,7 @@ import { useEffect, useState, ChangeEvent } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import RichTextEditor from "@/app/components/admin/RichTextEditor";
 import type { HeaderSettings, MenuItem } from "@/app/lib/types";
+import { deleteByDiff, deletePaths } from "@/app/utils/adminMediaClient";
 
 export default function AdminHeaderPage() {
   const [loading, setLoading] = useState(true);
@@ -12,6 +13,7 @@ export default function AdminHeaderPage() {
 
   // Logo
   const [logoPath, setLogoPath] = useState<string | null>(null);
+  const [initialLogoPath, setInitialLogoPath] = useState<string | null>(null);
   
   // Settings
   const [settings, setSettings] = useState<HeaderSettings>({
@@ -32,6 +34,7 @@ export default function AdminHeaderPage() {
       if (data) {
         if (data.media_paths && data.media_paths.length > 0) {
             setLogoPath(data.media_paths[0]);
+            setInitialLogoPath(data.media_paths[0]);
         }
         
         if (data.settings) {
@@ -62,7 +65,18 @@ export default function AdminHeaderPage() {
         const { error: uploadError } = await supabase.storage.from("public-media").upload(filePath, file);
         if (uploadError) throw uploadError;
 
-        setLogoPath(filePath); 
+        const previousUnsavedPath =
+          logoPath && logoPath !== initialLogoPath ? logoPath : null;
+
+        if (previousUnsavedPath) {
+          try {
+            await deletePaths([previousUnsavedPath]);
+          } catch (cleanupError) {
+            console.warn("Nem sikerült törölni a korábbi ideiglenes logót:", cleanupError);
+          }
+        }
+
+        setLogoPath(filePath);
     } catch (error) {
         console.error(error);
         alert("Hiba a feltöltés során!");
@@ -97,18 +111,31 @@ export default function AdminHeaderPage() {
   async function save() {
     setSaving(true);
     const mediaToSave = logoPath ? [logoPath] : [];
+    const oldPaths = initialLogoPath ? [initialLogoPath] : [];
 
-    const { error } = await supabase
-      .from("page_sections")
-      .update({
-        media_paths: mediaToSave,
-        settings: settings
-      })
-      .eq("key", "global_header");
-    
-    setSaving(false);
-    if (error) alert("Hiba mentéskor!");
-    else alert("Sikeres mentés!");
+    try {
+      await deleteByDiff(oldPaths, mediaToSave);
+
+      const { error } = await supabase
+        .from("page_sections")
+        .update({
+          media_paths: mediaToSave,
+          settings: settings
+        })
+        .eq("key", "global_header");
+
+      if (error) {
+        alert("Hiba mentéskor!");
+      } else {
+        setInitialLogoPath(logoPath);
+        alert("Sikeres mentés!");
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Hiba a képtörlés során.";
+      alert(message);
+    } finally {
+      setSaving(false);
+    }
   }
 
   const getStorageUrl = (path: string) => 
