@@ -86,10 +86,11 @@ function GlobeIcon({ className }: { className?: string }) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
   const { data: restaurant } = await supabase
     .from("restaurants")
     .select("name, description, cover_path")
-    .eq("slug", slug)
+    .eq("slug", decodedSlug)
     .eq("is_active", true)
     .single<{ name: string; description: string | null; cover_path: string | null }>();
 
@@ -114,7 +115,7 @@ export default async function RestaurantDetailPage({ params }: Props) {
 
   const { data: restaurant } = await supabase
     .from("restaurants")
-    .select("id, name, slug, description, cover_path, address, phone, website, is_active, gallery_paths, gallery_images")
+    .select("*")
     .eq("slug", decodedSlug)
     .eq("is_active", true)
     .single<RestaurantDetailRow>();
