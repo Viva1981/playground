@@ -40,6 +40,8 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
   }, [id]);
 
   async function save() {
+    if (!restaurant) return;
+
     setSaving(true);
     await supabase
       .from("restaurants")
@@ -58,6 +60,8 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
   }
 
   async function uploadCover(file: File) {
+    if (!restaurant) return;
+
     setUploading(true);
     const previousCoverPath = restaurant.cover_path as string | null;
     const fileExt = file.name.split(".").pop();

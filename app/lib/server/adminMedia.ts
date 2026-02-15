@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/app/lib/server/supabaseAdmin";
+import { getSupabaseAdmin } from "@/app/lib/server/supabaseAdmin";
 
 const BUCKET = "public-media";
 
@@ -8,6 +8,7 @@ export function diffRemovedPaths(oldPaths: string[], newPaths: string[]): string
 }
 
 export async function deleteFiles(paths: string[]) {
+  const supabaseAdmin = getSupabaseAdmin();
   const filtered = paths.filter(Boolean);
   if (filtered.length === 0) return { success: true as const };
 
@@ -20,6 +21,7 @@ export async function deleteFiles(paths: string[]) {
 }
 
 export async function getEventAssetPaths(eventId: string) {
+  const supabaseAdmin = getSupabaseAdmin();
   const { data, error } = await supabaseAdmin
     .from("events")
     .select("cover_path, gallery_paths")
@@ -37,4 +39,3 @@ export async function getEventAssetPaths(eventId: string) {
 
   return { success: true as const, paths };
 }
-
