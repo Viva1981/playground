@@ -57,7 +57,7 @@ export default async function EventDetailPage({ params }: Props) {
       src={coverUrl}
       alt={event.title}
       fill
-      className="object-cover"
+      className="object-contain bg-black"
     />
   </div>
 )}
