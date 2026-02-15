@@ -13,6 +13,8 @@ type EventRow = {
   title: string;
   slug: string;
   starts_at: string | null;
+  is_featured?: boolean | null;
+  featured_rank?: number | null;
   event_type?: "program" | "news" | "report" | null;
   schedule_type?: "datetime" | "date_range" | "undated" | null;
   starts_on?: string | null;
@@ -68,6 +70,14 @@ export default function EditEventPage({
       Object.prototype.hasOwnProperty.call(event, "starts_on") &&
       Object.prototype.hasOwnProperty.call(event, "ends_on") &&
       Object.prototype.hasOwnProperty.call(event, "date_label")
+    );
+  }, [event]);
+
+  const supportsFeaturedFields = useMemo(() => {
+    if (!event) return false;
+    return (
+      Object.prototype.hasOwnProperty.call(event, "is_featured") &&
+      Object.prototype.hasOwnProperty.call(event, "featured_rank")
     );
   }, [event]);
 
@@ -135,6 +145,22 @@ export default function EditEventPage({
       if (advancedError) {
         setSaving(false);
         setError(advancedError.message);
+        return;
+      }
+    }
+
+    if (supportsFeaturedFields) {
+      const { error: featuredError } = await supabase
+        .from("events")
+        .update({
+          is_featured: Boolean(event.is_featured),
+          featured_rank: event.is_featured ? Number(event.featured_rank ?? 0) : 0,
+        })
+        .eq("id", event.id);
+
+      if (featuredError) {
+        setSaving(false);
+        setError(featuredError.message);
         return;
       }
     }
@@ -426,6 +452,43 @@ export default function EditEventPage({
                 placeholder="pl. Hamarosan, vagy 2026 március"
               />
             </div>
+          </div>
+        )}
+
+        {supportsFeaturedFields && (
+          <div className="rounded-xl border p-4 bg-neutral-50">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={Boolean(event.is_featured)}
+                onChange={(e) =>
+                  setEvent({
+                    ...event,
+                    is_featured: e.target.checked,
+                    featured_rank: e.target.checked ? Number(event.featured_rank ?? 0) : 0,
+                  })
+                }
+              />
+              <span className="text-sm font-medium">Kiemelt esemény</span>
+            </label>
+
+            {event.is_featured && (
+              <div className="mt-3">
+                <div className="font-medium mb-1 text-sm">Kiemelt sorrend</div>
+                <input
+                  type="number"
+                  min={0}
+                  className="w-full border rounded p-3"
+                  value={event.featured_rank ?? 0}
+                  onChange={(e) =>
+                    setEvent({
+                      ...event,
+                      featured_rank: Number(e.target.value) || 0,
+                    })
+                  }
+                />
+              </div>
+            )}
           </div>
         )}
 

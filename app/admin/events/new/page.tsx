@@ -45,6 +45,8 @@ export default function NewEventPage() {
 
   const [eventType, setEventType] = useState<EventType>("program");
   const [scheduleType, setScheduleType] = useState<ScheduleType>("datetime");
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [featuredRank, setFeaturedRank] = useState(0);
 
   const [startsAt, setStartsAt] = useState("");
   const [startsOn, setStartsOn] = useState("");
@@ -64,7 +66,7 @@ export default function NewEventPage() {
           .order("name"),
         supabase
           .from("events")
-          .select("id, event_type, schedule_type, starts_on, ends_on, date_label")
+          .select("id, event_type, schedule_type, starts_on, ends_on, date_label, is_featured, featured_rank")
           .limit(1),
       ]);
 
@@ -145,6 +147,8 @@ export default function NewEventPage() {
       insertPayload.ends_on = endsOn || null;
       insertPayload.date_label = dateLabel.trim() || null;
       insertPayload.body = body.trim() || null;
+      insertPayload.is_featured = isFeatured;
+      insertPayload.featured_rank = isFeatured ? featuredRank : 0;
     }
 
     const { error } = await supabase.from("events").insert(insertPayload);
@@ -214,6 +218,29 @@ export default function NewEventPage() {
               <option value="news">Hir</option>
               <option value="report">Beszamolo</option>
             </select>
+          </div>
+
+          <div className="rounded-xl border p-4 bg-neutral-50">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+              />
+              <span className="text-sm font-medium">Kiemelt esemény</span>
+            </label>
+            {isFeatured && (
+              <div className="mt-3">
+                <label className="block text-sm font-medium mb-1">Kiemelt sorrend</label>
+                <input
+                  type="number"
+                  min={0}
+                  className="w-full rounded-xl border p-3"
+                  value={featuredRank}
+                  onChange={(e) => setFeaturedRank(Number(e.target.value) || 0)}
+                />
+              </div>
+            )}
           </div>
 
           <div>
