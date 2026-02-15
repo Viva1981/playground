@@ -176,8 +176,8 @@ export default function EditEventPage({
     setError(null);
 
     const previousCoverPath = event.cover_path;
-    const ext = file.name.split(".").pop();
-    const filePath = `events/${event.id}/cover.${ext}`;
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const filePath = `events/${event.id}/cover-${Date.now()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from("public-media")
