@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import RestaurantGalleryClient from "@/app/components/RestaurantGalleryClient";
 
 export const dynamic = "force-dynamic";
 
@@ -175,34 +176,7 @@ export default async function RestaurantDetailPage({ params }: Props) {
             <RichText html={restaurant.description ?? ""} className="prose-lg" />
 
             {galleryUrls.length > 0 && (
-              <section className="mt-10">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-neutral-900">Galeria</h2>
-                  <span className="text-xs font-medium text-neutral-500">{galleryUrls.length}/10 kep</span>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[120px] md:auto-rows-[150px] gap-3">
-                  {galleryUrls.map((img, idx) => (
-                    <a
-                      key={img.path}
-                      href={img.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`group relative overflow-hidden rounded-xl border bg-neutral-100 ${
-                        idx === 0 ? "col-span-2 row-span-2" : "col-span-1 row-span-1"
-                      }`}
-                    >
-                      <Image
-                        src={img.url}
-                        alt={`${restaurant.name} - galeria ${idx + 1}`}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </a>
-                  ))}
-                </div>
-              </section>
+              <RestaurantGalleryClient images={galleryUrls} restaurantName={restaurant.name} />
             )}
           </div>
 
