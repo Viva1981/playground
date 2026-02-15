@@ -183,7 +183,7 @@ export default function HomeHero({
     return (
       <section className="flex flex-col md:block md:relative w-full bg-white md:bg-black md:h-[700px]">
         {/* Kép Konténer (Mobil 3:1) */}
-        <div className="relative w-full aspect-[2/1] md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
+        <div className="relative w-full aspect-[3/1] md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
              <ImageSlider isStackMobile={true} />
              <div 
                 className="hidden md:block absolute inset-0 bg-black pointer-events-none transition-opacity duration-500" 
@@ -218,7 +218,7 @@ export default function HomeHero({
         className="bg-white"
         style={{ backgroundColor: customBgColor }} 
     >
-      <div className="relative w-full aspect-[2/1] md:aspect-[2/1] max-h-[600px] overflow-hidden bg-neutral-50">
+      <div className="relative w-full aspect-[3/1] md:aspect-[3/1] max-h-[600px] overflow-hidden bg-neutral-50">
         <ImageSlider isStackMobile={true} />
       </div>
 

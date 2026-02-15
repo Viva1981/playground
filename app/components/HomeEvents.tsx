@@ -61,7 +61,7 @@ export default async function HomeEvents() {
                 className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-neutral-100"
               >
                 {/* Kép */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
+                <div className="relative aspect-[2/1] overflow-hidden bg-neutral-100">
                   {event.cover_path ? (
                     <Image
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
