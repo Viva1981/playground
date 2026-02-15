@@ -71,19 +71,17 @@ export default async function HomeEvents() {
                 href={`/events/${featuredEvent.slug}`}
                 className="group block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2">
-                  <div className="relative aspect-[2/1] md:aspect-auto md:min-h-[260px] bg-neutral-100">
-                    {featuredEvent.cover_path ? (
+                <div className={`grid grid-cols-1 ${featuredEvent.cover_path ? "md:grid-cols-2" : ""}`}>
+                  {featuredEvent.cover_path && (
+                    <div className="relative w-full aspect-[2/1] bg-neutral-100">
                       <Image
                         src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${featuredEvent.cover_path}`}
                         alt={featuredEvent.title}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-neutral-400">Nincs kep</div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   <div className="p-6 md:p-8 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-3">
@@ -108,9 +106,6 @@ export default async function HomeEvents() {
 
             {reportEvents.length > 0 && (
               <div>
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-neutral-900">Beszámolók</h3>
-                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {reportEvents.map((event) => (
                     <Link
@@ -118,18 +113,16 @@ export default async function HomeEvents() {
                       href={`/events/${event.slug}`}
                       className="group block rounded-2xl border border-neutral-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <div className="relative aspect-[2/1] bg-neutral-100">
-                        {event.cover_path ? (
+                      {event.cover_path && (
+                        <div className="relative aspect-[2/1] bg-neutral-100">
                           <Image
                             src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
                             alt={event.title}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                           />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center text-neutral-400">Nincs kep</div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                       <div className="p-5">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold bg-neutral-100 text-neutral-700 px-2 py-1 rounded-full">
@@ -156,18 +149,16 @@ export default async function HomeEvents() {
                     href={`/events/${event.slug}`}
                     className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-neutral-100"
                   >
-                    <div className="relative aspect-[2/1] overflow-hidden bg-neutral-100">
-                      {event.cover_path ? (
+                    {event.cover_path && (
+                      <div className="relative aspect-[2/1] overflow-hidden bg-neutral-100">
                         <Image
                           src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
                           alt={event.title}
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-neutral-400">Nincs kep</div>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-3 gap-3">
