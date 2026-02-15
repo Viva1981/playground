@@ -117,7 +117,7 @@ export default function HomeHero({
         ) : null,
         
         body: body ? (
-            <RichText key="body" html={body} className={`text-lg md:text-xl leading-relaxed ${!customContentColor ? defaultBodyColor : ''}`} />
+          <RichText key="body" html={body} className={`text-lg md:text-xl leading-relaxed ${!customContentColor ? defaultBodyColor : ''}`} style={customContentColor ? { color: customContentColor } : undefined} />
         ) : null,
         
         buttons: (ctaLabel || ctaLabel2) ? (

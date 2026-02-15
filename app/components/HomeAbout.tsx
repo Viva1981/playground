@@ -30,7 +30,7 @@ export default function HomeAbout({ title, body, settings }: Props) {
     ) : null,
 
     body: body ? (
-      <RichText key="body" html={body} className={!customContentColor ? 'text-neutral-700' : ''} />
+      <RichText key="body" html={body} className={!customContentColor ? 'text-neutral-700' : ''} style={customContentColor ? { color: customContentColor } : undefined} />
     ) : null
   };
 

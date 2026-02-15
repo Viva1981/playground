@@ -48,7 +48,7 @@ export default async function HomeEvents() {
             className="text-3xl md:text-4xl font-bold mb-4"
             style={{ color: contentColor }}
           />
-          <RichText html={body} className="text-lg opacity-80" />
+          <RichText html={body} className="text-lg opacity-80" style={{ color: contentColor }} />
         </div>
 
         {/* ESEMÉNY LISTA */}

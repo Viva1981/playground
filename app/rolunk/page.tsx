@@ -56,7 +56,7 @@ export default async function RolunkPage() {
           )}
 
           {/* SZÖVEG */}
-          <RichText html={body} className="" />
+          <RichText html={body} className="" style={{ color: textColor }} />
         </article>
       </div>
     </main>
