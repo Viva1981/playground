@@ -13,7 +13,7 @@ function fixListHtml(html: string): string {
   // Regex: keresd meg azokat a <li> elemeket, amelyekben több <br> van
   return html.replace(/<li>([\s\S]*?<br>[\s\S]*?)<\/li>/g, (match, content) => {
     // Szétbontjuk <br> alapján
-    const items = content.split(/<br\s*\/?\s*>/).map(item => item.trim()).filter(Boolean);
+    const items = content.split(/<br\s*\/?\s*>/).map((item: string) => item.trim()).filter(Boolean);
     // Új <li> elemeket készítünk
     return items.map(item => `<li>${item}</li>`).join('');
   });
