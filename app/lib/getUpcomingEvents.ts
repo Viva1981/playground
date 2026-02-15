@@ -13,6 +13,8 @@ export type EventListItem = {
   starts_at: string | null;
   summary: string | null;
   cover_path: string | null;
+  is_featured?: boolean | null;
+  featured_rank?: number | null;
   event_type?: "program" | "news" | "report" | null;
   schedule_type?: "datetime" | "date_range" | "undated" | null;
   starts_on?: string | null;
@@ -43,7 +45,7 @@ export async function getUpcomingEvents(limit: number = 12): Promise<EventListIt
   noStore();
 
   const advancedSelect =
-    "id, title, slug, starts_at, summary, cover_path, event_type, schedule_type, starts_on, ends_on, date_label, restaurants(name, slug)";
+    "id, title, slug, starts_at, summary, cover_path, is_featured, featured_rank, event_type, schedule_type, starts_on, ends_on, date_label, restaurants(name, slug)";
   const legacySelect =
     "id, title, slug, starts_at, summary, cover_path, restaurants(name, slug)";
 

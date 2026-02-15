@@ -21,6 +21,36 @@ export default async function HomeEvents() {
   const bgColor = settings.background_color || "#ffffff";
   const contentColor = settings.content_color || "#000000";
 
+  const sortedEvents = [...events].sort((a, b) => {
+    const aFeatured = a.is_featured ? 1 : 0;
+    const bFeatured = b.is_featured ? 1 : 0;
+    if (aFeatured !== bFeatured) return bFeatured - aFeatured;
+
+    const aRank = a.featured_rank ?? Number.MAX_SAFE_INTEGER;
+    const bRank = b.featured_rank ?? Number.MAX_SAFE_INTEGER;
+    if (aRank !== bRank) return aRank - bRank;
+
+    const aTime = a.starts_at ? new Date(a.starts_at).getTime() : 0;
+    const bTime = b.starts_at ? new Date(b.starts_at).getTime() : 0;
+    return bTime - aTime;
+  });
+
+  const featuredEvent = sortedEvents.find((e) => e.is_featured) ?? null;
+  const reportEvents = sortedEvents
+    .filter((e) => e.event_type === "report" && e.id !== featuredEvent?.id)
+    .slice(0, 2);
+  const excludedIds = new Set<string>([
+    ...(featuredEvent ? [featuredEvent.id] : []),
+    ...reportEvents.map((e) => e.id),
+  ]);
+  const regularEvents = sortedEvents.filter((e) => !excludedIds.has(e.id));
+
+  const typeLabel = (type: string | null | undefined) => {
+    if (type === "report") return "Beszámoló";
+    if (type === "news") return "Hír";
+    return "Program";
+  };
+
   return (
     <section className="py-10 md:py-14" style={{ backgroundColor: bgColor, color: contentColor }}>
       <div className="container mx-auto px-6">
@@ -35,46 +65,135 @@ export default async function HomeEvents() {
         </div>
 
         {events.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
+          <div className="space-y-10">
+            {featuredEvent && (
               <Link
-                key={event.id}
-                href={`/events/${event.slug}`}
-                className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-neutral-100"
+                href={`/events/${featuredEvent.slug}`}
+                className="group block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="relative aspect-[2/1] overflow-hidden bg-neutral-100">
-                  {event.cover_path ? (
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
-                      alt={event.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-neutral-400">Nincs kep</div>
-                  )}
-                </div>
-
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    {event.restaurants ? (
-                      <span className="text-xs font-bold text-black bg-neutral-100 px-2 py-1 rounded">
-                        {event.restaurants.name}
-                      </span>
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                  <div className="relative aspect-[2/1] md:aspect-auto md:min-h-[260px] bg-neutral-100">
+                    {featuredEvent.cover_path ? (
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${featuredEvent.cover_path}`}
+                        alt={featuredEvent.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
                     ) : (
-                      <span />
+                      <div className="absolute inset-0 flex items-center justify-center text-neutral-400">Nincs kep</div>
                     )}
-                    <span className="text-xs font-medium text-neutral-500">
-                      {formatEventDateLabel(event)}
-                    </span>
                   </div>
-                  <h3 className="text-xl font-bold text-neutral-900 mb-2 group-hover:text-neutral-700 transition-colors">
-                    {event.title}
-                  </h3>
-                  {event.summary && <p className="text-neutral-600 text-sm line-clamp-2">{event.summary}</p>}
+                  <div className="p-6 md:p-8 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xs font-semibold bg-black text-white px-2.5 py-1 rounded-full">
+                          Kiemelt
+                        </span>
+                        <span className="text-xs font-medium text-neutral-500">
+                          {formatEventDateLabel(featuredEvent)}
+                        </span>
+                      </div>
+                      <h3 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-3">
+                        {featuredEvent.title}
+                      </h3>
+                      {featuredEvent.summary && (
+                        <p className="text-neutral-600 line-clamp-3">{featuredEvent.summary}</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </Link>
-            ))}
+            )}
+
+            {reportEvents.length > 0 && (
+              <div>
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-neutral-900">Beszámolók</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {reportEvents.map((event) => (
+                    <Link
+                      key={event.id}
+                      href={`/events/${event.slug}`}
+                      className="group block rounded-2xl border border-neutral-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="relative aspect-[2/1] bg-neutral-100">
+                        {event.cover_path ? (
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
+                            alt={event.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-neutral-400">Nincs kep</div>
+                        )}
+                      </div>
+                      <div className="p-5">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold bg-neutral-100 text-neutral-700 px-2 py-1 rounded-full">
+                            Beszámoló
+                          </span>
+                          <span className="text-xs text-neutral-500">{formatEventDateLabel(event)}</span>
+                        </div>
+                        <h4 className="text-lg font-bold text-neutral-900 mb-2">{event.title}</h4>
+                        {event.summary && (
+                          <p className="text-sm text-neutral-600 line-clamp-2">{event.summary}</p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {regularEvents.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {regularEvents.map((event) => (
+                  <Link
+                    key={event.id}
+                    href={`/events/${event.slug}`}
+                    className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-neutral-100"
+                  >
+                    <div className="relative aspect-[2/1] overflow-hidden bg-neutral-100">
+                      {event.cover_path ? (
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${event.cover_path}`}
+                          alt={event.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-neutral-400">Nincs kep</div>
+                      )}
+                    </div>
+
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-3 gap-3">
+                        <div className="flex gap-2 items-center min-h-[24px]">
+                          {event.restaurants ? (
+                            <span className="text-xs font-bold text-black bg-neutral-100 px-2 py-1 rounded">
+                              {event.restaurants.name}
+                            </span>
+                          ) : null}
+                          <span className="text-xs font-medium text-neutral-600 bg-neutral-50 px-2 py-1 rounded">
+                            {typeLabel(event.event_type)}
+                          </span>
+                        </div>
+                        <span className="text-xs font-medium text-neutral-500 whitespace-nowrap">
+                          {formatEventDateLabel(event)}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-neutral-900 mb-2 group-hover:text-neutral-700 transition-colors">
+                        {event.title}
+                      </h3>
+                      {event.summary && <p className="text-neutral-600 text-sm line-clamp-2">{event.summary}</p>}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-12 opacity-60">
