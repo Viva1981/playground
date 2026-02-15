@@ -161,8 +161,8 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
 
     setCoverUploading(true);
     const previousCoverPath = restaurant.cover_path;
-    const fileExt = file.name.split(".").pop();
-    const filePath = `restaurants/${id}/cover.${fileExt}`;
+    const fileExt = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const filePath = `restaurants/${id}/cover-${Date.now()}.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
       .from("public-media")
