@@ -53,17 +53,21 @@ export default async function HomeEvents() {
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-neutral-400">Nincs kep</div>
                   )}
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-black shadow-sm">
-                    {formatEventDateLabel(event)}
-                  </div>
                 </div>
 
                 <div className="p-6">
-                  {event.restaurants && (
-                    <div className="text-xs font-bold text-neutral-500 uppercase tracking-wide mb-2">
-                      {event.restaurants.name}
-                    </div>
-                  )}
+                  <div className="flex justify-between items-start mb-3">
+                    {event.restaurants ? (
+                      <span className="text-xs font-bold text-black bg-neutral-100 px-2 py-1 rounded">
+                        {event.restaurants.name}
+                      </span>
+                    ) : (
+                      <span />
+                    )}
+                    <span className="text-xs font-medium text-neutral-500">
+                      {formatEventDateLabel(event)}
+                    </span>
+                  </div>
                   <h3 className="text-xl font-bold text-neutral-900 mb-2 group-hover:text-neutral-700 transition-colors">
                     {event.title}
                   </h3>
