@@ -24,6 +24,21 @@ export type EventListItem = {
   } | null;
 };
 
+type RawEventRow = Omit<EventListItem, "restaurants"> & {
+  restaurants: { name: string; slug: string } | { name: string; slug: string }[] | null;
+};
+
+function normalizeEventRow(row: RawEventRow): EventListItem {
+  const restaurants = Array.isArray(row.restaurants)
+    ? (row.restaurants[0] ?? null)
+    : row.restaurants;
+
+  return {
+    ...row,
+    restaurants: restaurants ? { name: restaurants.name, slug: restaurants.slug } : null,
+  };
+}
+
 export async function getUpcomingEvents(limit: number = 12): Promise<EventListItem[]> {
   noStore();
 
@@ -41,7 +56,7 @@ export async function getUpcomingEvents(limit: number = 12): Promise<EventListIt
     .limit(limit);
 
   if (!advancedError) {
-    return (advancedData as EventListItem[]) ?? [];
+    return ((advancedData as RawEventRow[]) ?? []).map(normalizeEventRow);
   }
 
   // Fallback régi sémára
@@ -57,5 +72,5 @@ export async function getUpcomingEvents(limit: number = 12): Promise<EventListIt
     return [];
   }
 
-  return (legacyData as EventListItem[]) ?? [];
+  return ((legacyData as RawEventRow[]) ?? []).map(normalizeEventRow);
 }
