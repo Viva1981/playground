@@ -21,21 +21,8 @@ export default async function RestaurantsPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Fejléc */}
-      <div className="border-b bg-neutral-50 px-6 py-16 md:py-24">
-        <div className="mx-auto max-w-6xl text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-900 mb-4">
-            Éttermek & Helyek
-          </h1>
-          <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-            Ismerd meg Miskolc gasztronómiai kínálatát. Partnereink, ahol mindig
-            jókat ehetsz, és szuper eseményeken vehetsz részt.
-          </p>
-        </div>
-      </div>
-
       {/* Lista / Grid */}
-      <div className="px-6 py-16 mx-auto max-w-6xl">
+      <div className="px-6 py-10 md:py-14 mx-auto max-w-6xl">
         {!restaurants || restaurants.length === 0 ? (
           <div className="text-center text-neutral-500 py-10">
             Jelenleg nincs megjeleníthető étterem.
