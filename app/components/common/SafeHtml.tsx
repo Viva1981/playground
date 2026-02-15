@@ -21,7 +21,8 @@ export default function SafeHtml({
     if (!html) return "";
     return DOMPurify.sanitize(html, {
       ALLOWED_TAGS: [
-        "b", "strong", "i", "em", "u", "a", "span"
+        "b", "strong", "i", "em", "u", "a", "span",
+        "ul", "ol", "li", "h1", "h2", "h3", "h4", "h5", "h6", "p", "br"
       ],
       ALLOWED_ATTR: ["href", "title", "target", "rel", "class"],
       KEEP_CONTENT: true,
