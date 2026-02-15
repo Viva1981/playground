@@ -1,3 +1,4 @@
+import SafeHtml from "./common/SafeHtml";
 // app/components/HomeEvents.tsx
 import Image from "next/image";
 import Link from "next/link";
