@@ -1,3 +1,4 @@
+import SafeHtml from "./common/SafeHtml";
 // app/components/HomeHero.tsx
 "use client";
 
