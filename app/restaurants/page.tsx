@@ -2,7 +2,6 @@ import { supabase } from "@/app/utils/supabaseClient";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
-import RichText from "@/components/RichText";
 
 // Hogy mindig friss adatot mutasson (ha új étterem kerül be)
 export const dynamic = "force-dynamic";
@@ -16,7 +15,7 @@ export default async function RestaurantsPage() {
   // Lekérjük az aktív éttermeket ABC sorrendben
   const { data: restaurants } = await supabase
     .from("restaurants")
-    .select("id, name, slug, address, cover_path, description")
+    .select("id, name, slug, address, cover_path")
     .eq("is_active", true)
     .order("name");
 
@@ -46,7 +45,7 @@ export default async function RestaurantsPage() {
                 className="group flex flex-col overflow-hidden rounded-2xl border bg-white transition hover:shadow-xl hover:-translate-y-1"
               >
                 {/* Kép Konténer */}
-                <div className="relative h-56 w-full overflow-hidden bg-neutral-100">
+                <div className="relative w-full aspect-[2/1] overflow-hidden bg-neutral-100">
                   {place.cover_path ? (
                     <Image
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${place.cover_path}`}
@@ -73,20 +72,6 @@ export default async function RestaurantsPage() {
                       <span>{place.address}</span>
                     </div>
                   )}
-
-                  {place.description && (
-                    <div className="relative mb-4 max-h-24 overflow-hidden">
-                      <RichText
-                        html={place.description}
-                        className="prose-sm text-neutral-600 [&_p]:my-0 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5"
-                      />
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent" />
-                    </div>
-                  )}
-
-                  <div className="mt-auto pt-4 border-t flex items-center text-sm font-semibold underline underline-offset-4">
-                    Adatlap megtekintése
-                  </div>
                 </div>
               </Link>
             ))}
