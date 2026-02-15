@@ -1,6 +1,7 @@
 ﻿import { supabase } from "@/app/utils/supabaseClient";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import type { ReactNode } from "react";
 
 import RichText from "@/components/RichText";
 import RestaurantGalleryClient from "@/app/components/RestaurantGalleryClient";
@@ -30,7 +31,7 @@ function renderBodyWithGalleryShortcodes(
   title: string
 ) {
   const tokenRegex = /\[galeria-(\d+)\]/gi;
-  const nodes: JSX.Element[] = [];
+  const nodes: ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null = null;
   let key = 0;
