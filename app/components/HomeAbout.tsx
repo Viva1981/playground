@@ -36,7 +36,7 @@ export default function HomeAbout({ title, body, settings }: Props) {
 
   return (
     <section 
-      className="px-6 py-24"
+      className="px-6 py-14 md:py-16"
       // Háttérszín alkalmazása
       style={{ backgroundColor: customBgColor }} 
     >

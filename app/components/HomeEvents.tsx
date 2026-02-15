@@ -35,13 +35,13 @@ export default async function HomeEvents() {
 
   return (
     <section 
-        className="py-16 md:py-24"
+        className="py-10 md:py-14"
         style={{ backgroundColor: bgColor, color: contentColor }}
     >
       <div className="container mx-auto px-6">
         
         {/* DINAMIKUS FEJLÉC */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className="text-center max-w-2xl mx-auto mb-10">
           <SafeHtml
             html={title}
             tag="h2"
