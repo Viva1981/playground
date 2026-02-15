@@ -21,19 +21,17 @@ export default async function EventsPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 pb-20">
-      
-      {/* FEJLÉC (Egyszerű, fix) */}
-      <div className="bg-white border-b py-16 md:py-24 mb-12">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Miskolci Gasztro Események</h1>
-          <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-            Böngészd át partnereink következő eseményeit, és foglalj asztalt időben!
-          </p>
-        </div>
-      </div>
-
       {/* LISTA */}
-      <div className="container mx-auto px-6">
+      <div className="px-6 py-10 md:py-14 mx-auto max-w-6xl">
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium hover:bg-neutral-50"
+          >
+            ← Vissza a főoldalra
+          </Link>
+        </div>
+
         {events.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((event) => (
