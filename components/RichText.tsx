@@ -15,7 +15,7 @@ function fixListHtml(html: string): string {
     // Szétbontjuk <br> alapján
     const items = content.split(/<br\s*\/?\s*>/).map((item: string) => item.trim()).filter(Boolean);
     // Új <li> elemeket készítünk
-    return items.map(item => `<li>${item}</li>`).join('');
+    return items.map((item: string) => `<li>${item}</li>`).join('');
   });
 }
 
