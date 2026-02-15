@@ -2,6 +2,7 @@ import { supabase } from "@/app/utils/supabaseClient";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
+import RichText from "@/components/RichText";
 
 // Hogy mindig friss adatot mutasson (ha új étterem kerül be)
 export const dynamic = "force-dynamic";
@@ -74,9 +75,13 @@ export default async function RestaurantsPage() {
                   )}
 
                   {place.description && (
-                    <p className="text-sm text-neutral-600 line-clamp-2 mb-4">
-                      {place.description}
-                    </p>
+                    <div className="relative mb-4 max-h-24 overflow-hidden">
+                      <RichText
+                        html={place.description}
+                        className="prose-sm text-neutral-600 [&_p]:my-0 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5"
+                      />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent" />
+                    </div>
                   )}
 
                   <div className="mt-auto pt-4 border-t flex items-center text-sm font-semibold underline underline-offset-4">

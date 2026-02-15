@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
+import RichTextEditor from "@/app/components/admin/RichTextEditor";
 import {
   deletePaths,
   deleteRestaurantWithRelated,
@@ -371,11 +372,17 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
 
         <div>
           <label className="text-sm font-medium">Leiras</label>
-          <textarea
-            className="w-full border p-2 rounded-lg min-h-[100px]"
-            value={restaurant.description || ""}
-            onChange={(e) => setRestaurant({ ...restaurant, description: e.target.value })}
-          />
+          <div className="mt-1">
+            <RichTextEditor
+              value={restaurant.description || ""}
+              onChange={(value) => setRestaurant({ ...restaurant, description: value })}
+              placeholder="Etterem leiras (formatalhato)..."
+              minHeight="160px"
+            />
+          </div>
+          <p className="mt-2 text-xs text-neutral-500">
+            A kartyan a rich text formazas megjelenik roviditett nezetben.
+          </p>
         </div>
 
         <div className="border-t pt-4 mt-2">
