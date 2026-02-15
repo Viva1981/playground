@@ -1,4 +1,5 @@
-import SafeHtml from "./common/SafeHtml";
+
+import RichText from "@/components/RichText";
 import type { AboutSettings, AboutComponentType } from "@/app/lib/types";
 
 type Props = {
@@ -28,13 +29,7 @@ export default function HomeAbout({ title, body, settings }: Props) {
     ) : null,
 
     body: body ? (
-      <SafeHtml
-        key="body" 
-        html={body}
-        tag="div"
-        className={`text-lg leading-relaxed prose prose-sm max-w-none ${!customContentColor ? 'text-neutral-700' : ''}`}
-        style={{ color: customContentColor }}
-      />
+      <RichText key="body" html={body} className={!customContentColor ? 'text-neutral-700' : ''} />
     ) : null
   };
 

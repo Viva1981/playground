@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import SafeHtml from "./common/SafeHtml";
+
+import RichText from "@/components/RichText";
 import type { HeroSettings, HeroComponentType } from "@/app/lib/types";
 
 const getStorageUrl = (path: string) => {
@@ -117,13 +118,7 @@ export default function HomeHero({
         ) : null,
         
         body: body ? (
-            <SafeHtml
-              key="body" 
-              html={body}
-              tag="p"
-              className={`text-lg md:text-xl leading-relaxed ${!customContentColor ? defaultBodyColor : ''}`}
-              style={{ color: customContentColor }}
-            />
+            <RichText key="body" html={body} className={`text-lg md:text-xl leading-relaxed ${!customContentColor ? defaultBodyColor : ''}`} />
         ) : null,
         
         buttons: (ctaLabel || ctaLabel2) ? (

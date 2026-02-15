@@ -1,7 +1,8 @@
 // app/rolunk/page.tsx
 import { getRolunkSection } from "@/app/lib/getRolunkSection";
 import { Metadata } from "next";
-import SafeHtml from "@/app/components/common/SafeHtml";
+
+import RichText from "@/components/RichText";
 
 export const dynamic = "force-dynamic";
 
@@ -54,11 +55,7 @@ export default async function RolunkPage() {
           )}
 
           {/* SZÖVEG */}
-          <div
-            className="prose prose-neutral max-w-none text-neutral-800 [&_p]:mb-4 [&_br]:block"
-            dangerouslySetInnerHTML={{ __html: body ?? "" }}
-            style={{ color: textColor }}
-          />
+          <RichText html={body} className="" />
         </article>
       </div>
     </main>

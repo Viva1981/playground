@@ -1,7 +1,8 @@
 // app/components/HomeEvents.tsx
 import Image from "next/image";
 import Link from "next/link";
-import SafeHtml from "./common/SafeHtml";
+
+import RichText from "@/components/RichText";
 import { getUpcomingEvents } from "@/app/lib/getUpcomingEvents";
 import { getHomeSection } from "@/app/lib/getHomeSection";
 import type { EventsSectionSettings } from "@/app/lib/types";
@@ -46,12 +47,7 @@ export default async function HomeEvents() {
             className="text-3xl md:text-4xl font-bold mb-4"
             style={{ color: contentColor }}
           />
-          <SafeHtml
-            html={body}
-            tag="p"
-            className="text-lg opacity-80"
-            style={{ color: contentColor }}
-          />
+          <RichText html={body} className="text-lg opacity-80" />
         </div>
 
         {/* ESEMÉNY LISTA */}

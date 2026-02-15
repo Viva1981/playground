@@ -1,7 +1,8 @@
 import { supabase } from "@/app/utils/supabaseClient";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import SafeHtml from "@/app/components/common/SafeHtml";
+
+import RichText from "@/components/RichText";
 
 export const dynamic = "force-dynamic";
 
@@ -62,12 +63,7 @@ export default async function EventDetailPage({ params }: Props) {
 )}
 
         {/* LEÍRÁS */}
-        {event.body && (
-          <div
-            className="prose prose-neutral max-w-none text-neutral-800 [&_p]:mb-4 [&_br]:block"
-            dangerouslySetInnerHTML={{ __html: event.body ?? "" }}
-          />
-        )}
+        {event.body && <RichText html={event.body} />}
 
         {/* GALÉRIA */}
         {event.gallery_paths && event.gallery_paths.length > 0 && (

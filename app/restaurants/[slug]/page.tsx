@@ -1,3 +1,4 @@
+import RichText from "@/components/RichText";
 import { supabase } from "@/app/utils/supabaseClient";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
@@ -95,9 +96,7 @@ export default async function RestaurantDetailPage({ params }: Props) {
               {restaurant.name}
             </h1>
 
-            <div className="prose prose-neutral prose-lg max-w-none text-neutral-800">
-              <p className="whitespace-pre-wrap">{restaurant.description}</p>
-            </div>
+            <RichText html={restaurant.description} className="prose-lg" />
           </div>
 
           {/* Infó Doboz (Jobb oldal / Sidebar) */}
