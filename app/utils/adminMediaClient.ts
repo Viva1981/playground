@@ -40,3 +40,6 @@ export async function deleteEventAssets(eventId: string) {
   return postAdminMedia({ action: "deleteEventAssets", eventId });
 }
 
+export async function deleteRestaurantWithRelated(restaurantId: string) {
+  return postAdminMedia({ action: "deleteRestaurantWithRelated", restaurantId });
+}

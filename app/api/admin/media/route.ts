@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
   deleteFiles,
+  deleteRestaurantWithRelatedData,
   diffRemovedPaths,
   getEventAssetPaths,
 } from "@/app/lib/server/adminMedia";
@@ -9,7 +10,8 @@ import {
 type Body =
   | { action: "deletePaths"; paths: string[] }
   | { action: "deleteByDiff"; oldPaths: string[]; newPaths: string[] }
-  | { action: "deleteEventAssets"; eventId: string };
+  | { action: "deleteEventAssets"; eventId: string }
+  | { action: "deleteRestaurantWithRelated"; restaurantId: string };
 
 function createUserScopedSupabase(accessToken: string) {
   return createClient(
@@ -97,6 +99,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, removed: eventAssets.paths });
   }
 
+  if (body.action === "deleteRestaurantWithRelated") {
+    const result = await deleteRestaurantWithRelatedData(body.restaurantId);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      removed: result.removedPaths,
+      removedEventCount: result.removedEventCount,
+    });
+  }
+
   return NextResponse.json({ error: "Unsupported action" }, { status: 400 });
 }
-
