@@ -24,6 +24,58 @@ type EventRow = {
   gallery_paths: string[] | null;
 };
 
+function renderBodyWithGalleryShortcodes(
+  bodyHtml: string,
+  galleryUrls: Array<{ path: string; url: string }>,
+  title: string
+) {
+  const tokenRegex = /\[galeria-(\d+)\]/gi;
+  const nodes: JSX.Element[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null = null;
+  let key = 0;
+
+  while ((match = tokenRegex.exec(bodyHtml)) !== null) {
+    const tokenStart = match.index;
+    const tokenEnd = tokenRegex.lastIndex;
+    const rawIndex = Number(match[1]);
+    const galleryIndex = rawIndex - 1;
+
+    const htmlPart = bodyHtml.slice(lastIndex, tokenStart);
+    if (htmlPart.trim()) {
+      nodes.push(<RichText key={`body-${key++}`} html={htmlPart} />);
+    }
+
+    const img = galleryUrls[galleryIndex];
+    if (img) {
+      nodes.push(
+        <figure
+          key={`gallery-inline-${img.path}-${key++}`}
+          className="my-8 w-full overflow-hidden rounded-2xl border bg-neutral-100"
+        >
+          <div className="relative aspect-[2/1] w-full">
+            <Image
+              src={img.url}
+              alt={`${title} - galeria ${rawIndex}`}
+              fill
+              className="object-cover"
+            />
+          </div>
+        </figure>
+      );
+    }
+
+    lastIndex = tokenEnd;
+  }
+
+  const tail = bodyHtml.slice(lastIndex);
+  if (tail.trim()) {
+    nodes.push(<RichText key={`body-tail-${key++}`} html={tail} />);
+  }
+
+  return nodes.length > 0 ? nodes : <RichText html={bodyHtml} />;
+}
+
 export default async function EventDetailPage({ params }: Props) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
@@ -44,7 +96,7 @@ export default async function EventDetailPage({ params }: Props) {
   const galleryUrls = Array.isArray(event.gallery_paths)
     ? event.gallery_paths
         .filter((imgPath): imgPath is string => Boolean(imgPath))
-        .slice(0, 10)
+        .slice(0, 25)
         .map((imgPath) => ({
           path: imgPath,
           url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${imgPath}`,
@@ -64,10 +116,14 @@ export default async function EventDetailPage({ params }: Props) {
           </div>
         )}
 
-        {event.body && <RichText html={event.body} />}
+        {event.body && renderBodyWithGalleryShortcodes(event.body, galleryUrls, event.title)}
 
         {galleryUrls.length > 0 && (
-          <RestaurantGalleryClient images={galleryUrls} restaurantName={event.title} />
+          <RestaurantGalleryClient
+            images={galleryUrls}
+            restaurantName={event.title}
+            featuredIndexes={[0, 11, 24]}
+          />
         )}
       </div>
     </main>

@@ -313,6 +313,9 @@ export default function NewEventPage() {
               placeholder="Hir vagy beszamolo tartalma..."
               minHeight="180px"
             />
+            <p className="text-xs text-neutral-500 mt-2">
+              Tipp: fix galeria kep beszurasahoz hasznalhatsz shortcode-ot, pl. <code>[galeria-1]</code>, <code>[galeria-12]</code>.
+            </p>
           </div>
 
           {schemaSupportsAdvanced === false && (

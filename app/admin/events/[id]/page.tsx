@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useMemo } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -12,7 +12,12 @@ type EventRow = {
   id: string;
   title: string;
   slug: string;
-  starts_at: string;
+  starts_at: string | null;
+  event_type?: "program" | "news" | "report" | null;
+  schedule_type?: "datetime" | "date_range" | "undated" | null;
+  starts_on?: string | null;
+  ends_on?: string | null;
+  date_label?: string | null;
   summary: string | null;
   body: string | null;
   is_published: boolean;
@@ -20,6 +25,24 @@ type EventRow = {
   restaurant_id: string | null;
   gallery_paths?: string[];
 };
+
+function toLocalDateTimeInput(iso: string | null | undefined) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mi = pad(d.getMinutes());
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+}
+
+function fromLocalDateTimeInput(local: string) {
+  if (!local) return null;
+  return new Date(local).toISOString();
+}
 
 export default function EditEventPage({
   params,
@@ -36,6 +59,17 @@ export default function EditEventPage({
 
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [coverUploading, setCoverUploading] = useState(false);
+
+  const supportsAdvancedFields = useMemo(() => {
+    if (!event) return false;
+    return (
+      Object.prototype.hasOwnProperty.call(event, "event_type") &&
+      Object.prototype.hasOwnProperty.call(event, "schedule_type") &&
+      Object.prototype.hasOwnProperty.call(event, "starts_on") &&
+      Object.prototype.hasOwnProperty.call(event, "ends_on") &&
+      Object.prototype.hasOwnProperty.call(event, "date_label")
+    );
+  }, [event]);
 
   useEffect(() => {
     (async () => {
@@ -67,11 +101,12 @@ export default function EditEventPage({
     setSaving(true);
     setError(null);
 
-    const { error } = await supabase
+    const { error: baseError } = await supabase
       .from("events")
       .update({
         title: event.title,
         slug: event.slug,
+        starts_at: event.starts_at,
         summary: event.summary,
         body: event.body,
         is_published: event.is_published,
@@ -79,13 +114,33 @@ export default function EditEventPage({
       })
       .eq("id", event.id);
 
-    setSaving(false);
-
-    if (error) {
-      setError(error.message);
-    } else {
-      alert("Sikeres mentés!");
+    if (baseError) {
+      setSaving(false);
+      setError(baseError.message);
+      return;
     }
+
+    if (supportsAdvancedFields) {
+      const { error: advancedError } = await supabase
+        .from("events")
+        .update({
+          event_type: event.event_type ?? "program",
+          schedule_type: event.schedule_type ?? "datetime",
+          starts_on: event.starts_on ?? null,
+          ends_on: event.ends_on ?? null,
+          date_label: event.date_label ?? null,
+        })
+        .eq("id", event.id);
+
+      if (advancedError) {
+        setSaving(false);
+        setError(advancedError.message);
+        return;
+      }
+    }
+
+    setSaving(false);
+    alert("Sikeres mentés!");
   }
 
   async function uploadCover(file: File) {
@@ -165,6 +220,10 @@ export default function EditEventPage({
 
   async function uploadGalleryImages(files: FileList) {
     if (!event) return;
+    if ((event.gallery_paths?.length ?? 0) + files.length > 25) {
+      setError("Maximum 25 kép lehet az esemény galériában.");
+      return;
+    }
 
     setGalleryUploading(true);
     const newPaths: string[] = [];
@@ -274,6 +333,102 @@ export default function EditEventPage({
           placeholder="Slug"
         />
 
+        <div>
+          <div className="font-medium mb-1">Kezdés időpontja</div>
+          <input
+            type="datetime-local"
+            className="w-full border rounded p-3"
+            value={toLocalDateTimeInput(event.starts_at)}
+            onChange={(e) =>
+              setEvent({
+                ...event,
+                starts_at: fromLocalDateTimeInput(e.target.value),
+              })
+            }
+          />
+        </div>
+
+        {supportsAdvancedFields && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <div className="font-medium mb-1">Típus</div>
+              <select
+                className="w-full border rounded p-3 bg-white"
+                value={event.event_type ?? "program"}
+                onChange={(e) =>
+                  setEvent({
+                    ...event,
+                    event_type: e.target.value as EventRow["event_type"],
+                  })
+                }
+              >
+                <option value="program">Program</option>
+                <option value="news">Hír</option>
+                <option value="report">Beszámoló</option>
+              </select>
+            </div>
+            <div>
+              <div className="font-medium mb-1">Időkezelés</div>
+              <select
+                className="w-full border rounded p-3 bg-white"
+                value={event.schedule_type ?? "datetime"}
+                onChange={(e) =>
+                  setEvent({
+                    ...event,
+                    schedule_type: e.target.value as EventRow["schedule_type"],
+                  })
+                }
+              >
+                <option value="datetime">Dátum + idő</option>
+                <option value="date_range">Intervallum</option>
+                <option value="undated">Nincs konkrét dátum</option>
+              </select>
+            </div>
+            <div>
+              <div className="font-medium mb-1">Kezdő nap (intervallumnál)</div>
+              <input
+                type="date"
+                className="w-full border rounded p-3"
+                value={event.starts_on ?? ""}
+                onChange={(e) =>
+                  setEvent({
+                    ...event,
+                    starts_on: e.target.value || null,
+                  })
+                }
+              />
+            </div>
+            <div>
+              <div className="font-medium mb-1">Záró nap (intervallumnál)</div>
+              <input
+                type="date"
+                className="w-full border rounded p-3"
+                value={event.ends_on ?? ""}
+                onChange={(e) =>
+                  setEvent({
+                    ...event,
+                    ends_on: e.target.value || null,
+                  })
+                }
+              />
+            </div>
+            <div className="md:col-span-2">
+              <div className="font-medium mb-1">Megjelenítési dátumszöveg</div>
+              <input
+                className="w-full border rounded p-3"
+                value={event.date_label ?? ""}
+                onChange={(e) =>
+                  setEvent({
+                    ...event,
+                    date_label: e.target.value || null,
+                  })
+                }
+                placeholder="pl. Hamarosan, vagy 2026 március"
+              />
+            </div>
+          </div>
+        )}
+
         <textarea
           className="w-full border rounded p-3"
           value={event.summary ?? ""}
@@ -289,6 +444,9 @@ export default function EditEventPage({
             value={event.body ?? ""}
             onChange={(value) => setEvent({ ...event, body: value })}
           />
+          <p className="text-xs text-neutral-500 mt-2">
+            Tipp: a leírásba beszúrhatsz fix galéria képet shortcode-dal, pl. <code>[galeria-1]</code>, <code>[galeria-12]</code>.
+          </p>
         </div>
 
         <label className="flex gap-2 items-center">
@@ -339,12 +497,12 @@ export default function EditEventPage({
 
         {/* GALÉRIA */}
         <div className="space-y-2">
-          <div className="font-medium">Galéria</div>
+          <div className="font-medium">Galéria (max 25)</div>
           <input
             type="file"
             multiple
             accept="image/*"
-            disabled={galleryUploading || saving}
+            disabled={galleryUploading || saving || (event.gallery_paths?.length ?? 0) >= 25}
             onChange={(e) =>
               e.target.files && uploadGalleryImages(e.target.files)
             }

@@ -11,9 +11,14 @@ type GalleryImage = {
 type Props = {
   images: GalleryImage[];
   restaurantName: string;
+  featuredIndexes?: number[];
 };
 
-export default function RestaurantGalleryClient({ images, restaurantName }: Props) {
+export default function RestaurantGalleryClient({
+  images,
+  restaurantName,
+  featuredIndexes = [0],
+}: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
@@ -72,7 +77,7 @@ export default function RestaurantGalleryClient({ images, restaurantName }: Prop
             type="button"
             onClick={() => openAt(idx)}
             className={`group relative overflow-hidden rounded-xl border bg-neutral-100 text-left ${
-              idx === 0 ? "col-span-2 row-span-2" : "col-span-1 row-span-1"
+              featuredIndexes.includes(idx) ? "col-span-2 row-span-2" : "col-span-1 row-span-1"
             }`}
             aria-label={`Galeria kep megnyitasa ${idx + 1}`}
           >
