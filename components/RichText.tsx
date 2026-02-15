@@ -1,6 +1,6 @@
 "use client";
 
-import SafeHtml from "@/app/components/SafeHtml";
+import SafeHtml from "@/app/components/common/SafeHtml";
 
 type Props = {
   html?: string | null;
