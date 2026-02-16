@@ -8,6 +8,8 @@ export default function NewRestaurantPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [lat, setLat] = useState("");
+  const [lng, setLng] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Automatikus slug generálás a névből
@@ -30,6 +32,8 @@ export default function NewRestaurantPage() {
       name,
       slug,
       is_active: true,
+      lat: lat.trim() ? Number(lat) : null,
+      lng: lng.trim() ? Number(lng) : null,
     });
 
     if (!error) {
@@ -63,6 +67,27 @@ export default function NewRestaurantPage() {
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Latitude</label>
+            <input
+              className="w-full border p-2 rounded-lg"
+              value={lat}
+              onChange={(e) => setLat(e.target.value)}
+              placeholder="pl. 48.1035"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Longitude</label>
+            <input
+              className="w-full border p-2 rounded-lg"
+              value={lng}
+              onChange={(e) => setLng(e.target.value)}
+              placeholder="pl. 20.7784"
+            />
+          </div>
         </div>
 
         <button

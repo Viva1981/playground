@@ -17,6 +17,8 @@ type RestaurantRow = {
   name: string;
   slug: string;
   address: string | null;
+  lat: number | null;
+  lng: number | null;
   phone: string | null;
   website: string | null;
   description: string | null;
@@ -144,6 +146,8 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
         name: restaurant.name,
         slug: restaurant.slug,
         address: restaurant.address,
+        lat: restaurant.lat,
+        lng: restaurant.lng,
         phone: restaurant.phone,
         website: restaurant.website,
         description: restaurant.description,
@@ -349,6 +353,37 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
             value={restaurant.address || ""}
             onChange={(e) => setRestaurant({ ...restaurant, address: e.target.value })}
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium">Latitude</label>
+            <input
+              className="w-full border p-2 rounded-lg"
+              value={restaurant.lat ?? ""}
+              onChange={(e) =>
+                setRestaurant({
+                  ...restaurant,
+                  lat: e.target.value === "" ? null : Number(e.target.value),
+                })
+              }
+              placeholder="pl. 48.1035"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Longitude</label>
+            <input
+              className="w-full border p-2 rounded-lg"
+              value={restaurant.lng ?? ""}
+              onChange={(e) =>
+                setRestaurant({
+                  ...restaurant,
+                  lng: e.target.value === "" ? null : Number(e.target.value),
+                })
+              }
+              placeholder="pl. 20.7784"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

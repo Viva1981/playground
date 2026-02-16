@@ -6,6 +6,8 @@ export type Restaurant = {
   name: string;
   slug: string;
   address: string | null;
+  lat: number | null;
+  lng: number | null;
   phone: string | null;
   website: string | null;
   description: string | null;
