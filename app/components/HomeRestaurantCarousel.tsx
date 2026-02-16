@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 type RestaurantItem = {
   id: string;
@@ -23,29 +23,33 @@ const getStorageUrl = (path: string | null) => {
 
 export default function HomeRestaurantCarousel({ items }: Props) {
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const duplicated = useMemo(() => [...items, ...items], [items]);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track || items.length <= 1) return;
 
-    const getStep = () => {
-      const first = track.firstElementChild as HTMLElement | null;
-      return first ? first.offsetWidth + 16 : 280;
-    };
+    let rafId = 0;
+    let lastTime = 0;
+    const speed = 22; // px per second
 
-    const tick = () => {
+    const loop = (time: number) => {
       if (!track) return;
-      const step = getStep();
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      if (track.scrollLeft + step >= maxScroll - 4) {
-        track.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        track.scrollBy({ left: step, behavior: "smooth" });
+      if (!lastTime) lastTime = time;
+      const delta = time - lastTime;
+      lastTime = time;
+
+      const half = track.scrollWidth / 2;
+      track.scrollLeft += (speed * delta) / 1000;
+      if (track.scrollLeft >= half) {
+        track.scrollLeft -= half;
       }
+
+      rafId = window.requestAnimationFrame(loop);
     };
 
-    const interval = window.setInterval(tick, 3500);
-    return () => window.clearInterval(interval);
+    rafId = window.requestAnimationFrame(loop);
+    return () => window.cancelAnimationFrame(rafId);
   }, [items.length]);
 
   if (items.length === 0) return null;
@@ -56,9 +60,9 @@ export default function HomeRestaurantCarousel({ items }: Props) {
         ref={trackRef}
         className="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory no-scrollbar"
       >
-        {items.map((place) => (
+        {duplicated.map((place, index) => (
           <Link
-            key={place.id}
+            key={`${place.id}-${index}`}
             href={`/restaurants/${place.slug}`}
             className="group relative w-[70vw] max-w-[320px] shrink-0 overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-[320px] md:max-w-[360px] snap-start"
           >
