@@ -25,11 +25,11 @@ export default async function MapPage() {
   );
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen" style={{ backgroundColor: headerColor }}>
       <div className="px-6 py-10 md:py-14 mx-auto max-w-6xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">Terkep</h1>
-          <p className="text-sm text-neutral-600">
+          <h1 className="text-3xl font-bold text-white">Terkep</h1>
+          <p className="text-sm text-white/80">
             A VisEat Miskolc programban resztvevo etteremek terkepen.
           </p>
         </div>
@@ -41,7 +41,7 @@ export default async function MapPage() {
           <MapClient headerColor={headerColor} restaurants={restaurants ?? []} />
         </div>
 
-        <div className="mt-8">
+        <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-neutral-900">
             Resztvevo etteremek
           </h2>
