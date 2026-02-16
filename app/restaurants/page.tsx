@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { getHomeSection } from "@/app/lib/getHomeSection";
 import type { HeaderSettings } from "@/app/lib/types";
+import { getHomeHero } from "@/app/lib/getHomeHero";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,10 @@ export default async function RestaurantsPage() {
   const headerSection = await getHomeSection("global_header");
   const headerSettings = (headerSection?.settings ?? {}) as HeaderSettings;
   const headerColor = headerSettings.background_color || "#f5f5f5";
+  const hero = await getHomeHero();
+  const heroSettings = hero?.settings || null;
+  const heroContentColor = heroSettings?.content_color || null;
+  const heroPrimaryTextColor = heroSettings?.primary_button_text_color || "#000000";
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: headerColor }}>
@@ -46,7 +51,14 @@ export default async function RestaurantsPage() {
         <div className="mb-6">
           <Link
             href="/"
-            className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium hover:bg-neutral-50"
+            className={`inline-flex items-center rounded-full px-5 py-2 text-sm font-semibold transition hover:opacity-80 ${
+              heroContentColor ? "" : "bg-black text-white"
+            }`}
+            style={
+              heroContentColor
+                ? { backgroundColor: heroContentColor, color: heroPrimaryTextColor }
+                : undefined
+            }
           >
             ← Vissza a fooldalra
           </Link>
