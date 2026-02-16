@@ -54,14 +54,15 @@ export default function HomeRestaurantCarousel({ items }: Props) {
     <div className="mt-10">
       <div
         ref={trackRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth pb-2"
+        className="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory no-scrollbar"
       >
         {items.map((place) => (
           <Link
             key={place.id}
             href={`/restaurants/${place.slug}`}
-            className="group relative h-48 w-[70vw] max-w-[320px] shrink-0 overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:h-56 sm:w-[320px] md:h-60 md:w-[360px]"
+            className="group relative w-[70vw] max-w-[320px] shrink-0 overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-[320px] md:max-w-[360px] snap-start"
           >
+            <div className="relative w-full aspect-[2/1] overflow-hidden">
             {place.cover_path ? (
               <Image
                 src={getStorageUrl(place.cover_path)}
@@ -79,6 +80,7 @@ export default function HomeRestaurantCarousel({ items }: Props) {
               <div className="text-base font-semibold text-white drop-shadow-sm md:text-lg">
                 {place.name}
               </div>
+            </div>
             </div>
           </Link>
         ))}
