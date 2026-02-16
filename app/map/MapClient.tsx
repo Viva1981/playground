@@ -55,32 +55,38 @@ export default function MapClient({ headerColor, restaurants }: MapClientProps) 
   );
 
   return (
-    <div
-      className="overflow-hidden rounded-2xl border shadow-sm"
-      style={{ backgroundColor: headerColor }}
-    >
-      <MapContainer
-        bounds={bounds}
-        boundsOptions={{ padding: [36, 36] }}
-        style={{ height: "70vh", width: "100%" }}
-        scrollWheelZoom
+    <div className="space-y-4">
+      <div
+        className="relative overflow-hidden rounded-2xl border shadow-sm"
+        style={{ backgroundColor: headerColor }}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {points.map((r) => (
-          <Marker key={r.id} position={[r.lat, r.lng]} icon={markerIcon}>
-            <Popup>
-              <div className="text-sm">
-                <div className="font-semibold">{r.name}</div>
-                {r.address && <div className="text-neutral-600">{r.address}</div>}
-                <div className="mt-1 text-xs text-neutral-500">/{r.slug}</div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+        <MapContainer
+          bounds={bounds}
+          boundsOptions={{ padding: [36, 36] }}
+          className="h-[60vh] md:h-[70vh] w-full"
+          scrollWheelZoom
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {points.map((r) => (
+            <Marker key={r.id} position={[r.lat, r.lng]} icon={markerIcon}>
+              <Popup>
+                <div className="text-sm">
+                  <div className="font-semibold">{r.name}</div>
+                  {r.address && <div className="text-neutral-600">{r.address}</div>}
+                  <div className="mt-1 text-xs text-neutral-500">/{r.slug}</div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+
+        <div className="pointer-events-none absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-neutral-700 shadow">
+          VisEat Miskolc partnerettermei
+        </div>
+      </div>
     </div>
   );
 }
