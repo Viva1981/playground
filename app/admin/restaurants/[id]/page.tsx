@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import RichTextEditor from "@/app/components/admin/RichTextEditor";
+import MapPicker from "@/app/components/admin/MapPicker";
 import {
   deletePaths,
   deleteRestaurantWithRelated,
@@ -385,6 +386,14 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
             />
           </div>
         </div>
+
+        <MapPicker
+          lat={restaurant.lat}
+          lng={restaurant.lng}
+          onChange={(nextLat, nextLng) =>
+            setRestaurant({ ...restaurant, lat: nextLat, lng: nextLng })
+          }
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div>

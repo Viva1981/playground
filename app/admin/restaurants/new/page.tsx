@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
+import MapPicker from "@/app/components/admin/MapPicker";
 
 export default function NewRestaurantPage() {
   const router = useRouter();
@@ -89,6 +90,15 @@ export default function NewRestaurantPage() {
             />
           </div>
         </div>
+
+        <MapPicker
+          lat={lat.trim() ? Number(lat) : null}
+          lng={lng.trim() ? Number(lng) : null}
+          onChange={(nextLat, nextLng) => {
+            setLat(nextLat.toFixed(7));
+            setLng(nextLng.toFixed(7));
+          }}
+        />
 
         <button
           onClick={create}
