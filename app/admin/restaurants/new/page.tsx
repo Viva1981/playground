@@ -91,14 +91,17 @@ export default function NewRestaurantPage() {
           </div>
         </div>
 
-        <MapPicker
-          lat={lat.trim() ? Number(lat) : null}
-          lng={lng.trim() ? Number(lng) : null}
-          onChange={(nextLat, nextLng) => {
-            setLat(nextLat.toFixed(7));
-            setLng(nextLng.toFixed(7));
-          }}
-        />
+        <div className="mt-2">
+          <label className="block text-sm font-medium mb-2">Koordinata valaszto</label>
+          <MapPicker
+            lat={lat.trim() ? Number(lat) : null}
+            lng={lng.trim() ? Number(lng) : null}
+            onChange={(nextLat, nextLng) => {
+              setLat(nextLat.toFixed(7));
+              setLng(nextLng.toFixed(7));
+            }}
+          />
+        </div>
 
         <button
           onClick={create}

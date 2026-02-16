@@ -387,13 +387,16 @@ export default function EditRestaurantPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
 
-        <MapPicker
-          lat={restaurant.lat}
-          lng={restaurant.lng}
-          onChange={(nextLat, nextLng) =>
-            setRestaurant({ ...restaurant, lat: nextLat, lng: nextLng })
-          }
-        />
+        <div className="mt-2">
+          <label className="block text-sm font-medium mb-2">Koordinata valaszto</label>
+          <MapPicker
+            lat={restaurant.lat}
+            lng={restaurant.lng}
+            onChange={(nextLat, nextLng) =>
+              setRestaurant({ ...restaurant, lat: nextLat, lng: nextLng })
+            }
+          />
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
