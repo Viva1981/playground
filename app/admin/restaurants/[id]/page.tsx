@@ -7,7 +7,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import RichTextEditor from "@/app/components/admin/RichTextEditor";
-import MapPicker from "@/app/components/admin/MapPicker";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(() => import("@/app/components/admin/MapPicker"), {
+  ssr: false,
+});
 import {
   deletePaths,
   deleteRestaurantWithRelated,

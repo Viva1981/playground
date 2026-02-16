@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import { useRouter } from "next/navigation";
-import MapPicker from "@/app/components/admin/MapPicker";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(() => import("@/app/components/admin/MapPicker"), {
+  ssr: false,
+});
 
 export default function NewRestaurantPage() {
   const router = useRouter();
