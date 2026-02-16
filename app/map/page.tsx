@@ -16,6 +16,10 @@ export default async function MapPage() {
   const headerSection = await getHomeSection("global_header");
   const headerSettings = (headerSection?.settings ?? {}) as HeaderSettings;
   const headerColor = headerSettings.background_color || "#f5f5f5";
+  const headerLogoPath = headerSection?.media_paths?.[0] || null;
+  const headerLogoUrl = headerLogoPath
+    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${headerLogoPath}`
+    : null;
   const list = (restaurants ?? []).filter(
     (item) =>
       typeof item.lat === "number" &&
@@ -28,26 +32,22 @@ export default async function MapPage() {
     <main className="min-h-screen" style={{ backgroundColor: headerColor }}>
       <div className="px-6 py-10 md:py-14 mx-auto max-w-6xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white">Terkep</h1>
-          <p className="text-sm text-white/80">
-            A VisEat Miskolc programban resztvevo etteremek terkepen.
-          </p>
+          <h1 className="text-3xl font-bold text-white">VisEat Térkép</h1>
         </div>
 
         <div
           className="rounded-2xl p-3 md:p-4"
           style={{ backgroundColor: headerColor }}
         >
-          <MapClient headerColor={headerColor} restaurants={restaurants ?? []} />
+          <MapClient
+            headerColor={headerColor}
+            headerLogoUrl={headerLogoUrl}
+            restaurants={restaurants ?? []}
+          />
         </div>
 
         <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-neutral-900">
-            Resztvevo etteremek
-          </h2>
-          <p className="text-sm text-neutral-600">
-            Kattints a nevukre a reszletekhez.
-          </p>
+          <h2 className="text-lg font-semibold text-neutral-900">VisEat Éttermek</h2>
           {list.length === 0 ? (
             <div className="mt-4 rounded-2xl border bg-white p-6 text-sm text-neutral-600">
               Jelenleg nincs olyan etterem, amelyhez megadott koordinata van.

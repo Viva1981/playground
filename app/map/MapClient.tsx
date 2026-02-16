@@ -16,6 +16,7 @@ type MapRestaurant = {
 
 type MapClientProps = {
   headerColor: string;
+  headerLogoUrl: string | null;
   restaurants: MapRestaurant[];
 };
 
@@ -23,7 +24,7 @@ function isValidCoord(value: number | null) {
   return typeof value === "number" && Number.isFinite(value);
 }
 
-export default function MapClient({ headerColor, restaurants }: MapClientProps) {
+export default function MapClient({ headerColor, headerLogoUrl, restaurants }: MapClientProps) {
   const points = useMemo(
     () =>
       restaurants
@@ -46,12 +47,13 @@ export default function MapClient({ headerColor, restaurants }: MapClientProps) 
     () =>
       L.divIcon({
         className: "map-pin",
-        html:
-          '<span style="display:block;width:18px;height:18px;border-radius:999px;border:2px solid #111;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.2);"></span>',
-        iconSize: [18, 18],
-        iconAnchor: [9, 9],
+        html: headerLogoUrl
+          ? `<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;border:2px solid #111;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.2);overflow:hidden;"><img src="${headerLogoUrl}" alt="" style="width:20px;height:20px;object-fit:contain;display:block;" /></span>`
+          : '<span style="display:block;width:18px;height:18px;border-radius:999px;border:2px solid #111;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.2);"></span>',
+        iconSize: headerLogoUrl ? [28, 28] : [18, 18],
+        iconAnchor: headerLogoUrl ? [14, 14] : [9, 9],
       }),
-    []
+    [headerLogoUrl]
   );
 
   return (
