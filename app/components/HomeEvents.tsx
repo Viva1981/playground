@@ -7,12 +7,20 @@ import { getUpcomingEvents } from "@/app/lib/getUpcomingEvents";
 import { formatEventDateLabel } from "@/app/lib/formatEventDateLabel";
 import { getHomeSection } from "@/app/lib/getHomeSection";
 import type { EventsSectionSettings } from "@/app/lib/types";
+import { supabase } from "@/app/utils/supabaseClient";
+import HomeRestaurantCarousel from "@/app/components/HomeRestaurantCarousel";
 
 export default async function HomeEvents() {
-  const [sectionData, events] = await Promise.all([
+  const [sectionData, events, restaurantsResult] = await Promise.all([
     getHomeSection("home_events"),
     getUpcomingEvents(),
+    supabase
+      .from("restaurants")
+      .select("id, name, slug, cover_path")
+      .eq("is_active", true)
+      .order("name"),
   ]);
+  const restaurants = restaurantsResult.data ?? [];
 
   const title = sectionData?.title || "Esemenyek";
   const body = sectionData?.body || "A Vis Eat Miskolc partnereinek programjai.";
@@ -199,15 +207,7 @@ export default async function HomeEvents() {
           </div>
         )}
 
-        <div className="mt-12 text-center">
-          <Link
-            href="/events"
-            className="inline-block border-2 px-8 py-3 rounded-full font-semibold transition hover:opacity-70"
-            style={{ borderColor: contentColor, color: contentColor }}
-          >
-            Osszes esemeny megtekintese
-          </Link>
-        </div>
+        <HomeRestaurantCarousel items={restaurants} />
       </div>
     </section>
   );
