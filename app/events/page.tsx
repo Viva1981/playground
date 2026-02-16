@@ -3,15 +3,20 @@ import { getUpcomingEvents } from "@/app/lib/getUpcomingEvents";
 import { formatEventDateLabel } from "@/app/lib/formatEventDateLabel";
 import Link from "next/link";
 import Image from "next/image";
+import { getHomeSection } from "@/app/lib/getHomeSection";
+import type { HeaderSettings } from "@/app/lib/types";
 
 // Frissítés kényszerítése (hogy mindig lássuk az új eventeket)
 export const dynamic = "force-dynamic";
 
 export default async function EventsPage() {
   const events = await getUpcomingEvents();
+  const headerSection = await getHomeSection("global_header");
+  const headerSettings = (headerSection?.settings ?? {}) as HeaderSettings;
+  const headerColor = headerSettings.background_color || "#f5f5f5";
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-20">
+    <main className="min-h-screen pb-20" style={{ backgroundColor: headerColor }}>
       {/* LISTA */}
       <div className="px-6 py-10 md:py-14 mx-auto max-w-6xl">
         <div className="mb-6">
