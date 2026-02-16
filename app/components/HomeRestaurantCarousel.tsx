@@ -32,6 +32,7 @@ export default function HomeRestaurantCarousel({ items }: Props) {
     let rafId = 0;
     let lastTime = 0;
     const speed = 22; // px per second
+    let running = false;
 
     const loop = (time: number) => {
       if (!track) return;
@@ -48,8 +49,30 @@ export default function HomeRestaurantCarousel({ items }: Props) {
       rafId = window.requestAnimationFrame(loop);
     };
 
-    rafId = window.requestAnimationFrame(loop);
-    return () => window.cancelAnimationFrame(rafId);
+    const start = () => {
+      if (!track) return;
+      if (track.scrollWidth <= track.clientWidth + 10) {
+        if (running) {
+          window.cancelAnimationFrame(rafId);
+          running = false;
+        }
+        return;
+      }
+      if (!running) {
+        running = true;
+        lastTime = 0;
+        rafId = window.requestAnimationFrame(loop);
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(start);
+    resizeObserver.observe(track);
+    start();
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      resizeObserver.disconnect();
+    };
   }, [items.length]);
 
   if (items.length === 0) return null;
@@ -58,7 +81,7 @@ export default function HomeRestaurantCarousel({ items }: Props) {
     <div className="mt-10">
       <div
         ref={trackRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory no-scrollbar"
+        className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory no-scrollbar"
       >
         {duplicated.map((place, index) => (
           <Link
