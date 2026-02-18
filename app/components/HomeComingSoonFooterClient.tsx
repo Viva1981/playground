@@ -92,16 +92,18 @@ export default function HomeComingSoonFooterClient({
           {displayText}
         </h2>
         <div
-          className={`mt-6 text-[clamp(1rem,3.2vw,1.375rem)] text-center transition-opacity duration-[3000ms] ${
+          className={`mt-6 text-center transition-opacity duration-[3000ms] ${
             showSubtitle ? "opacity-100" : "opacity-0"
           }`}
         >
           {hasCustomSubtitle ? (
-            <p>{subtitle}</p>
+            <p className="text-[clamp(1rem,3.2vw,1.375rem)]">{subtitle}</p>
           ) : (
             <>
-              <p>Miskolc kultúrája az asztalnál kezdődik. Kóstolj bele.</p>
-              <p>Where culture begins at the table. Taste Miskolc.</p>
+              <p className="text-[clamp(0.9rem,2.8vw,1.2rem)]">Miskolc kultúrája az asztalnál kezdődik.</p>
+              <p className="text-[clamp(0.9rem,2.8vw,1.2rem)]">Kóstolj bele!</p>
+              <p className="text-[clamp(0.9rem,2.8vw,1.2rem)]">Where culture begins at the table.</p>
+              <p className="text-[clamp(0.9rem,2.8vw,1.2rem)]">Taste Miskolc!</p>
             </>
           )}
         </div>
