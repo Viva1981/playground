@@ -39,6 +39,9 @@ export type HeroSettings = {
     | 'bottom-left' | 'bottom-center' | 'bottom-right';
   overlay_opacity: number;
   components_order?: HeroComponentType[];
+  show_text_content?: boolean;
+  show_buttons?: boolean;
+  show_media?: boolean;
   content_color?: string;
   background_color?: string;
   primary_button_text_color?: string;

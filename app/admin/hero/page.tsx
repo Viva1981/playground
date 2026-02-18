@@ -36,6 +36,9 @@ export default function AdminHeroPage() {
       align: 'center-center',
       overlay_opacity: 50,
       components_order: ['title', 'body', 'buttons'],
+      show_text_content: true,
+      show_buttons: true,
+      show_media: true,
       content_color: "",
       background_color: "",
       primary_button_text_color: ""
@@ -67,6 +70,9 @@ export default function AdminHeroPage() {
                 ...prev, 
                 ...dbSettings,
                 components_order: dbSettings.components_order || ['title', 'body', 'buttons'],
+                show_text_content: dbSettings.show_text_content ?? true,
+                show_buttons: dbSettings.show_buttons ?? true,
+                show_media: dbSettings.show_media ?? true,
                 content_color: dbSettings.content_color || "",
                 background_color: dbSettings.background_color || "",
                 primary_button_text_color: dbSettings.primary_button_text_color || ""
@@ -200,6 +206,15 @@ export default function AdminHeroPage() {
         <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Szöveges tartalom</h2>
+                <label className="mb-4 flex items-center justify-between rounded-lg border p-3 text-sm">
+                    <span>Blokk látható</span>
+                    <input
+                        type="checkbox"
+                        checked={settings.show_text_content ?? true}
+                        onChange={(e) => setSettings({ ...settings, show_text_content: e.target.checked })}
+                        className="h-5 w-5"
+                    />
+                </label>
                 <div className="mb-4">
                     <label className="block text-sm font-medium mb-1">Főcím</label>
                     <RichTextEditor 
@@ -222,6 +237,15 @@ export default function AdminHeroPage() {
 
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                  <h2 className="text-lg font-semibold mb-4">Gombok</h2>
+                 <label className="mb-4 flex items-center justify-between rounded-lg border p-3 text-sm">
+                    <span>Blokk látható</span>
+                    <input
+                        type="checkbox"
+                        checked={settings.show_buttons ?? true}
+                        onChange={(e) => setSettings({ ...settings, show_buttons: e.target.checked })}
+                        className="h-5 w-5"
+                    />
+                 </label>
                  <div className="mb-4 pb-4 border-b">
                     <h3 className="text-sm font-bold text-neutral-500 mb-2 uppercase">Elsődleges (Fekete)</h3>
                     <div className="grid grid-cols-2 gap-3 mb-3">
@@ -266,6 +290,15 @@ export default function AdminHeroPage() {
         <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Képek</h2>
+                <label className="mb-4 flex items-center justify-between rounded-lg border p-3 text-sm">
+                    <span>Blokk látható</span>
+                    <input
+                        type="checkbox"
+                        checked={settings.show_media ?? true}
+                        onChange={(e) => setSettings({ ...settings, show_media: e.target.checked })}
+                        className="h-5 w-5"
+                    />
+                </label>
                 <div className="mb-4">
                     <label className="block w-full p-4 border-2 border-dashed rounded-xl text-center cursor-pointer hover:bg-neutral-50 transition">
                         <span className="text-sm font-medium text-neutral-600">{uploading ? "Feltöltés..." : "+ Képek (Max 10)"}</span>

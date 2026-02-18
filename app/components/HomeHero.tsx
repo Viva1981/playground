@@ -38,6 +38,9 @@ export default function HomeHero({
   const align = settings?.align || "center-center";
   const opacity = settings?.overlay_opacity ?? 50;
   const order: HeroComponentType[] = settings?.components_order || ['title', 'body', 'buttons'];
+  const showTextContent = settings?.show_text_content ?? true;
+  const showButtons = settings?.show_buttons ?? true;
+  const showMedia = settings?.show_media ?? true;
 
   // --- SZÍNEK ---
   const customContentColor = settings?.content_color || undefined;
@@ -106,7 +109,7 @@ export default function HomeHero({
 
     // A kulcsok típusa HeroComponentType kell legyen
     const components: Record<HeroComponentType, React.ReactNode> = {
-        title: title ? (
+        title: showTextContent && title ? (
             <SafeHtml
               key="title" 
               html={title}
@@ -116,11 +119,11 @@ export default function HomeHero({
             />
         ) : null,
         
-        body: body ? (
+        body: showTextContent && body ? (
           <RichText key="body" html={body} className={`text-lg md:text-xl leading-relaxed ${!customContentColor ? defaultBodyColor : ''}`} style={customContentColor ? { color: customContentColor } : undefined} />
         ) : null,
         
-        buttons: (ctaLabel || ctaLabel2) ? (
+        buttons: showButtons && (ctaLabel || ctaLabel2) ? (
             <div key="buttons" className={`flex flex-wrap gap-4 pt-2 w-full ${buttonAlignClasses}`}>
                 {ctaLabel && ctaUrl && (
                     <a 
@@ -147,10 +150,10 @@ export default function HomeHero({
         ) : null
     };
 
-    return order.map(key => components[key]);
+    return order.map(key => components[key]).filter(Boolean);
   };
 
-  const ImageSlider = ({ isStackMobile = false }: { isStackMobile?: boolean }) => (
+  const renderImageSlider = (isStackMobile = false) => (
     <>
       {images.length > 0 ? (
         images.map((path, idx) => (
@@ -177,23 +180,36 @@ export default function HomeHero({
     </>
   );
 
+  const contentItems = renderContent(layout === "overlay");
+  if (!showMedia && contentItems.length === 0) return null;
+
   // --- FŐ RENDER LOGIKA ---
   
   if (layout === "overlay") {
     return (
-      <section className="flex flex-col md:block md:relative w-full bg-white md:bg-black md:h-[700px]">
+      <section
+        className={
+          showMedia
+            ? "flex flex-col md:block md:relative w-full bg-white md:bg-black md:h-[700px]"
+            : "w-full bg-white"
+        }
+      >
         {/* Kép Konténer (Mobil 3:1) */}
-        <div className="relative w-full aspect-[3/1] md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
-             <ImageSlider isStackMobile={true} />
-             <div 
-                className="hidden md:block absolute inset-0 bg-black pointer-events-none transition-opacity duration-500" 
-                style={{ opacity: opacity / 100 }} 
-            />
-        </div>
+        {showMedia ? (
+          <div className="relative w-full aspect-[3/1] md:absolute md:inset-0 md:aspect-auto md:h-full overflow-hidden bg-neutral-50">
+               {renderImageSlider(true)}
+               <div 
+                  className="hidden md:block absolute inset-0 bg-black pointer-events-none transition-opacity duration-500" 
+                  style={{ opacity: opacity / 100 }} 
+              />
+          </div>
+        ) : null}
 
         {/* Tartalom Konténer */}
-        <div 
-            className={`
+        <div
+            className={
+              showMedia
+                ? `
                 relative md:absolute md:inset-0 
                 px-6 py-12 md:p-12 
                 h-auto md:h-full 
@@ -201,11 +217,17 @@ export default function HomeHero({
                 flex flex-col
                 ${containerClasses}
                 md:!bg-transparent 
-            `}
+            `
+                : `
+                px-6 py-12 md:p-12
+                flex flex-col
+                ${containerClasses}
+            `
+            }
             style={{ backgroundColor: customBgColor ? customBgColor : undefined }}
         >
             <div className="pointer-events-auto w-full max-w-3xl flex flex-col gap-6 md:gap-8">
-                {renderContent(true)}
+                {contentItems}
             </div>
         </div>
       </section>
@@ -218,13 +240,15 @@ export default function HomeHero({
         className="bg-white"
         style={{ backgroundColor: customBgColor }} 
     >
-      <div className="relative w-full aspect-[3/1] md:aspect-[3/1] max-h-[600px] overflow-hidden bg-neutral-50">
-        <ImageSlider isStackMobile={true} />
-      </div>
+      {showMedia ? (
+        <div className="relative w-full aspect-[3/1] md:aspect-[3/1] max-h-[600px] overflow-hidden bg-neutral-50">
+          {renderImageSlider(true)}
+        </div>
+      ) : null}
 
       <div className={`px-6 py-16 md:py-24 flex flex-col ${containerClasses}`}>
          <div className="w-full max-w-3xl flex flex-col gap-6">
-            {renderContent(false)}
+            {contentItems}
          </div>
       </div>
     </section>
