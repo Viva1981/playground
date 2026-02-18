@@ -96,7 +96,7 @@ export default async function Home() {
       {footer ? (
         <HomeComingSoonFooterClient
           title={footer.title || "COMING SOON"}
-          subtitle={footer.body || "A miskolci vendéglátók közös ügye."}
+          subtitle={footer.body}
           animationIntervalMs={(footer.settings as FooterSettings | null)?.animation_interval_ms ?? 80}
         />
       ) : null}

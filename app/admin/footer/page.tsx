@@ -16,7 +16,7 @@ type Section = {
 
 const SECTION_KEY = "home_footer";
 const DEFAULT_TITLE = "COMING SOON";
-const DEFAULT_SUBTITLE = "A miskolci vendeglato kozos ugye.";
+const DEFAULT_SUBTITLE = "";
 const DEFAULT_SETTINGS: FooterSettings = {
   animation_interval_ms: 80,
 };
@@ -56,7 +56,7 @@ export default function AdminFooterPage() {
           setSectionId(created.id);
           setIsActive(created.is_active);
           setTitle(created.title || DEFAULT_TITLE);
-          setSubtitle(created.body || DEFAULT_SUBTITLE);
+          setSubtitle(created.body ?? DEFAULT_SUBTITLE);
           setSettings({
             animation_interval_ms:
               created.settings?.animation_interval_ms ?? DEFAULT_SETTINGS.animation_interval_ms,
@@ -66,7 +66,7 @@ export default function AdminFooterPage() {
         setSectionId(existing.id);
         setIsActive(existing.is_active);
         setTitle(existing.title || DEFAULT_TITLE);
-        setSubtitle(existing.body || DEFAULT_SUBTITLE);
+        setSubtitle(existing.body ?? DEFAULT_SUBTITLE);
         setSettings({
           animation_interval_ms:
             existing.settings?.animation_interval_ms ?? DEFAULT_SETTINGS.animation_interval_ms,
@@ -85,7 +85,7 @@ export default function AdminFooterPage() {
       .from("page_sections")
       .update({
         title: title.trim() || DEFAULT_TITLE,
-        body: subtitle.trim() || DEFAULT_SUBTITLE,
+        body: subtitle.trim(),
         is_active: isActive,
         settings,
       })

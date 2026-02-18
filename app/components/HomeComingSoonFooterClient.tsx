@@ -17,7 +17,7 @@ function randomChar() {
 
 export default function HomeComingSoonFooterClient({
   title = "COMING SOON",
-  subtitle = "A miskolci vendéglátók közös ügye.",
+  subtitle = "",
   backgroundColor = "#768f4d",
   animationIntervalMs = 80,
 }: Props) {
@@ -25,6 +25,7 @@ export default function HomeComingSoonFooterClient({
   const safeAnimationIntervalMs = Math.min(300, Math.max(20, animationIntervalMs));
   const [displayText, setDisplayText] = useState("");
   const [showSubtitle, setShowSubtitle] = useState(false);
+  const hasCustomSubtitle = (subtitle ?? "").trim().length > 0;
 
   useEffect(() => {
     const target = finalText;
@@ -90,13 +91,20 @@ export default function HomeComingSoonFooterClient({
         <h2 className="m-0 font-black tracking-[0.2em] text-[clamp(2rem,10vw,5rem)]">
           {displayText}
         </h2>
-        <p
-          className={`mt-6 text-[clamp(1rem,3.2vw,1.375rem)] transition-opacity duration-[2000ms] ${
+        <div
+          className={`mt-6 text-[clamp(1rem,3.2vw,1.375rem)] text-center transition-opacity duration-[3000ms] ${
             showSubtitle ? "opacity-100" : "opacity-0"
           }`}
         >
-          {subtitle}
-        </p>
+          {hasCustomSubtitle ? (
+            <p>{subtitle}</p>
+          ) : (
+            <>
+              <p>Miskolc kultúrája az asztalnál kezdődik. Kóstolj bele.</p>
+              <p>Where culture begins at the table. Taste Miskolc.</p>
+            </>
+          )}
+        </div>
       </div>
     </section>
   );
