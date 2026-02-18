@@ -24,7 +24,6 @@ export default function AdminDashboardPage() {
 
       setEmail(session.user.email ?? null);
 
-      // Admin check (admins táblában benne van-e)
       const { data: adminRow, error } = await supabase
         .from("admins")
         .select("user_id")
@@ -32,7 +31,6 @@ export default function AdminDashboardPage() {
         .maybeSingle<AdminRow>();
 
       if (error || !adminRow) {
-        // be van lépve, de nem admin
         await supabase.auth.signOut();
         router.replace("/admin/login");
         return;
@@ -50,7 +48,7 @@ export default function AdminDashboardPage() {
   if (checking) {
     return (
       <main className="min-h-screen flex items-center justify-center p-6">
-        <p className="text-sm text-neutral-600">Ellenőrzés...</p>
+        <p className="text-sm text-neutral-600">Ellenorzes...</p>
       </main>
     );
   }
@@ -61,81 +59,57 @@ export default function AdminDashboardPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Admin</h1>
-            <p className="mt-1 text-sm text-neutral-600">
-              Bejelentkezve: {email ?? "—"}
-            </p>
+            <p className="mt-1 text-sm text-neutral-600">Bejelentkezve: {email ?? "-"}</p>
           </div>
 
-          <button
-            onClick={logout}
-            className="rounded-xl border px-4 py-2 text-sm"
-          >
-            Kilépés
+          <button onClick={logout} className="rounded-xl border px-4 py-2 text-sm">
+            Kilepes
           </button>
         </div>
 
         <div className="mt-8 grid gap-4 grid-cols-1 md:grid-cols-2">
-          
-          {/* --- GLOBÁLIS BEÁLLÍTÁSOK --- */}
-          
-          <a
-            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
-            href="/admin/header"
-          >
-            <div className="text-sm text-neutral-600">Globális</div>
-            <div className="mt-1 text-lg font-semibold">Fejléc (Header)</div>
+          <a className="rounded-2xl border p-5 hover:bg-neutral-50 transition" href="/admin/header">
+            <div className="text-sm text-neutral-600">Globalis</div>
+            <div className="mt-1 text-lg font-semibold">Fejlec (Header)</div>
           </a>
 
-          <a
-            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
-            href="/admin/hero"
-          >
-            <div className="text-sm text-neutral-600">Főoldal</div>
-            <div className="mt-1 text-lg font-semibold">Hero Szekció</div>
+          <a className="rounded-2xl border p-5 hover:bg-neutral-50 transition" href="/admin/hero">
+            <div className="text-sm text-neutral-600">Fooldal</div>
+            <div className="mt-1 text-lg font-semibold">Hero szekcio</div>
           </a>
 
-          <a
-            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
-            href="/admin/about"
-          >
-            <div className="text-sm text-neutral-600">Főoldal</div>
+          <a className="rounded-2xl border p-5 hover:bg-neutral-50 transition" href="/admin/about">
+            <div className="text-sm text-neutral-600">Fooldal</div>
             <div className="mt-1 text-lg font-semibold">About / Vision</div>
           </a>
 
-          <a
-            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
-            href="/admin/home-events"
-          >
-            <div className="text-sm text-neutral-600">Főoldal</div>
-            <div className="mt-1 text-lg font-semibold">Home Események (Design)</div>
+          <a className="rounded-2xl border p-5 hover:bg-neutral-50 transition" href="/admin/home-events">
+            <div className="text-sm text-neutral-600">Fooldal</div>
+            <div className="mt-1 text-lg font-semibold">Home esemenyek (design)</div>
           </a>
 
-          <a
-            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
-            href="/admin/rolunk"
-          >
-            <div className="text-sm text-neutral-600">Globális</div>
-            <div className="mt-1 text-lg font-semibold">Rólunk oldal</div>
+          <a className="rounded-2xl border p-5 hover:bg-neutral-50 transition" href="/admin/footer">
+            <div className="text-sm text-neutral-600">Fooldal</div>
+            <div className="mt-1 text-lg font-semibold">Footer / Coming Soon</div>
           </a>
 
-          {/* --- TARTALOM KEZELÉS --- */}
+          <a className="rounded-2xl border p-5 hover:bg-neutral-50 transition" href="/admin/rolunk">
+            <div className="text-sm text-neutral-600">Globalis</div>
+            <div className="mt-1 text-lg font-semibold">Rolunk oldal</div>
+          </a>
 
-          <a
-            className="rounded-2xl border p-5 hover:bg-neutral-50 transition"
-            href="/admin/events"
-          >
+          <a className="rounded-2xl border p-5 hover:bg-neutral-50 transition" href="/admin/events">
             <div className="text-sm text-neutral-600">Tartalom</div>
-            <div className="mt-1 text-lg font-semibold">Események</div>
+            <div className="mt-1 text-lg font-semibold">Esemenyek</div>
           </a>
 
           <a
             href="/admin/restaurants"
             className="rounded-2xl border p-5 hover:bg-neutral-50 transition md:col-span-2 bg-neutral-900 text-white hover:bg-neutral-800"
           >
-             <div className="text-sm opacity-80">Adatbázis</div>
-             <div className="mt-1 text-lg font-semibold">Éttermek & Partnerek</div>
+            <div className="text-sm opacity-80">Adatbazis</div>
+            <div className="mt-1 text-lg font-semibold">Ettermek es partnerek</div>
           </a>
-          
         </div>
       </div>
     </main>

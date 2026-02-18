@@ -2,6 +2,7 @@
 import HomeHero from "@/app/components/HomeHero";
 import HomeAbout from "@/app/components/HomeAbout";
 import HomeEvents from "@/app/components/HomeEvents"; 
+import HomeComingSoonFooterClient from "@/app/components/HomeComingSoonFooterClient";
 import { getHomeHero, getHomeHeroMetadataData } from "@/app/lib/getHomeHero";
 import { getHomeSection } from "@/app/lib/getHomeSection";
 import type { AboutSettings } from "@/app/lib/types";
@@ -56,9 +57,10 @@ export default async function Home() {
   // Párhuzamos adatlekérés
   // FIGYELEM: Az eseményeket (getUpcomingEvents) INNEN KIVETTÜK,
   // mert a <HomeEvents /> komponens már intézi magának belül!
-  const [hero, about] = await Promise.all([
+  const [hero, about, footer] = await Promise.all([
     getHomeHero(),
     getHomeSection("home_about"),
+    getHomeSection("home_footer"),
   ]);
 
   return (
@@ -89,6 +91,14 @@ export default async function Home() {
 
       {/* EVENTS SZEKCIÓ - JAVÍTVA: Nincs prop átadás! */}
       <HomeEvents />
+
+      {/* FOOTER / COMING SOON SZEKCIÓ */}
+      {footer ? (
+        <HomeComingSoonFooterClient
+          title={footer.title || "COMING SOON"}
+          subtitle={footer.body || "A miskolci vendéglátók közös ügye."}
+        />
+      ) : null}
       
     </main>
   );
