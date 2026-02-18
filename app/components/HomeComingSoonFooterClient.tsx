@@ -6,6 +6,7 @@ type Props = {
   title?: string | null;
   subtitle?: string | null;
   backgroundColor?: string;
+  animationIntervalMs?: number;
 };
 
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -18,8 +19,10 @@ export default function HomeComingSoonFooterClient({
   title = "COMING SOON",
   subtitle = "A miskolci vendéglátók közös ügye.",
   backgroundColor = "#768f4d",
+  animationIntervalMs = 80,
 }: Props) {
   const finalText = useMemo(() => (title ?? "COMING SOON").toUpperCase(), [title]);
+  const safeAnimationIntervalMs = Math.min(300, Math.max(20, animationIntervalMs));
   const [displayText, setDisplayText] = useState("");
   const [showSubtitle, setShowSubtitle] = useState(false);
 
@@ -56,7 +59,7 @@ export default function HomeComingSoonFooterClient({
       setDisplayText(display.join(""));
 
       if (!allDone) {
-        timeoutId = setTimeout(animate, 80);
+        timeoutId = setTimeout(animate, safeAnimationIntervalMs);
       } else {
         timeoutId = setTimeout(() => {
           if (!stopped) setShowSubtitle(true);
@@ -76,7 +79,7 @@ export default function HomeComingSoonFooterClient({
       if (resetId) clearTimeout(resetId);
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [finalText]);
+  }, [finalText, safeAnimationIntervalMs]);
 
   return (
     <section

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/utils/supabaseClient";
 import AdminPageHeader from "@/app/components/AdminPageHeader";
+import type { FooterSettings } from "@/app/lib/types";
 
 type Section = {
   id: string;
@@ -10,11 +11,15 @@ type Section = {
   title: string | null;
   body: string | null;
   is_active: boolean;
+  settings: FooterSettings | null;
 };
 
 const SECTION_KEY = "home_footer";
 const DEFAULT_TITLE = "COMING SOON";
-const DEFAULT_SUBTITLE = "A miskolci vendéglátók közös ügye.";
+const DEFAULT_SUBTITLE = "A miskolci vendeglato kozos ugye.";
+const DEFAULT_SETTINGS: FooterSettings = {
+  animation_interval_ms: 80,
+};
 
 export default function AdminFooterPage() {
   const [loading, setLoading] = useState(true);
@@ -24,6 +29,7 @@ export default function AdminFooterPage() {
   const [isActive, setIsActive] = useState(true);
   const [title, setTitle] = useState(DEFAULT_TITLE);
   const [subtitle, setSubtitle] = useState(DEFAULT_SUBTITLE);
+  const [settings, setSettings] = useState<FooterSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
     (async () => {
@@ -41,6 +47,7 @@ export default function AdminFooterPage() {
             title: DEFAULT_TITLE,
             body: DEFAULT_SUBTITLE,
             is_active: false,
+            settings: DEFAULT_SETTINGS,
           })
           .select("*")
           .single<Section>();
@@ -50,12 +57,20 @@ export default function AdminFooterPage() {
           setIsActive(created.is_active);
           setTitle(created.title || DEFAULT_TITLE);
           setSubtitle(created.body || DEFAULT_SUBTITLE);
+          setSettings({
+            animation_interval_ms:
+              created.settings?.animation_interval_ms ?? DEFAULT_SETTINGS.animation_interval_ms,
+          });
         }
       } else {
         setSectionId(existing.id);
         setIsActive(existing.is_active);
         setTitle(existing.title || DEFAULT_TITLE);
         setSubtitle(existing.body || DEFAULT_SUBTITLE);
+        setSettings({
+          animation_interval_ms:
+            existing.settings?.animation_interval_ms ?? DEFAULT_SETTINGS.animation_interval_ms,
+        });
       }
 
       setLoading(false);
@@ -72,6 +87,7 @@ export default function AdminFooterPage() {
         title: title.trim() || DEFAULT_TITLE,
         body: subtitle.trim() || DEFAULT_SUBTITLE,
         is_active: isActive,
+        settings,
       })
       .eq("id", sectionId);
 
@@ -122,6 +138,27 @@ export default function AdminFooterPage() {
               onChange={(e) => setSubtitle(e.target.value)}
               placeholder={DEFAULT_SUBTITLE}
             />
+          </div>
+
+          <div className="rounded-2xl border p-5 bg-white">
+            <label className="block text-sm font-medium mb-1">
+              Animacio sebesseg: {settings.animation_interval_ms ?? DEFAULT_SETTINGS.animation_interval_ms} ms
+            </label>
+            <input
+              type="range"
+              min="20"
+              max="300"
+              step="10"
+              value={settings.animation_interval_ms ?? DEFAULT_SETTINGS.animation_interval_ms}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  animation_interval_ms: Number(e.target.value),
+                })
+              }
+              className="w-full"
+            />
+            <p className="text-xs text-neutral-600 mt-2">Kisebb ertek = gyorsabb animacio.</p>
           </div>
 
           <button

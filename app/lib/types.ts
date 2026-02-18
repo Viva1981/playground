@@ -78,6 +78,10 @@ export type EventsSectionSettings = {
   content_color?: string;
 };
 
+export type FooterSettings = {
+  animation_interval_ms?: number;
+};
+
 // --- RÓLUNK / ABOUT US SZEKCIÓ ---
 export type RolunkSettings = {
   title?: string;

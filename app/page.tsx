@@ -5,7 +5,7 @@ import HomeEvents from "@/app/components/HomeEvents";
 import HomeComingSoonFooterClient from "@/app/components/HomeComingSoonFooterClient";
 import { getHomeHero, getHomeHeroMetadataData } from "@/app/lib/getHomeHero";
 import { getHomeSection } from "@/app/lib/getHomeSection";
-import type { AboutSettings } from "@/app/lib/types";
+import type { AboutSettings, FooterSettings } from "@/app/lib/types";
 import type { Metadata } from "next";
 
 // Fontos: mivel adatbázisból dolgozunk, ne cache-eljen agresszívan
@@ -97,6 +97,7 @@ export default async function Home() {
         <HomeComingSoonFooterClient
           title={footer.title || "COMING SOON"}
           subtitle={footer.body || "A miskolci vendéglátók közös ügye."}
+          animationIntervalMs={(footer.settings as FooterSettings | null)?.animation_interval_ms ?? 80}
         />
       ) : null}
       
