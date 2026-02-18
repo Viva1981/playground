@@ -14,11 +14,11 @@ export const metadata: Metadata = {
 
 export default async function RolunkPage() {
   const data = await getRolunkSection();
+  if (!data) return null;
 
-  // Fallback értékek, ha még nincs adatbázis rekord
-  const title = data?.title || "Rólunk";
-  const body = data?.body || "Hamarosan erre az oldalra kerül a közösség bemutatkozása.";
-  const settings = data?.settings || {};
+  const title = data.title || "Rólunk";
+  const body = data.body || "Hamarosan erre az oldalra kerül a közösség bemutatkozása.";
+  const settings = data.settings || {};
 
   const bgColor = settings.bg_color || "#ffffff";
   const textColor = settings.text_color || "#000000";

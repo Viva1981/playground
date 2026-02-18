@@ -5,6 +5,7 @@ import type { HeaderSettings } from "@/app/lib/types";
 
 export default async function Header() {
   const data = await getHomeSection("global_header");
+  if (!data) return null;
   
   // Típus kényszerítés, mert a getHomeSection generic
   const settings = (data?.settings as HeaderSettings) || null;

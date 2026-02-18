@@ -12,6 +12,7 @@ export default function AdminHomeEventsPage() {
   // Form state
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [settings, setSettings] = useState<EventsSectionSettings>({
     background_color: "#ffffff",
     content_color: "#000000",
@@ -28,6 +29,7 @@ export default function AdminHomeEventsPage() {
       if (data) {
         setTitle(data.title || "");
         setBody(data.body || "");
+        setIsActive(data.is_active ?? true);
         if (data.settings) {
           const dbSettings = data.settings as EventsSectionSettings;
           setSettings({
@@ -47,6 +49,7 @@ export default function AdminHomeEventsPage() {
       .update({
         title,
         body,
+        is_active: isActive,
         settings,
       })
       .eq("key", "home_events");
@@ -80,6 +83,19 @@ export default function AdminHomeEventsPage() {
       </div>
 
       <div className="space-y-6">
+        <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium">Aktív</div>
+            <div className="text-sm text-neutral-600">Kikapcsolva nem jelenik meg.</div>
+          </div>
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.target.checked)}
+            className="h-5 w-5"
+          />
+        </div>
+
         {/* SZÖVEGEK */}
         <div className="bg-white p-6 rounded-xl border shadow-sm">
           <h2 className="text-lg font-semibold mb-4">Szövegek</h2>

@@ -21,6 +21,7 @@ export default function AdminHeroPage() {
   // Mezők
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [ctaLabel, setCtaLabel] = useState("");
   const [ctaUrl, setCtaUrl] = useState("");
   const [ctaLabel2, setCtaLabel2] = useState("");
@@ -51,6 +52,7 @@ export default function AdminHeroPage() {
       if (data) {
         setTitle(data.title || "");
         setBody(data.body || "");
+        setIsActive(data.is_active ?? true);
         setCtaLabel(data.cta_label || "");
         setCtaUrl(data.cta_url || "");
         setCtaLabel2(data.cta_label_2 || "");
@@ -141,6 +143,7 @@ export default function AdminHeroPage() {
           cta_label: ctaLabel, cta_url: ctaUrl,
           cta_label_2: ctaLabel2, cta_url_2: ctaUrl2,
           media_paths: mediaPaths,
+          is_active: isActive,
           settings: settings
         })
         .eq("key", "home_hero");
@@ -281,6 +284,19 @@ export default function AdminHeroPage() {
 
             <div className="bg-white p-6 rounded-xl border shadow-sm">
                 <h2 className="text-lg font-semibold mb-4">Megjelenés & Sorrend</h2>
+
+                <div className="mb-6 rounded-xl border p-4 flex items-center justify-between">
+                    <div>
+                        <div className="text-sm font-medium">Aktív</div>
+                        <div className="text-sm text-neutral-600">Kikapcsolva nem jelenik meg.</div>
+                    </div>
+                    <input
+                        type="checkbox"
+                        checked={isActive}
+                        onChange={(e) => setIsActive(e.target.checked)}
+                        className="h-5 w-5"
+                    />
+                </div>
 
                 {/* SZÍNEK */}
                 <div className="mb-6 p-4 bg-neutral-50 rounded-lg border">

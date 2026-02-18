@@ -10,6 +10,7 @@ export default function AdminHeaderPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isActive, setIsActive] = useState(true);
 
   // Logo
   const [logoPath, setLogoPath] = useState<string | null>(null);
@@ -32,6 +33,7 @@ export default function AdminHeaderPage() {
         .single();
 
       if (data) {
+        setIsActive(data.is_active ?? true);
         if (data.media_paths && data.media_paths.length > 0) {
             setLogoPath(data.media_paths[0]);
             setInitialLogoPath(data.media_paths[0]);
@@ -120,6 +122,7 @@ export default function AdminHeaderPage() {
         .from("page_sections")
         .update({
           media_paths: mediaToSave,
+          is_active: isActive,
           settings: settings
         })
         .eq("key", "global_header");
@@ -168,6 +171,18 @@ export default function AdminHeaderPage() {
         
         {/* BAL OSZLOP */}
         <div className="space-y-6">
+            <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center justify-between">
+                <div>
+                    <div className="text-sm font-medium">Aktív</div>
+                    <div className="text-sm text-neutral-600">Kikapcsolva nem jelenik meg.</div>
+                </div>
+                <input
+                    type="checkbox"
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                    className="h-5 w-5"
+                />
+            </div>
             
             {/* LOGO & CÍM */}
             <div className="bg-white p-6 rounded-xl border shadow-sm">

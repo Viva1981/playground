@@ -21,6 +21,7 @@ export async function getRolunkSection(): Promise<RolunkData | null> {
     .from("page_sections")
     .select("title, body, settings")
     .eq("key", "global_rolunk")
+    .eq("is_active", true)
     .single();
 
   if (!data) return null;

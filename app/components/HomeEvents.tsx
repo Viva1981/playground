@@ -21,10 +21,11 @@ export default async function HomeEvents() {
       .order("name"),
   ]);
   const restaurants = restaurantsResult.data ?? [];
+  if (!sectionData) return null;
 
-  const title = sectionData?.title || "Esemenyek";
-  const body = sectionData?.body || "A Vis Eat Miskolc partnereinek programjai.";
-  const settings = (sectionData?.settings as EventsSectionSettings) || {};
+  const title = sectionData.title || "Esemenyek";
+  const body = sectionData.body || "A Vis Eat Miskolc partnereinek programjai.";
+  const settings = (sectionData.settings as EventsSectionSettings) || {};
 
   const bgColor = settings.background_color || "#ffffff";
   const contentColor = settings.content_color || "#000000";

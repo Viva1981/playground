@@ -21,16 +21,18 @@ export default async function Home() {
   return (
     <main>
       {/* HERO SZEKCIÓ */}
-      <HomeHero
-        title={hero?.title ?? null}
-        body={hero?.body ?? null}
-        ctaLabel={hero?.cta_label ?? null}
-        ctaUrl={hero?.cta_url ?? null}
-        ctaLabel2={hero?.cta_label_2 ?? null}
-        ctaUrl2={hero?.cta_url_2 ?? null}
-        mediaPaths={hero?.media_paths ?? []}
-        settings={hero?.settings}
-      />
+      {hero ? (
+        <HomeHero
+          title={hero.title ?? null}
+          body={hero.body ?? null}
+          ctaLabel={hero.cta_label ?? null}
+          ctaUrl={hero.cta_url ?? null}
+          ctaLabel2={hero.cta_label_2 ?? null}
+          ctaUrl2={hero.cta_url_2 ?? null}
+          mediaPaths={hero.media_paths ?? []}
+          settings={hero.settings}
+        />
+      ) : null}
 
       {/* ABOUT SZEKCIÓ */}
       {about ? (

@@ -28,6 +28,7 @@ export async function getHomeSection(key: string): Promise<HomeSectionData | nul
     .from("page_sections")
     .select("title, body, settings, media_paths")
     .eq("key", key)
+    .eq("is_active", true)
     .single();
 
   return data;

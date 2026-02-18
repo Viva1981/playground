@@ -27,6 +27,7 @@ export async function getHomeHero(): Promise<HomeHeroData | null> {
     .from("page_sections")
     .select("*")
     .eq("key", "home_hero")
+    .eq("is_active", true)
     .single();
 
   if (!data) return null;

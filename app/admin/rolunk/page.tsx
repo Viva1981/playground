@@ -13,6 +13,7 @@ export default function AdminRolunkPage() {
   // Form state
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [settings, setSettings] = useState<RolunkSettings>({
     bg_color: "#ffffff",
     text_color: "#000000",
@@ -33,6 +34,7 @@ export default function AdminRolunkPage() {
       if (data) {
         setTitle(data.title || "");
         setBody(data.body || "");
+        setIsActive(data.is_active ?? true);
         if (data.settings) {
           const dbSettings = data.settings as RolunkSettings;
           setSettings({
@@ -58,6 +60,7 @@ export default function AdminRolunkPage() {
           key: "global_rolunk",
           title,
           body,
+          is_active: isActive,
           settings,
         },
         { onConflict: "key" }
@@ -104,6 +107,19 @@ export default function AdminRolunkPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* BAL OSZLOP: SZÖVEGEK */}
         <div className="space-y-6">
+          <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center justify-between">
+            <div>
+              <div className="text-sm font-medium">Aktív</div>
+              <div className="text-sm text-neutral-600">Kikapcsolva nem jelenik meg.</div>
+            </div>
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+              className="h-5 w-5"
+            />
+          </div>
+
           <div className="bg-white p-6 rounded-xl border shadow-sm">
             <h2 className="text-lg font-semibold mb-4">Szövegek</h2>
 
