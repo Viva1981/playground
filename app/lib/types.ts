@@ -42,6 +42,9 @@ export type HeroSettings = {
   show_text_content?: boolean;
   show_buttons?: boolean;
   show_media?: boolean;
+  seo_title?: string;
+  seo_description?: string;
+  seo_image?: string;
   content_color?: string;
   background_color?: string;
   primary_button_text_color?: string;

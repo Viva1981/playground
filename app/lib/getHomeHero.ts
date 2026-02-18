@@ -20,6 +20,13 @@ export type HomeHeroData = {
   settings: HeroSettings | null; // Itt már a szigorú típust használjuk
 };
 
+export type HomeHeroMetadataData = {
+  title: string | null;
+  body: string | null;
+  media_paths: string[] | null;
+  settings: HeroSettings | null;
+};
+
 export async function getHomeHero(): Promise<HomeHeroData | null> {
   noStore();
   
@@ -42,5 +49,24 @@ export async function getHomeHero(): Promise<HomeHeroData | null> {
     media_paths: data.media_paths,
     // Kényszerítjük a típust, mert a DB-ből JSONB (any) jön
     settings: (data.settings as unknown as HeroSettings) || null
+  };
+}
+
+export async function getHomeHeroMetadataData(): Promise<HomeHeroMetadataData | null> {
+  noStore();
+
+  const { data } = await supabase
+    .from("page_sections")
+    .select("title, body, media_paths, settings")
+    .eq("key", "home_hero")
+    .maybeSingle();
+
+  if (!data) return null;
+
+  return {
+    title: data.title,
+    body: data.body,
+    media_paths: data.media_paths,
+    settings: (data.settings as unknown as HeroSettings) || null,
   };
 }

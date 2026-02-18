@@ -39,6 +39,9 @@ export default function AdminHeroPage() {
       show_text_content: true,
       show_buttons: true,
       show_media: true,
+      seo_title: "",
+      seo_description: "",
+      seo_image: "",
       content_color: "",
       background_color: "",
       primary_button_text_color: ""
@@ -73,6 +76,9 @@ export default function AdminHeroPage() {
                 show_text_content: dbSettings.show_text_content ?? true,
                 show_buttons: dbSettings.show_buttons ?? true,
                 show_media: dbSettings.show_media ?? true,
+                seo_title: dbSettings.seo_title || "",
+                seo_description: dbSettings.seo_description || "",
+                seo_image: dbSettings.seo_image || "",
                 content_color: dbSettings.content_color || "",
                 background_color: dbSettings.background_color || "",
                 primary_button_text_color: dbSettings.primary_button_text_color || ""
@@ -428,6 +434,48 @@ export default function AdminHeroPage() {
                                 <div className={`w-2 h-2 rounded-full mx-auto ${settings.align === pos ? 'bg-white' : 'bg-neutral-300'}`} />
                             </button>
                         ))}
+                    </div>
+                </div>
+
+                <div className="mt-8 rounded-xl border p-4">
+                    <h3 className="text-sm font-bold text-neutral-700 mb-3 uppercase">SEO (Home)</h3>
+                    <div className="space-y-3">
+                        <div>
+                            <label className="block text-xs font-semibold mb-1">SEO cim</label>
+                            <input
+                                type="text"
+                                value={settings.seo_title || ""}
+                                onChange={(e) => setSettings({ ...settings, seo_title: e.target.value })}
+                                className="w-full border p-2 rounded text-sm"
+                                placeholder="pl. Vis Eat Miskolc | Fooldal"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold mb-1">SEO leiras</label>
+                            <textarea
+                                value={settings.seo_description || ""}
+                                onChange={(e) => setSettings({ ...settings, seo_description: e.target.value })}
+                                className="w-full border p-2 rounded text-sm min-h-[90px]"
+                                placeholder="Rovid leiras a fooldalhoz."
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold mb-1">SEO kep (URL vagy storage path)</label>
+                            <input
+                                type="text"
+                                value={settings.seo_image || ""}
+                                onChange={(e) => setSettings({ ...settings, seo_image: e.target.value })}
+                                className="w-full border p-2 rounded text-sm"
+                                placeholder="pl. hero/valami.jpg vagy https://..."
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setSettings({ ...settings, seo_image: mediaPaths[0] || "" })}
+                                className="text-xs text-neutral-600 mt-2 underline"
+                            >
+                                Elso hero kep hasznalata
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

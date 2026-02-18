@@ -2,12 +2,55 @@
 import HomeHero from "@/app/components/HomeHero";
 import HomeAbout from "@/app/components/HomeAbout";
 import HomeEvents from "@/app/components/HomeEvents"; 
-import { getHomeHero } from "@/app/lib/getHomeHero";
+import { getHomeHero, getHomeHeroMetadataData } from "@/app/lib/getHomeHero";
 import { getHomeSection } from "@/app/lib/getHomeSection";
 import type { AboutSettings } from "@/app/lib/types";
+import type { Metadata } from "next";
 
 // Fontos: mivel adatbázisból dolgozunk, ne cache-eljen agresszívan
 export const dynamic = "force-dynamic";
+
+function stripHtml(input: string | null | undefined): string {
+  if (!input) return "";
+  return input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function buildSeoImageUrl(seoImage: string | null | undefined, fallbackMediaPath: string | null | undefined): string | null {
+  const value = seoImage?.trim() || fallbackMediaPath?.trim() || "";
+  if (!value) return null;
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/public-media/${value}`;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const heroMeta = await getHomeHeroMetadataData();
+  const settings = heroMeta?.settings;
+
+  const title = settings?.seo_title?.trim() || "Vis Eat Miskolc";
+  const description =
+    settings?.seo_description?.trim() ||
+    stripHtml(heroMeta?.body) ||
+    "Fedezd fel Miskolc éttermeit és eseményeit a Vis Eat Miskolc oldalán.";
+  const image = buildSeoImageUrl(settings?.seo_image, heroMeta?.media_paths?.[0]);
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: image ? [image] : undefined,
+      type: "website",
+      locale: "hu_HU",
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  };
+}
 
 export default async function Home() {
   // Párhuzamos adatlekérés
