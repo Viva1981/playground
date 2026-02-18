@@ -19,7 +19,7 @@ export default function HomeComingSoonFooterClient({
   subtitle = "A miskolci vendéglátók közös ügye.",
   backgroundColor = "#768f4d",
 }: Props) {
-  const finalText = useMemo(() => title.toUpperCase(), [title]);
+  const finalText = useMemo(() => (title ?? "COMING SOON").toUpperCase(), [title]);
   const [displayText, setDisplayText] = useState("");
   const [showSubtitle, setShowSubtitle] = useState(false);
 
