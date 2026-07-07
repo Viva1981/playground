@@ -180,23 +180,26 @@
   .paint-vid{position:absolute;left:50%;top:50%;width:440px;max-width:82vw;height:auto;transform:translate(-50%,-50%);mix-blend-mode:multiply;pointer-events:none;opacity:0;transition:opacity .3s;z-index:6}
   .paint-vid.show{opacity:1}
   .about{position:relative}
-  .pillango{position:absolute;left:0;top:0;width:clamp(24px,3.4vw,32px);height:auto;opacity:.82;z-index:1;line-height:0;pointer-events:none;will-change:left,top,transform;animation:fly 26s ease-in-out infinite}
+  .pillango{position:absolute;left:88%;top:8%;width:clamp(24px,3.6vw,32px);height:auto;opacity:.85;z-index:1;line-height:0;pointer-events:none}
   .pillango svg{width:100%;height:auto;display:block;overflow:visible}
-  .fly-wings{transform-box:fill-box;transform-origin:center;animation:flap .45s ease-in-out infinite}
-  @keyframes flap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.32)}}
+  .fly-wings{transform-box:fill-box;transform-origin:center;animation:flap 6.5s ease-in-out infinite}
+  @keyframes flap{0%,78%,100%{transform:scaleX(1)}83%{transform:scaleX(.4)}88%{transform:scaleX(1)}93%{transform:scaleX(.4)}98%{transform:scaleX(1)}}
+  .pillango.flying{animation:fly 16s ease-in-out 1;will-change:left,top,transform}
+  .pillango.flying .fly-wings{animation:flapfast .45s ease-in-out infinite}
+  @keyframes flapfast{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.32)}}
   @keyframes fly{
-    0%{left:5%;top:12%;transform:rotate(-8deg)}
-    11%{left:34%;top:4%;transform:rotate(7deg)}
-    22%{left:64%;top:13%;transform:rotate(-5deg)}
-    33%{left:83%;top:33%;transform:rotate(11deg)}
-    44%{left:69%;top:57%;transform:rotate(4deg)}
-    55%{left:43%;top:69%;transform:rotate(-7deg)}
-    66%{left:19%;top:54%;transform:rotate(8deg)}
-    77%{left:7%;top:33%;transform:rotate(-4deg)}
-    88%{left:29%;top:22%;transform:rotate(6deg)}
-    100%{left:5%;top:12%;transform:rotate(-8deg)}
+    0%{left:88%;top:8%;transform:rotate(0deg)}
+    10%{left:66%;top:5%;transform:rotate(-8deg)}
+    22%{left:40%;top:12%;transform:rotate(6deg)}
+    33%{left:14%;top:9%;transform:rotate(-7deg)}
+    44%{left:8%;top:34%;transform:rotate(8deg)}
+    55%{left:26%;top:60%;transform:rotate(-5deg)}
+    66%{left:52%;top:70%;transform:rotate(7deg)}
+    77%{left:76%;top:56%;transform:rotate(-6deg)}
+    88%{left:88%;top:30%;transform:rotate(6deg)}
+    100%{left:88%;top:8%;transform:rotate(0deg)}
   }
-  @media (prefers-reduced-motion:reduce){.pillango{animation:none;left:auto;right:clamp(12px,5vw,44px);top:clamp(30px,5vw,54px)}.fly-wings{animation:none}}
+  @media (prefers-reduced-motion:reduce){.fly-wings{animation:none}.pillango.flying{animation:none}}
 </style>
 
 <div class="wrap">
@@ -233,8 +236,8 @@
 <img src="data:image/webp;base64,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" alt="ONEMIN">
         </div>
         <p>
-          <span class="big">2024 óta a OneMin csapatában dolgozom,</span>
-          ami a piacon elérhető leginnovatívabb, <b>AI-támogatott éttermi rendszer</b>. <a href="https://onemin.hu/" target="_blank" rel="noopener">onemin.hu</a>
+          <span class="big">2024 óta a OneMin csapatában dolgozom.</span>
+          A OneMin egy modern, <b>AI-támogatott éttermi platform</b>. A napi munkám során a vendéglátás digitális oldalát ismerem meg közelről – ezek a tapasztalatok adják a legtöbb saját projektem alapját. <a href="https://onemin.hu/" target="_blank" rel="noopener">onemin.hu</a>
         </p>
       </div>
     </section>
@@ -351,6 +354,12 @@
   // AI-karika: betoltes utan 3.5s-cel indul, egyszer megy le (nincs loop -> a kesz koron megall)
   var cv=document.querySelector('.circle-vid');
   if(cv){cv.pause();try{cv.currentTime=0;}catch(e){}cv.addEventListener('ended',function(){setTimeout(function(){cv.classList.add('gone');},5000);});setTimeout(function(){var pr=cv.play();if(pr&&pr.catch)pr.catch(function(){});},10000);}
+  // pillango: pihen a sarokban; a Rolam szekcio lathatova valasa utan 6s-cel egy kort repul, majd visszaul
+  var fly=document.querySelector('.pillango'),about=document.querySelector('section.about');
+  if(fly&&about){var flew=false;
+    var pio=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting||flew)return;flew=true;pio.unobserve(e.target);setTimeout(function(){fly.classList.add('flying');},6000);});},{threshold:.3});
+    pio.observe(about);
+    fly.addEventListener('animationend',function(ev){if(ev.animationName==='fly')fly.classList.remove('flying');});}
 })();
 </script>
 
