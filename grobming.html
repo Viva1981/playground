@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gröbming 2026 — utazási dosszié</title>
+</head>
+<body>
+<style>
+  :root{
+    --green:#1b5e20; --green2:#2e7d32; --blue:#0d47a1; --blue2:#1565c0;
+    --amber:#b26a00; --amber-bg:#fff4e0; --ink:#1f2937; --muted:#5b6675;
+    --line:#e3e8ef; --card:#ffffff; --bg:#f5f7fa; --green-bg:#e8f3ea; --blue-bg:#e7eefb;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:"Segoe UI",system-ui,Arial,sans-serif; color:var(--ink);
+    background:var(--bg); line-height:1.5; font-size:14px;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .wrap{ max-width:900px; margin:0 auto; padding:24px; }
+
+  header.cover{
+    background:linear-gradient(135deg,var(--green) 0%,var(--green2) 45%,var(--blue2) 100%);
+    color:#fff; border-radius:16px; padding:28px 30px; margin-bottom:22px;
+    box-shadow:0 6px 18px rgba(13,71,161,.18);
+  }
+  header.cover .kicker{ text-transform:uppercase; letter-spacing:.14em; font-size:11px; opacity:.85; }
+  header.cover h1{ margin:6px 0 2px; font-size:30px; line-height:1.15; }
+  header.cover h2{ margin:0 0 16px; font-size:15px; font-weight:500; opacity:.92; }
+  .facts{ display:flex; flex-wrap:wrap; gap:8px; }
+  .facts .chip{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.28);
+    border-radius:999px; padding:5px 12px; font-size:12.5px; white-space:nowrap;
+  }
+  .facts .chip b{ font-weight:600; }
+
+  .roadmap{
+    background:var(--blue-bg); border:1px solid #cdd9f3; border-left:5px solid var(--blue2);
+    border-radius:12px; padding:14px 16px; margin-bottom:22px; font-size:13px;
+  }
+  .roadmap b{ color:var(--blue); }
+  .roadmap .done{ color:var(--green); font-weight:600; }
+
+  section.block{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:22px 24px; margin-bottom:22px; box-shadow:0 1px 3px rgba(16,24,40,.04);
+  }
+  .secnum{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:30px; border-radius:8px; background:var(--green);
+    color:#fff; font-weight:700; font-size:15px; margin-right:10px;
+  }
+  h3.sectitle{ display:flex; align-items:center; font-size:20px; margin:0 0 4px; color:var(--green); }
+  .lead{ color:var(--muted); margin:0 0 18px; }
+
+  h4{ font-size:14.5px; margin:22px 0 10px; color:var(--blue); border-bottom:2px solid var(--blue-bg); padding-bottom:5px; }
+
+  table{ width:100%; border-collapse:collapse; margin:6px 0 4px; font-size:13px; }
+  th,td{ text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  thead th{ background:var(--green-bg); color:var(--green); font-weight:600; border-bottom:2px solid #cfe3d3; }
+  tbody tr:nth-child(even){ background:#fafcfb; }
+  td.num,th.num{ text-align:right; white-space:nowrap; }
+  .stop-row{ background:#fff8e8 !important; }
+  .stop-row td{ font-weight:600; }
+
+  .cards{ display:flex; flex-wrap:wrap; gap:14px; }
+  .pcard{ flex:1 1 240px; border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:#fff; }
+  .pcard.green{ border-top:4px solid var(--green2); }
+  .pcard.blue{ border-top:4px solid var(--blue2); }
+  .pcard.amber{ border-top:4px solid var(--amber); }
+  .pcard .tag{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+  .pcard h5{ margin:4px 0 6px; font-size:15px; }
+  .pcard .when{ font-weight:700; color:var(--amber); }
+  .pcard ul{ margin:8px 0 0; padding-left:18px; }
+  .pcard li{ margin:3px 0; }
+
+  .total{
+    background:linear-gradient(135deg,var(--green-bg),var(--blue-bg));
+    border:1px solid #cfe0d6; border-radius:12px; padding:16px 18px; margin-top:8px;
+    display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+  .total .label{ font-size:13px; color:var(--muted); }
+  .total .value{ font-size:24px; font-weight:800; color:var(--green); }
+
+  .tips{ background:var(--amber-bg); border:1px solid #f2dcb3; border-left:5px solid var(--amber);
+    border-radius:10px; padding:12px 16px; margin-top:16px; font-size:13px; }
+  .tips b{ color:var(--amber); }
+  .tips ul{ margin:6px 0 0; padding-left:18px; } .tips li{ margin:3px 0; }
+
+  footer.note{ color:var(--muted); font-size:11.5px; margin-top:8px; padding:0 6px 20px; }
+  .pill{ display:inline-block; background:#eef1f5; border:1px solid var(--line); border-radius:6px;
+    padding:1px 7px; font-size:11px; color:var(--muted); }
+  a.maplink{ color:var(--blue2); font-weight:600; text-decoration:none; white-space:nowrap; }
+  a.maplink:hover{ text-decoration:underline; }
+  .townchips{ display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 6px; }
+  .townchips .tc{ background:var(--green-bg); border:1px solid #cfe3d3; border-radius:999px; padding:5px 12px; font-size:12.5px; }
+  .townchips .tc b{ color:var(--green); } .townchips .tc span{ color:var(--muted); }
+  .badge{ display:inline-block; font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:6px; white-space:nowrap; }
+  .badge.free{ background:var(--green-bg); color:var(--green); border:1px solid #cfe3d3; }
+  .badge.disc{ background:var(--amber-bg); color:var(--amber); border:1px solid #f2dcb3; }
+  .badge.paid{ background:#fdecec; color:#b3261e; border:1px solid #f3c7c4; }
+  .badge.closed{ background:#eef1f5; color:#5b6675; border:1px solid var(--line); }
+  .callout{ background:var(--green-bg); border:1px solid #cfe3d3; border-left:5px solid var(--green2);
+    border-radius:10px; padding:12px 16px; margin:6px 0 16px; font-size:13px; }
+  .callout b{ color:var(--green); } .callout ul{ margin:6px 0 0; padding-left:18px; } .callout li{ margin:3px 0; }
+  .callout.alert{ background:#fdecec; border-color:#f3c7c4; border-left-color:#b3261e; }
+  .callout.alert b{ color:#b3261e; }
+
+  .prog{ padding:11px 0; border-bottom:1px dashed var(--line); }
+  .prog:last-child{ border-bottom:none; }
+  .prog .ph{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:2px; }
+  .prog .ph .name{ font-weight:700; font-size:14.5px; color:var(--ink); }
+  .prog .meta{ font-size:12px; color:var(--muted); margin:0 0 4px; }
+  .prog p{ margin:3px 0 4px; font-size:13px; }
+  .prog .web a{ font-size:12.5px; color:var(--blue2); font-weight:600; text-decoration:none; }
+  .prog .web a:hover{ text-decoration:underline; }
+
+  .dayrow{ display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); }
+  .dayrow:last-child{ border-bottom:none; }
+  .dayrow .t{ flex:0 0 84px; font-weight:700; color:var(--blue); font-size:13px; }
+  .dayrow .c{ flex:1; font-size:13px; }
+  .event{ background:#fff8e8; border:1px solid #f2dcb3; border-left:5px solid var(--amber);
+    border-radius:12px; padding:16px 18px; margin:16px 0 4px; }
+  .event h5{ margin:0 0 6px; color:var(--amber); font-size:16px; }
+  .event p{ margin:4px 0 8px; font-size:13px; }
+  .event table{ margin:6px 0; }
+  .event table td{ border-bottom:1px solid #f2e2c2; }
+  .event .web a{ font-size:12.5px; color:var(--blue2); font-weight:600; text-decoration:none; }
+  .event .web a:hover{ text-decoration:underline; }
+
+  @page{ size:A4; margin:14mm 12mm; }
+  @media print{
+    body{ background:#fff; } .wrap{ padding:0; max-width:none; }
+    section.block, header.cover, .roadmap{ box-shadow:none; }
+    section.block{ break-inside:avoid; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="cover">
+    <div class="kicker">Utazási dosszié &middot; komplett családi terv</div>
+    <h1>Gröbming 2026</h1>
+    <h2>Schladming-Dachstein régió, Ausztria — 4 fős családi nyaralás</h2>
+    <div class="facts">
+      <span class="chip"><b>Időpont:</b> 2026.06.21–26. (5 éj)</span>
+      <span class="chip"><b>Indulás:</b> 06.20. szo 23:00</span>
+      <span class="chip"><b>Honnan:</b> Miskolc</span>
+      <span class="chip"><b>Szállás:</b> Gröbming</span>
+      <span class="chip"><b>Utazók:</b> 2 felnőtt + 2 gyerek</span>
+      <span class="chip"><b>Autóval</b> (0,9 turbó, ~6 l/100)</span>
+    </div>
+  </header>
+
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">1</span> Az odaút</h3>
+    <p class="lead">
+      Szombat éjjel indulunk, hogy elkerüljük a forgalmat (Budapest, Bécs) és vasárnap
+      reggel megérkezzünk. Az út ~690–710 km, nettó ~7–7,5 óra vezetés, két pihenővel
+      ~7,5–8,5 óra. Megérkezés vasárnap reggel ~06:30–07:30 — a szállás check-inje előtt
+      lesz idő reggelizni / bevásárolni.
+    </p>
+
+    <h4>Útvonal és idővonal (23:00 indulás)</h4>
+    <table>
+      <thead>
+        <tr><th>Szakasz</th><th class="num">Táv</th><th class="num">Össztáv</th><th class="num">Idő</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Miskolc → Budapest (M30 / M3 / M0)</td><td class="num">~175 km</td><td class="num">~175 km</td><td class="num">23:00 → 00:40</td></tr>
+        <tr class="stop-row"><td>Budapest → Győr / Arrabona (M1) — PIHENŐ 1</td><td class="num">~120 km</td><td class="num">~295 km</td><td class="num">→ 01:40</td></tr>
+        <tr><td>Győr → Hegyeshalom (határ)</td><td class="num">~50 km</td><td class="num">~345 km</td><td class="num">→ 02:15</td></tr>
+        <tr class="stop-row"><td>Hegyeshalom → Bécs körül → Ansfelden/Linz (A1) — PIHENŐ 2</td><td class="num">~235 km</td><td class="num">~580 km</td><td class="num">→ 04:45</td></tr>
+        <tr><td>Voralpenkreuz → A9 Pyhrn (Bosruck) → Ardning</td><td class="num">~75 km</td><td class="num">~655 km</td><td class="num">→ 05:45</td></tr>
+        <tr><td>Ardning / Liezen → B320 → Gröbming</td><td class="num">~35 km</td><td class="num">~690 km</td><td class="num">→ 06:30 érkezés</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">
+      Útvonal: M30 → M3 → M0 → M1 → Hegyeshalom → A4 → Bécs gyűrű → A1 → A9 Pyhrn → B320.
+      Távok és idők becslések; induláskor útvonaltervezővel pontosítandó.
+    </p>
+
+    <h4>Pihenők — a fáradtsági pontokra szabva</h4>
+    <div class="cards">
+      <div class="pcard green">
+        <div class="tag">Első etap</div>
+        <h5>250–300 km egy húzóra</h5>
+        <div class="when">23:00 → ~01:30</div>
+        <ul>
+          <li>Miskolctól Budapesten túlig megállás nélkül.</li>
+          <li>Friss vagy, az M0/M1 jól folyik éjjel.</li>
+        </ul>
+      </div>
+      <div class="pcard blue">
+        <div class="tag">Pihenő 1 — Budapest után</div>
+        <h5>M1 Arrabona / Autohof Győr</h5>
+        <div class="when">~01:30–01:45 &middot; 15–20 perc</div>
+        <ul>
+          <li><b>M1 Arrabona</b> (119. km, OMV) — kút éjjel: ellenőrizendő.</li>
+          <li><b>M1 Autohof Győr</b> (115. kijárat) — biztos 24 órás, étterem.</li>
+          <li>Mosdó, kávé, gyors mozgás.</li>
+        </ul>
+      </div>
+      <div class="pcard amber">
+        <div class="tag">Pihenő 2 — hajnali holtpont</div>
+        <h5>30–60 perc (napkelte ~05:10)</h5>
+        <div class="when">~04:30–05:30</div>
+        <ul>
+          <li><b>Biztonságos:</b> Rosenberger Ansfelden Süd (A1, 24h, meleg étel) — itt tankolj is.</li>
+          <li><b>Szép / alpesi:</b> A9 Ardning-Ost vagy Rottenmann pihenő — napkelte a Grimming panorámával.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>Úti költségek — üzemanyag</h4>
+    <table>
+      <thead><tr><th>Tétel</th><th class="num">Mennyiség</th><th class="num">Költség</th></tr></thead>
+      <tbody>
+        <tr><td>Odaút (~700 km), ~6,2 l/100</td><td class="num">~43 L</td><td class="num">~26.000 Ft</td></tr>
+        <tr><td>&nbsp;&nbsp;— ebből HU (~345 km, 600 Ft/L)</td><td class="num">~21 L</td><td class="num">~12.400 Ft</td></tr>
+        <tr><td>&nbsp;&nbsp;— ebből AT (~355 km, €1,74/L)</td><td class="num">~22 L</td><td class="num">~13.800 Ft</td></tr>
+        <tr><td><b>Oda-vissza (~1.400 km)</b></td><td class="num">~86 L</td><td class="num"><b>~52.000 Ft</b></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">A helyszíni kirándulások üzemanyaga külön, a Tételes költségelszámolásnál (4. szekció).</p>
+
+    <h4>Autópálya-matricák és útdíjak (oda-vissza)</h4>
+    <table>
+      <thead><tr><th>Tétel</th><th class="num">EUR</th><th class="num">HUF (355)</th></tr></thead>
+      <tbody>
+        <tr><td>HU 10 napos D1 matrica</td><td class="num">—</td><td class="num">6.900 Ft</td></tr>
+        <tr><td>AT 10 napos digitális vignetta</td><td class="num">€12,80</td><td class="num">~4.550 Ft</td></tr>
+        <tr><td>AT A9 Bosruck szakaszdíj (€6,00 × 2 irány)</td><td class="num">€12,00</td><td class="num">~4.260 Ft</td></tr>
+        <tr><td><b>Útdíj összesen</b></td><td class="num"></td><td class="num"><b>~15.700 Ft</b></td></tr>
+      </tbody>
+    </table>
+
+    <div class="total">
+      <span class="label">Az odaút teljes költsége (üzemanyag oda-vissza + útdíjak)</span>
+      <span class="value">~67.700 Ft</span>
+    </div>
+
+    <div class="tips">
+      <b>Praktikus tippek</b>
+      <ul>
+        <li>A vignettát és a Bosruck-díjat indulás <b>előtt online</b> megváltani (rendszámhoz kötve) — éjjel ne kelljen megállni.</li>
+        <li>Tankolj <b>itthon tele</b> (hatósági ~600 Ft/L, magyar rendszámra); a hajnali pihenőnél (Ansfelden) vagy AT diszkontnál tölts, ne a legdrágább pálya-pihenőn.</li>
+        <li>A Bosruck-alagút kikerülhető lenne a B138 Pyhrnpasson (ingyenes), de éjjel, fáradtan a sötét hegyi út <b>nem ajánlott</b> — maradjon az A9.</li>
+        <li>A kis tank miatt odafelé ~1 tankolás reális — tervezd a hajnali megállóhoz.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">2</span> Napi programok</h3>
+    <p class="lead">Napi bontás: érkezés és Stoderzinken (1.), Rittisberg (2.), Dachstein-gleccser (3.), Der Wilde Berg vadaspark (4.), Planai (5.). Lent egy esőnap-tartalék (bármelyik napra cserélhető) és egy opcionális extra is.</p>
+
+    <div class="event">
+      <h5>Esőnap — tartalék terv (bármelyik napra cserélhető)</h5>
+      <p>Tartós eső esetén ez a fedett nap: egy <b>fedett vár magyar nyelvű audioguide-dal</b> + egy <b>zárt, fedett fürdő</b>.</p>
+      <table>
+        <tbody>
+          <tr><td><b>Fő program</b></td><td><b>Erlebnisburg Hohenwerfen</b> (Werfen, ~70 km / 1 óra) — középkori élményvár; <b>felnőtt audioguide 13 nyelven, magyarul is</b> (megerősítve). Belső túra fedett; a sólyomshow (~11:00/15:00) szabadtéri. Kártyával kedvezmény (~€15,40-19,40 felnőtt).</td></tr>
+          <tr><td><b>Zárt fürdő</b></td><td><b>Erlebnis-Hallenbad Schladming</b> (hazafelé, ~22 km) — fedett medence, <span class="badge free">kártyával ingyenes</span>, max. 3 óra.</td></tr>
+          <tr><td><b>Közelebbi alternatíva</b></td><td>Schloss Trautenfels (~13 km, kártyával ingyenes tájmúzeum) vagy Stift Admont (~45 km, kolostorkönyvtár) — magyar vezetés nem megerősített; + fedett fürdő (Hallenbad Schladming / Dachstein Bad Ramsau)</td></tr>
+          <tr><td><b>Prémium fürdő</b></td><td>Grimming-Therme (Bad Mitterndorf, ~28 km) — igazi fedett termál, de nem kártyás (~€20-25/fő)</td></tr>
+        </tbody>
+      </table>
+      <div class="web"><a href="https://www.burg-hohenwerfen.at/">burg-hohenwerfen.at</a></div>
+    </div>
+
+    <h4>1. nap — Érkezés (2026.06.21., vasárnap)</h4>
+    <div class="dayrow"><div class="t">~07:00</div><div class="c">Érkezés az éjszakai út után. Reggeli a <b>Steffl-Bäck</b>nél (vasárnap nyitva). Boltok vasárnap zárva.</div></div>
+    <div class="dayrow"><div class="t">Délelőtt</div><div class="c"><b>Check-in csak 15:00-tól</b> — addig laza, nem megterhelő program (opciók alább), ami ebédig kitart.</div></div>
+    <div class="dayrow"><div class="t">~12:30</div><div class="c">Ebéd: <b>Pizzeria La Piazza</b> Gröbmingben (vasárnap nyitva).</div></div>
+    <div class="dayrow"><div class="t">15:00</div><div class="c">Bejelentkezés (belépőkód WhatsApp/SMS), kipakolás, <b>pihenő/szundi</b>.</div></div>
+    <div class="dayrow"><div class="t">Késő délután</div><div class="c">Autóval fel a <b>Stoderzinken Alpenstraße</b> toll roadon a <b>Steinerhaus-parkolóig</b> (~1.750 m; kártyával ingyenes), ~20-30 perc séta a <b>Friedenskircherl</b>hez (1.898 m). Az autó fent marad az esti tűzhöz (egy út a hegyre).</div></div>
+    <div class="dayrow"><div class="t">20:00</div><div class="c"><b>Sonnwendfeuer am Stoderzinken</b> — napfordulós tüzek (részletek alább).</div></div>
+
+    <div class="callout">
+      <b>Délelőtti program-opciók (ha nem tudunk korábban bejutni a szállásra) — fáradtan is laza, ebédig kitart</b>
+      <ul>
+        <li><b>Steirischer Bodensee</b> (autóval ~15-18 km; a Mautstraße a kártyával ingyenes): a parkolótól ~25 perc sík séta a tóhoz + ~45-55 perc tókör, vízeséssel; WC + Seewigtalstüberl (étel/ital) a parkolónál. Szép, sík, kevés erőfeszítés.</li>
+        <li><b>FX-Mayr-Weg</b> (gyalog Gröbmingből, ~6,4 km, könnyű): 11 pihenő-/elmélkedő pont + Kneipp-taposó — autózás nélkül.</li>
+        <li><b>Baumhoroskopweg</b> a Kulmon (~1,5 óra könnyű körút) vagy a <b>Gröbminger Alm</b> felé (Kneipp + kis állatsimogató a gyerekeknek; kissé hosszabb/emelkedik).</li>
+        <li>Legrelaxáltabb: <b>Putterersee</b> (Aigen, ~15 km) — sík tóparti séta + strandkávézó.</li>
+      </ul>
+      <span style="font-size:12px;color:var(--muted)">Ha sikerül korábban bejutni a szállásra, a program csúszhat pihenésre/délutánra. A hütte-nyitvatartások vasárnap ellenőrizendők.</span>
+    </div>
+
+    <div class="event">
+      <h5>Sonnwendfeuer am Stoderzinken — napfordulós tüzek</h5>
+      <p>
+        A nyári napforduló ősi alpesi hagyománya: a hegyeken tüzeket gyújtanak, és a
+        Stoderzinkenen az <b>Alpenverein és a Bergrettung Gröbming</b> közös, vezetett
+        feljutást szervez a csúcsra, ahol meggyújtják a közös tüzet. A völgyből és a
+        környező csúcsokról is gyönyörű látvány, ahogy a hegyek "kigyúlnak" a sötétben.
+        A találkozó <b>FENT</b>, a Stoderzinken Alpenstraße toll road végén van
+        (~1.750-1.800 m) — autóval kell felmenni (a kártyával ingyenes), a völgyi
+        szállástól csak légvonalban közel. Jól passzol viszont a délutáni Stoderzinken-
+        sétához: egy úttal fent maradunk, és pont az érkezés estéjére (napforduló) esik.
+      </p>
+      <table>
+        <tbody>
+          <tr><td><b>Mikor</b></td><td>2026. június 21. (vasárnap), <b>20:00</b> találkozó</td></tr>
+          <tr><td><b>Hol</b></td><td>Bergrettungshütte am Stoderzinken — <b>FENT</b>, a Stoderzinken Alpenstraße (toll road) végén, ~1.750-1.800 m (Steinerhaus-parkoló). Autóval kell felmenni; a völgyi szállástól csak légvonalban közel.</td></tr>
+          <tr><td><b>Odajutás / parkolás</b></td><td>fel a Stoderzinken Alpenstraße toll roadon (kártyával PKW-ra ingyenes a mi időnkben), parkolás a Steinerhausnál (~1.750 m)</td></tr>
+          <tr><td><b>Feljutás a tűzhöz</b></td><td>20:00-tól közös séta a csúcsra (2.048 m): ~250 m szint / ~1,5 km / ~1 óra (könnyű), <b>tűz ~21:00</b>, le ~22:00</td></tr>
+          <tr><td><b>Vinni</b></td><td>fejlámpa (leereszkedéshez), meleg ruha, ennivaló/ital, és hagyomány szerint tűzifa felfelé</td></tr>
+          <tr><td><b>Költség</b></td><td>nincs megadva (Alpenverein-esemény) — info/jelentkezés a kapcsolaton</td></tr>
+          <tr><td><b>Kapcsolat</b></td><td>0677/63125943 (Alpenverein/Bergrettung Gröbming)</td></tr>
+          <tr><td><b>Fontos</b></td><td>az eseményre vonatkozó parkolás és a toll road esti nyitvatartása a szervezőnél ellenőrizendő (0677/63125943); időjárás / tűzveszély miatt módosulhat</td></tr>
+        </tbody>
+      </table>
+      <div class="web">
+        <a href="https://www.alpenverein.at/groebming/suchergebnis/officeveranstaltung_liste_detail_default.php?veranstaltungID=8aae745e-571d-4b19-ac8f-c2cc95b93df6">Esemény oldala (Alpenverein Gröbming)</a> ·
+        <a href="https://www.schladming-dachstein.at/de/Aktuelles/Alle-Veranstaltungen/Sonnwendfeuer-am-Stoderzinken_ev_447707">régiós esemény</a> ·
+        <a href="https://www.bergrettung-groebming.at/sonnwendfeuer-am-stoder-und-kamm/">Bergrettung Gröbming</a>
+      </div>
+    </div>
+
+    <div class="tips">
+      <b>Megjegyzés az 1. naphoz</b>
+      <ul>
+        <li>Az éjszakai vezetés után fáradtak leszünk — a délutáni Stoderzinken közben/után érdemes pihenni, hogy az esti tűz jól menjen.</li>
+        <li>A délutáni autós feljutás és az esti túra ugyanoda (Stoderzinken) visz; a tüzes program a Bergrettungshütténél indul 20:00-kor.</li>
+        <li>A tűz csak ezen az estén van (napforduló) — ezért került ez fixen az 1. napra.</li>
+      </ul>
+    </div>
+
+    <h4>2. nap — Rittisberg (Ramsau) + nagy bevásárlás (2026.06.22., hétfő)</h4>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px;">A család fő programja a Rittisberg. Nem megterhelő (gondola visz fel), mégis élményes; a hazafelé eső Hofer Schladmingnál a nagy bevásárlás.</p>
+    <div class="dayrow"><div class="t">Délelőtt</div><div class="c">Át Ramsauba (~25 km / 30 perc), parkolás a völgyállomásnál (nyáron €4, felvonójeggyel ingyenes). <b>Gondola fel</b> (1.500 m) — <span class="badge free">kártyával ingyenes</span> (napi 1).</div></div>
+    <div class="dayrow"><div class="t">Fent (~3-4 ó)</div><div class="c"><b>Panoramarundweg</b> (~5 km, könnyű) a Dachstein-panorámáért; <b>1 ingyenes Coaster (bob) menet/fő</b> (továbbiak €11/€8,50); nagy <b>játszótér</b>; ebéd a Sonnenalmnál vagy Kaiserschmarrn a Halseralmnál.</div></div>
+    <div class="dayrow"><div class="t">Késő délután</div><div class="c"><b>Schladming</b>: könnyed séta a sétálóutcás belvárosban + <b>fagyi</b> (pl. Sattler's). Itt a <b>nagy bevásárlás — Hofer Schladming</b> (Salzburger Siedlung 259, H-P 07:30-19:00) is — Ramsau → Schladming → Gröbming útba esik. (Lidl: Liezen.)</div></div>
+    <div class="dayrow"><div class="t">Este</div><div class="c">Haza, vacsora az apartmanban (már bevásárolva), pihenés.</div></div>
+
+    <div class="event">
+      <h5>Rittisberg — a fontos infók</h5>
+      <p>Stájerország legnagyobb családi élményhegye Ramsauban: 10 személyes gondola a 1.500 m-es hegyállomásig, fent játszótér, nyári bobpálya (Coaster), Flyline, kötélpálya és a Dachstein-panoráma. <b>Jún. 22. (hétfő) nyitva</b> (09:30-17:00; 3 forrásból megerősítve). Gondolával fel, így alig van szint — fáradtság-barát.</p>
+      <table>
+        <tbody>
+          <tr><td><b>Gondola</b></td><td><span class="badge free">kártyával ingyenes</span> (napi 1 oda-vissza)</td></tr>
+          <tr><td><b>Coaster (bob)</b></td><td>1 menet/fő <span class="badge free">ingyenes</span> a kártyával (vorszezon); továbbiak €11 / €8,50. Pálya 1,33 km, ~6 perc. Egyedül 8 évtől és 135 cm-től, 3 évtől felnőttel.</td></tr>
+          <tr><td><b>Flyline</b></td><td><span class="badge paid">fizetős</span> €12,50 / €10 (az ingyenes menet csak ősszel)</td></tr>
+          <tr><td><b>Kötélpálya / íjászat</b></td><td><span class="badge paid">fizetős</span> €30-40 / €37 — idő- és energiaigényes, ezen a napon kihagyható</td></tr>
+          <tr><td><b>Parkolás</b></td><td>nyáron €4 (felvonójeggyel ingyenes)</td></tr>
+          <tr><td><b>Étkezés</b></td><td>Sonnenalm / Rittisstadl a hegyállomásnál; Halseralm (400 éves tanyaház) — flambírozott Kaiserschmarrn</td></tr>
+          <tr><td><b>Túra</b></td><td>fő séta: Panoramarundweg ~5 km, könnyű, babakocsibarát, Dachstein-panoráma. Kényelmes 8-10 km-es izgalmas kör itt nincs; arra a Wilde Wasser/Riesachfälle való külön napon.</td></tr>
+        </tbody>
+      </table>
+      <div class="web"><a href="https://www.rittisberg.at/">rittisberg.at</a></div>
+    </div>
+
+    <h4>3. nap — Dachstein-gleccser (2.700 m) + fürdő (2026.06.23., kedd)</h4>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px;">A hét nagy dobása: júniusban is hó és jég 2.700 m-en, a Skywalkról fél Alpok a lábad alatt. Cserébe ez a leghidegebb, legtöbb szervezést igénylő nap — a gondolát ELŐRE foglalni kell.</p>
+    <div class="dayrow"><div class="t">Délelőtt</div><div class="c">Át Ramsauba, fel a <b>Dachstein Mautstraße</b> toll roadon (<span class="badge free">kártyával ingyenes</span>) a völgyállomásig (~1.700 m), parkolás. <b>Panoramagondel</b> a Hunerkogelre (2.700 m, ~6 perc) — <span class="badge free">kártyával ingyenes</span> (1×/7 nap), <b>de kötelező előfoglalás</b> (lásd a dobozt).</div></div>
+    <div class="dayrow"><div class="t">Fent</div><div class="c"><b>Skywalk</b> (ingyenes), <b>Hängebrücke</b> (Ausztria legmagasabb függőhídja), <b>Treppe ins Nichts</b>, <b>Eispalast</b> (a híd+lépcső+jégpalota kombi fizetős), 280°-os panorámaétterem. Meleg ruha + napszemüveg! A csúcs sightseeing, nem családi túraterep.</div></div>
+    <div class="dayrow"><div class="t">Délután</div><div class="c">Lefelé, majd <b>Dachstein Bad Ramsau</b> (fedett fürdő, <span class="badge free">kártyával ingyenes</span>, max. 3 óra; szauna nem jár) — bemelegedés a gleccser után. Túraalternatíva: könnyű séta a Ramsau-fennsíkon.</div></div>
+    <div class="dayrow"><div class="t">Este (opció)</div><div class="c">Könnyed séta <b>Haus im Ennstal</b> kis falujában (~15 km) vagy a Ramsau-fennsíkon; vacsora az apartmanban.</div></div>
+
+    <div class="event">
+      <h5>Dachstein-gleccser — foglalás és menet (FONTOS)</h5>
+      <p>A gondolát a kártya fedezi (1×/7 nap, min. 2 éj), de nyáron <b>kötelező a fixhely-foglalás — a kártyával is</b>. Foglalás nélkül nem lehet felmenni.</p>
+      <table>
+        <tbody>
+          <tr><td><b>Hogyan jutunk fel</b></td><td>autóval a Dachstein Mautstraße toll roadon (kártyával ingyenes) a völgyállomásig (~1.700 m) → parkolás → Panoramagondel a 2.700 m-es Hunerkogelre (~6 perc)</td></tr>
+          <tr><td><b>Foglalás menete</b></td><td>online előre: <b>derdachstein.at/reservierung</b> (nap + idősáv kiválasztása); foglalási díj <b>~€2,90/fő</b> (a gondolamenetet a kártya fedezi)</td></tr>
+          <tr><td><b>Foglalás nélkül?</b></td><td><b>Nem</b> — a fixhely kötelező. A kasszánál is kérhető, de csak szabad hely esetén → előre online a biztos</td></tr>
+          <tr><td><b>Ingyenes a kártyával</b></td><td>toll road (PKW), gondola oda-vissza, Skywalk</td></tr>
+          <tr><td><b>Extra (nem a kártyában)</b></td><td>Hängebrücke + Treppe ins Nichts + Eispalast kombi: €10 / €8 / €5,50 → család ~€33,50; + foglalás 4×€2,90 ≈ €11,60</td></tr>
+          <tr><td><b>Nyitva</b></td><td>gondola 08:00–17:20; Eispalast 09:00–16:15</td></tr>
+        </tbody>
+      </table>
+      <div class="web"><a href="https://www.derdachstein.at/de/tickets-infos">derdachstein.at</a></div>
+    </div>
+
+    <h4>4. nap — Der Wilde Berg vadaspark + fürdő (2026.06.24., szerda)</h4>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px;">Lazább, gyerekközpontú nap: szabadon mozgó vadak, ragadozó-/repülőbemutató, sesselbahn és nyári bobozás — a teljes belépő a kártyával ingyenes.</p>
+    <div class="dayrow"><div class="t">Egész nap</div><div class="c"><b>Der Wilde Berg, Mautern</b> (~50-55 km, az A9-en) — alpesi állatpark 65 ha-on ~300 állattal, nagy játszótér, ragadozó-show, nyári bob/Mountain-Kart. Belépő + felvonó/Parkbus <span class="badge free">kártyával ingyenes</span> (mi fizetős: lásd a dobozt). ~4-5 óra.</div></div>
+    <div class="dayrow"><div class="t">Hazafelé</div><div class="c">Igény szerint fürdés: útközben <b>Erlebnisbad Stainach</b> vagy itthon a <b>Panoramabad Gröbming</b> (<span class="badge free">kártyával ingyenes</span>).</div></div>
+    <div class="dayrow"><div class="t">Este (opció)</div><div class="c">Könnyed séta <b>Pürgg</b>ben (~13 km) — a „stájer Betlehem”, festői dombi falucska, esti fényben gyönyörű. Vacsora az apartmanban.</div></div>
+    <p style="font-size:12px;color:var(--muted);margin:2px 0;">A hét legtöbb autózást igénylő napja (A9), de a teljes belépő ingyenessége miatt megéri; a park maga is sok sétával jár.</p>
+
+    <div class="event">
+      <h5>Der Wilde Berg — a fontos infók</h5>
+      <table>
+        <tbody>
+          <tr><td><b>Odajutás / parkolás</b></td><td>A9, Mautern lehajtó; parkolás a völgyállomásnál (~50-55 km Gröbmingtől)</td></tr>
+          <tr><td><b>Fel a hegyre (~1.100 m)</b></td><td><b>Sessellift</b> (nyitott libegő) vagy <b>Parkbus</b> (zárt, babakocsibarát, időjárásfüggetlen alternatíva); a lift ~17:15-ig</td></tr>
+          <tr><td><b>Le a völgybe</b></td><td>sesselbahn / Parkbus, vagy a szórakoztató opciók: <b>Wiesengleiter</b> (1.200 m nyári bob) / <b>Mountain-Kart</b></td></tr>
+          <tr><td><b>Mi a Parkbus</b></td><td>a sesselbahn helyett a fel-/lejutás kényelmes, fedett shuttle-busza (babakocsival/rossz időben ideális)</td></tr>
+          <tr><td><b>Kártyával ingyenes</b></td><td>belépő (állatpark + játszótér) + a sesselbahn/Parkbus oda-vissza</td></tr>
+          <tr><td><b>Fizetős extra</b></td><td>Wiesengleiter (nyári bob), Mountain-Kart; a ragadozó-show/etetések jellemzően a belépőben, de helyszínen ellenőrizendő</td></tr>
+          <tr><td><b>Idő / egy nap</b></td><td>~4-5 óra: állatok, etetések, ragadozó-repülőshow, játszótér, 1-1 bob/kart</td></tr>
+        </tbody>
+      </table>
+      <div class="web"><a href="https://www.derwildeberg.at/">derwildeberg.at</a></div>
+    </div>
+
+    <h4>5. nap — Planai + fürdő + (opció) esti hangverseny (2026.06.25., csütörtök)</h4>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px;">Schladming háznegye gondolával: fent Dachstein-panoráma és könnyű magaslati séták, lent a város és egy fürdő.</p>
+    <div class="dayrow"><div class="t">Délelőtt</div><div class="c"><b>Planai-Seilbahn</b> a csúcsra (1.906 m) — <span class="badge free">kártyával ingyenes</span> (napi 1); ~1.000 ingyenes parkoló a völgyállomásnál. Fent <b>Panorama-Rundweg</b> (könnyű, Dachstein-panoráma). „Felvonóval fel, gyalog le” opció: lásd a dobozt.</div></div>
+    <div class="dayrow"><div class="t">Délután</div><div class="c"><b>Erlebnisbad Schladming</b> (fedett + szabadtéri, <span class="badge free">kártyával ingyenes</span>, max. 3 óra); Schladming sétálóutca, kávé/fagyi.</div></div>
+    <div class="dayrow"><div class="t">Este (opció)</div><div class="c">Könnyed séta Gröbming belvárosában — ha időben visszaérünk, <b>17:00-kor zeneiskolai hangverseny a Stoderplatzlon</b> (ingyenes); vagy kis falusi séta <b>Öblarn</b>ban (~10 km). Vacsora az apartmanban.</div></div>
+
+    <div class="event">
+      <h5>Planai — parkolás és túrák</h5>
+      <table>
+        <tbody>
+          <tr><td><b>Odajutás / parkolás</b></td><td>Völgyállomás: Coburgstraße 52, Schladming; ~1.000 <b>ingyenes</b> parkolóhely (Planet Planai, 08:00-20:00)</td></tr>
+          <tr><td><b>Fel</b></td><td>Planai-Seilbahn a csúcsra (1.906 m) — kártyával ingyenes (napi 1)</td></tr>
+          <tr><td><b>Könnyű túra fent</b></td><td><b>Planai Panorama-Rundweg</b> — könnyű körút, Dachstein-panoráma</td></tr>
+          <tr><td><b>„Fel felvonóval, le gyalog” (ajánlott)</b></td><td>a csúcsról az <b>53-as ösvényen</b> le Schladmingba: erdei út, panoráma Rohrmoosra, a végén a <b>Talbachklamm</b> szurdokon át vissza az autóhoz. ~900 m lejtés, ~2,5-3 óra; bottal kíméletesebb. Megéri: szép, változatos, a Talbachklamm jó zárás. Gyengébb térdekkel inkább a körút + felvonóval le.</td></tr>
+        </tbody>
+      </table>
+      <div class="web"><a href="https://www.planai.at/">planai.at</a></div>
+    </div>
+
+
+
+    <div class="event">
+      <h5>„Gröbmingi rollercoaster” — Flying Coaster (Stoderzinken)</h5>
+      <p>A Stoderzinkenen (Stoderstraße 114 — a szállás háznegyén!) egy 800 m hosszú, 3–12 m magasan erdőn átfutó „zipline-hullámvasút”, akár 40 km/h, 100+ m szintkülönbség. A <b>Zipline Stoderzinken</b> (Európa legnagyobbja, 2,5 km, 4 sáv, ~115 km/h) és az <b>Abenteuerpark</b> (Ausztria legnagyobb kalandparkja) komplexum része. <b>NEM kártyás.</b></p>
+      <table>
+        <tbody>
+          <tr><td><b>Ár</b></td><td>Flying Coaster €30 (15+) / €25 (15 alatt); Zipline-kombók €53-73; Abenteuerpark €47-57</td></tr>
+          <tr><td><b>Korhatár</b></td><td>min. 8 év, 30 kg, 120 cm (max 195 cm / 110 kg) — a 11 éves valószínűleg megfelel</td></tr>
+          <tr><td><b>Nyitva a héten</b></td><td>vasárnap, szerda, csütörtök (hétfő-kedd zárva; pénteken hazaindulás). Sze-P 11-15, Szo-V 10-16.</td></tr>
+          <tr><td><b>Hol</b></td><td>Stoderstraße 114, Gröbming (a Stoderzinkenen)</td></tr>
+        </tbody>
+      </table>
+      <div class="web"><a href="https://www.flyingcoaster.at/">flyingcoaster.at</a></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">3</span> Hazaút</h3>
+    <h4>2026.06.26. (péntek) — 9:00 indulás</h4>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px;">Búcsú-pékáru és pár osztrák finomság, majd haza egy igazán megérő megállóval.</p>
+    <div class="dayrow"><div class="t">07:30–09:00</div><div class="c">Check-out; úti pékáru a <b>Steffl-Bäck</b>nél; búcsú-bevásárlás osztrák finomságokból az <b>Eurospar/Billa</b>ban (tökmagolaj, Almkäse, Zotter/Manner csoki, Almdudler).</div></div>
+    <div class="dayrow"><div class="t">09:00</div><div class="c">Indulás Gröbming → Miskolc (~700 km). Megálló (eldöntve): <b>Dr. Vogelgesang-Klamm</b> (Spital am Pyhrn, az A9-en) — lásd a dobozt.</div></div>
+    <div class="dayrow"><div class="t">Este</div><div class="c">Érkezés Miskolcra ~19:00–20:00.</div></div>
+
+    <div class="event">
+      <h5>Hazaúti megálló: Dr. Vogelgesang-Klamm (Spital am Pyhrn)</h5>
+      <p>Felső-Ausztria leghosszabb szurdoka, közvetlenül az A9-en (~1,5 óra autóút után) — zúgó vízesések, fa lépcsősoros ösvény és hidak a sziklafalak között. Tökéletes lábkinyújtó és élmény a hosszú út első harmadában.</p>
+      <table>
+        <tbody>
+          <tr><td><b>Hossz / lépcsők</b></td><td>~1,5 km, ~500 fa- és kőlépcső + több híd; a Bosruckhütte (1.043 m) felé vezet</td></tr>
+          <tr><td><b>Idő / nehézség</b></td><td>~1,5-2 óra (fel a szurdokba és vissza); gyerekeknek és időseknek is járható, jó cipővel</td></tr>
+          <tr><td><b>Belépő / parkolás</b></td><td>~€6,50/fő (ellenőrizendő); ingyenes parkoló a bejáratnál</td></tr>
+          <tr><td><b>Nyitva</b></td><td>májustól (a lépcsőket szezon előtt ellenőrzik)</td></tr>
+        </tbody>
+      </table>
+      <div class="web"><a href="https://www.360alpenland.com/oesterreich-tour/detail/430000994/dr-vogelgesang-klamm.html">infó &amp; megközelítés</a></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">4</span> Tételes költségelszámolás (355 Ft/€)</h3>
+    <p class="lead">Becslés a megadott szokásokkal: 3× bolt ~€100, 3× étterem/elvitel (2-3 pizza/étel), 2× fagyi, 2× kávé. A kártya fedezi a felvonókat (napi 1), a Dachstein-gondolát, a fürdőket, a Stoderzinken-autóutat és a vadaspark belépőjét.</p>
+    <table>
+      <thead><tr><th>Tétel</th><th class="num">EUR</th><th class="num">HUF</th></tr></thead>
+      <tbody>
+        <tr><td>Szállás — online (apartman + ÁFA + €100 takarítás)</td><td class="num">855,35</td><td class="num">303.650</td></tr>
+        <tr><td>Idegenforgalmi adó (helyszínen)</td><td class="num">48,75</td><td class="num">17.300</td></tr>
+        <tr><td>Üzemanyag (oda-vissza + helyi ~1.800 km)</td><td class="num">~191</td><td class="num">~68.000</td></tr>
+        <tr><td>Útdíjak (HU matrica + AT vignetta + Bosruck)</td><td class="num">~44</td><td class="num">~15.700</td></tr>
+        <tr><td>Bolt (3 × ~€100)</td><td class="num">300</td><td class="num">106.500</td></tr>
+        <tr><td>Étterem / elvitel (3 × ~€33)</td><td class="num">~100</td><td class="num">~35.500</td></tr>
+        <tr><td>Fagyi (2×) + kávé (2×)</td><td class="num">~52</td><td class="num">~18.400</td></tr>
+        <tr><td>Dachstein-gleccser (foglalás + attrakció-kombi)</td><td class="num">~45</td><td class="num">~16.000</td></tr>
+        <tr><td>Dr. Vogelgesang-Klamm belépő (4×€6,50)</td><td class="num">26</td><td class="num">~9.200</td></tr>
+        <tr><td>Parkolás-buffer</td><td class="num">~10</td><td class="num">~3.550</td></tr>
+      </tbody>
+    </table>
+    <div class="total">
+      <span class="label">Teljes út (becslés) &middot; napi átlag ~99.000 Ft</span>
+      <span class="value">~593.600 Ft (~€1.672)</span>
+    </div>
+    <div class="tips">
+      <b>Opcionális extrák (nincs a fenti összegben)</b>
+      <ul>
+        <li><b>Flying Coaster</b>, 1 menet / 4 fő: ~€115 (~40.800 Ft)</li>
+        <li><b>Der Wilde Berg</b>: Wiesengleiter / Mountain-Kart ~€5-8/fő/menet</li>
+        <li><b>Esőnap — Hohenwerfen</b> belépő: ~€50-60 a családnak (a Hallenbad Schladming ingyenes)</li>
+        <li><b>Grimming-Therme</b> (prémium fürdő): ~€20-25/fő (nem kártyás)</li>
+      </ul>
+      A ~100.000 Ft/napos kereten belül (épp a határon); a legnagyobb tétel a szállás. 1-2 étterem/extra kihagyásával nő a tartalék.
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">5</span> Boltok, bevásárlás</h3>
+    <p class="lead">
+      Gröbmingben két szupermarket van helyben (Eurospar, Billa), a diszkontok
+      (Hofer, Penny, Lidl) a környező településeken. A távolságok a szállástól
+      (Gröbming) autóval, közelítő értékek.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Bolt</th><th>Cím</th><th>Nyitvatartás</th><th class="num">Táv (autóval)</th><th>Térkép</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>EUROSPAR</b><br><span style="font-size:11px;color:var(--muted)">Gröbming</span></td>
+          <td>Wiesackstraße 513</td>
+          <td>H–P 07:00–19:00<br>Szo 07:00–18:00<br>V zárva</td>
+          <td class="num">~1,5 km / 3 perc</td>
+          <td><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=EUROSPAR+Landmarkt+Wiesackstra%C3%9Fe+513+8962+Gr%C3%B6bming">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>BILLA</b><br><span style="font-size:11px;color:var(--muted)">Gröbming</span></td>
+          <td>Buchenweg 830</td>
+          <td>H–P 07:15–19:30<br>Szo 07:15–18:00<br>V zárva</td>
+          <td class="num">~1,5 km / 3 perc</td>
+          <td><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=BILLA+Buchenweg+830+8962+Gr%C3%B6bming">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>HOFER</b><br><span style="font-size:11px;color:var(--muted)">Stainach</span></td>
+          <td>Bahnhofstraße 518, Stainach-Pürgg</td>
+          <td>H–P 07:15–19:00<br>Szo 07:15–18:00<br>V zárva</td>
+          <td class="num">~13 km / 13 perc</td>
+          <td><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=HOFER+Bahnhofstra%C3%9Fe+518+8950+Stainach-P%C3%BCrgg">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>PENNY</b><br><span style="font-size:11px;color:var(--muted)">Stainach</span></td>
+          <td>Salzburger Straße 495</td>
+          <td>H–P 07:15–19:00<br>Szo 07:15–18:00<br>V zárva</td>
+          <td class="num">~13 km / 13 perc</td>
+          <td><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=PENNY+Salzburger+Stra%C3%9Fe+495+8950+Stainach">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>LIDL</b><br><span style="font-size:11px;color:var(--muted)">Liezen</span></td>
+          <td>Gesäusestraße 2</td>
+          <td>H–P 07:15–19:30<br>Szo 07:15–18:00<br>V zárva</td>
+          <td class="num">~25 km / 22 perc</td>
+          <td><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Lidl+Ges%C3%A4usestra%C3%9Fe+2+8940+Liezen">Maps</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="tips">
+      <b>Vasárnap — fontos</b>
+      <ul>
+        <li>Az osztrák boltok <b>vasárnap zárva</b>. Vasárnap reggel érkezünk, így aznap nincs nagybevásárlás — az első rendes bevásárlás reálisan <b>hétfőn</b> (vagy hozzunk alapokat itthonról / szombat este indulás előtt).</li>
+        <li>A legközelebbi <b>Hofer</b> valójában Irdningben is van (~9 km); a táblázatbeli Stainachi ~13 km.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">6</span> Esti kiruccanás és étkezés</h3>
+    <p class="lead">
+      Az esti szokás: autóval egy közeli szép kisvárosba, séta és vacsora. Itt a
+      40 km-es körön belüli szép települések, és ehhez igazítva a low-budget
+      éttermek/kajáldák. Az árak becslések (a helyek nem közölnek pontos netes árat).
+    </p>
+
+    <h4>Közeli szép települések (≤40 km, autóval)</h4>
+    <div class="townchips">
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Schladming+%C3%96sterreich">Schladming</a> <span>~22 km / 20 perc — élénk belváros</span></span>
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Haus+im+Ennstal">Haus im Ennstal</a> <span>~15 km</span></span>
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Irdning">Irdning</a> <span>~10 km</span></span>
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=%C3%96blarn">Öblarn</a> <span>~10 km — festői falu</span></span>
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=P%C3%BCrgg+Stainach">Pürgg</a> <span>~14 km — "stájer Betlehem"</span></span>
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Bad+Mitterndorf">Bad Mitterndorf</a> <span>~28 km</span></span>
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Bad+Aussee">Bad Aussee</a> <span>~35 km / 40 perc</span></span>
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Altaussee">Altaussee</a> <span>~40 km — tó, sóbánya</span></span>
+      <span class="tc"><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Grundlsee">Grundlsee</a> <span>~38 km — tó</span></span>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin:2px 0 0;">
+      Esti gyors kiruccanásra a ≤25 km-es helyek valók (Schladming, Haus, Irdning, Öblarn, Pürgg);
+      az Ausseerland (~40-50 perc) inkább fél napos program.
+    </p>
+
+    <h4>Éttermek, kajáldák</h4>
+    <table>
+      <thead><tr><th>Hely</th><th>Település / jelleg</th><th>Ár (becslés)</th><th>Nyitva</th><th>Link</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>Pizzeria La Piazza</b></td>
+          <td>Gröbming — pizza, tészta, burger</td>
+          <td>pizza ~€9-13<br>tészta ~€10-14</td>
+          <td>H-K, Cs-V 11-22<br>Sze zárva</td>
+          <td><a class="maplink" href="https://www.ristorante-lapiazza.at/">Web</a> ·
+              <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Pizzeria+La+Piazza+Horstigstra%C3%9Fe+899+8962+Gr%C3%B6bming">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>Pizzeria Bella Italia</b></td>
+          <td>Gröbming — olasz/mexikói</td>
+          <td>pizza ~€9-13</td>
+          <td>ellenőrizendő</td>
+          <td><a class="maplink" href="https://www.bellaitalia-groebming.at/">Web</a> ·
+              <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Pizzeria+Bella+Italia+Hauptstra%C3%9Fe+800+8962+Gr%C3%B6bming">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>Restaurant Landalm</b></td>
+          <td>Schladming-Untertal — stájer Wirtshaus, 300 éves tanyaház</td>
+          <td>főétel ~€15-22<br>schnitzel ~€16-20</td>
+          <td>naponta 11-23<br>(konyha 11:30-21), K zárva</td>
+          <td><a class="maplink" href="https://www.landalm.at/">Web</a> ·
+              <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Restaurant+Landalm+Bachweg+120+8971+Schladming+Untertal">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>Waldhäuslalm</b></td>
+          <td>Schladming-Untertal — kirándulóhely, pisztráng, játszótér (Card-partner)</td>
+          <td>melegétel ~€12-18</td>
+          <td>konyha 11:30-19:30</td>
+          <td><a class="maplink" href="https://www.waldhaeuslalm.at/">Web</a> ·
+              <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Waldh%C3%A4uslalm+Untertal+Schladming">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>Sattler's</b></td>
+          <td>Schladming — reggeli, pizza, burger, fagyi</td>
+          <td>pizza/burger ~€10-15</td>
+          <td>ellenőrizendő</td>
+          <td><a class="maplink" href="https://www.sattlers-schladming.at/">Web</a> ·
+              <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Sattlers+Schladming">Maps</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Pékségek / reggeli</h4>
+    <table>
+      <thead><tr><th>Pékség</th><th>Cím</th><th>Nyitvatartás</th><th>Link</th></tr></thead>
+      <tbody>
+        <tr class="stop-row">
+          <td><b>Steffl-Bäck</b><br><span style="font-size:11px;color:var(--muted)">pékség + kávézó</span></td>
+          <td>Hauptplatz 110, Gröbming</td>
+          <td>Minden nap 07:00-17:00 (K 07-12) — VASÁRNAP IS</td>
+          <td><a class="maplink" href="http://www.stefflbaeck.at/">Web</a> ·
+              <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Steffl-B%C3%A4ck+Hauptplatz+110+8962+Gr%C3%B6bming">Maps</a></td>
+        </tr>
+        <tr>
+          <td><b>Bäckerei Baier</b></td>
+          <td>Hauptstraße 51, Gröbming</td>
+          <td>H-Szo reggeltől; vasárnap ellenőrizendő</td>
+          <td><a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=B%C3%A4ckerei+Baier+Hauptstra%C3%9Fe+51+8962+Gr%C3%B6bming">Maps</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="tips">
+      <b>Vasárnapi tipp (érkezés napja)</b>
+      <ul>
+        <li>Reggelire/pékáruért a <b>Steffl-Bäck</b> Gröbmingben vasárnap is nyitva (07:00-17:00).</li>
+        <li>Esti melegételre a <b>La Piazza</b> vasárnap is nyitva (de szerdán zárva).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">7</span> Schladming-Dachstein Card — programok</h3>
+    <p class="lead">
+      Az érdeklődésünk szerinti programok a kártyáról, kategóriánként, mindegyikhez
+      rövid összefoglalóval (mi ez, miért érdemes) és weboldal-linkkel. Prioritás:
+      ami <b>ingyenes</b> a kártyával. A
+      felhasználási korlát és a jún. 21-26. nyitvatartás minden tételnél jelölve.
+      <b>A kártya a szállásunknál megerősítve jár</b> (a házigazda 2026-06-13-án
+      visszaigazolta), így az ingyenes tételek élnek.
+    </p>
+
+    <div class="callout">
+      <b>Fontos felhasználási korlátok</b>
+      <ul>
+        <li><b>Felvonók:</b> naponta csak <b>1 oda-vissza út, EGY választott felvonóval</b> (a teljes kártyára, nem felvonónként).</li>
+        <li><b>Dachstein-gleccserbahn:</b> <b>1× a 7 napban</b>, min. 2 éj, <b>kötelező előfoglalás</b>.</li>
+        <li><b>Egyszeri ingyenes menet:</b> Rittisberg Coaster (csak Vor-/Nachsaison) és Pürcherhof traktorozás (kedd). A Flyline ingyenes menet csak ősztől — nálunk nem.</li>
+        <li><b>Jelölés:</b> <span class="badge free">Ingyenes</span> <span class="badge disc">Kedvezmény</span> <span class="badge paid">Fizetős</span> <span class="badge closed">Zárva nálunk</span></li>
+      </ul>
+    </div>
+
+    <h4>Felvonózások</h4>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Planai-Seilbahn</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Schladming (~22 km) · naponta nyitva · napi 1 felvonó-szabály</div>
+      <p>Schladming házicsúcsának modern gondolája, fent a 2013-as sí-vb legendás helyszíne és tágas Dachstein-panoráma. A hegyállomásnál családbarát sétautak, kilátópont és vendéglátás van. Jó választás az első felvonós napra, mert naponta végig jár és könnyen elérhető.</p>
+      <div class="web"><a href="https://www.planai.at/">planai.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Gipfelbahn Hochwurzen</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Rohrmoos (~25 km) · naponta nyitva</div>
+      <p>Gondola a Hochwurzen csúcsára (1.850 m), fent 360°-os panoráma a Schladmingi-Tauernre és a Dachsteinre. A csúcsról könnyű körséták indulnak, és innen ereszkedik a 7 km-es Mountain-GoKart-pálya (felár). Kerekesszékkel is megközelíthető, az egész család számára kényelmes.</p>
+      <div class="web"><a href="https://www.planai.at/">planai.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Hauser Kaibling</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Haus im Ennstal (~15 km) · nyitva (pontos dátum ellenőrizendő)</div>
+      <p>A „4-Berge” sírégió nyári arca a Haus fölötti Hauser Kaibling, 8-személyes gondolával. Fent panorámaösvények és széles Ennstal-kilátás, jellemzően kevésbé zsúfolt, mint a Planai. Jó választás egy nyugodtabb hegytetői sétához, közel a szálláshoz.</p>
+      <div class="web"><a href="https://www.hauser-kaibling.at/">hauser-kaibling.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Reiteralm „Preunegg Jet”</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Pichl/Preunegg (~30 km) · jún. 22-25. jellemzően zárva, jún. 26-tól naponta</div>
+      <p>A Reiteralm gondolája családi hegyi élménypark a csúcson, bringás trailekkel és a híres Spiegelsee (Tükör-tó) túrával. A tóhoz a hegyállomástól ~40 perc séta, tiszta időben a Dachstein tükröződik a vízben. Nálunk fontos: a hét közepén (jún. 22-25.) jellemzően zárva, csak jún. 26-tól (a hazaindulás napján) jár naponta.</p>
+      <div class="web"><a href="https://www.reiteralm.at/">reiteralm.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Rittisberg 10er Gondelbahn</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Ramsau am Dachstein (~25 km) · kedd-szerda zárva (jún. 23-24.)</div>
+      <p>A ramsaui Rittisberg igazi családi élményhegy: gondolával fel, fent játszótér, túraösvények, nyári bobpálya (Coaster) és Flyline. Ideális a kisebbnek és egy lazább napra, esőmentes időben. Vorszezonban kedd-szerda zárva, a többi napon jár.</p>
+      <div class="web"><a href="https://www.rittisberg.at/">rittisberg.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Schladminger Tauernseilbahn</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Schladming (~22 km) · nyitvatartás ellenőrizendő</div>
+      <p>A kártyában szereplő schladmingi felvonó a Schladmingi-Tauern irányába. A pontos útvonalat és a nyári üzemnapokat érdemes a szolgáltatónál ellenőrizni indulás előtt.</p>
+      <div class="web"><a href="https://www.planai.at/">planai.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Riesneralm Bergbahnen</span> <span class="badge closed">Zárva nálunk</span></div>
+      <div class="meta">Donnersbachwald (~30 km) · csak júl. 3-tól üzemel</div>
+      <p>Családbarát hegy a Donnersbachtalban; a mi időnkben még nem üzemel (csak júl. 3-tól).</p>
+      <div class="web"><a href="https://www.riesneralm.at/">riesneralm.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Dachstein-Gletscherbahn</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Ramsau (~30 km) · 1× a 7 napban, min. 2 éj, kötelező előfoglalás</div>
+      <p>A régió fő látványossága: gondola a Dachstein-gleccserre (2.700 m), fent jég, hó, a Skywalk kilátóterasz, a „Treppe ins Nichts” lépcső és a függőhíd. Még júniusban is télies, havas élmény — meleg ruha és jó cipő kell. A kártyával 1× ingyenes a 7 napban (min. 2 éj), de KÖTELEZŐ az előfoglalás a weboldalon.</p>
+      <div class="web"><a href="https://www.derdachstein.at/">derdachstein.at</a></div>
+    </div>
+
+    <h4>Hegytetői túrák (felvonóval/úttal fel, a túra ingyenes)</h4>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Reiteralm — Spiegelsee (Tükör-tó)</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">a Preunegg Jet csúcsától ~40 perc · a felvonó hét közepén zárhat (lásd fent)</div>
+      <p>A régió egyik leghíresebb fotótémája: a Spiegelsee vizében tükröződik a Dachstein. A hegyállomástól könnyű, családdal is járható ~40 perces séta vezet a tóhoz, több kis tó mellett. A felvonó ingyenes a kártyával, de a mi hetünkön a Preunegg Jet jellemzően csak jún. 26-tól jár.</p>
+      <div class="web"><a href="https://www.reiteralm.at/">reiteralm.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Ursprungalm → Giglachseen</span> <span class="badge free">Busz ingyenes</span> <span class="badge paid">autóval az út fizetős</span></div>
+      <div class="meta">Preuneggtal · 1.610 m-től induló túra</div>
+      <p>Az Ursprungalm (1.610 m) népszerű túrakiindulás a Giglachseen tóláncolathoz (~2.000 m), két kezelt menedékházzal. Könnyű alm-körút és nehezebb csúcstúrák is indulnak innen, gyönyörű magashegyi környezetben. A felvezető Mautstraße autóval fizetős, de a kártyás busz ingyenes.</p>
+      <div class="web"><a href="https://www.schladming-dachstein.at/">schladming-dachstein.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Csúcstúrák a felvonókról</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Hochwurzen / Planai / Hauser Kaibling · napi 1 felvonó-szabály</div>
+      <p>A felvonókkal feljutva (naponta 1 ingyenes) több könnyű-közepes hegytetői séta indul, Dachstein-panorámával. A magasban változó az időjárás, ezért réteges ruha és jó cipő kell, és reggel érdemes indulni. A felvonóköltség a kártyával kiváltható, a túra eleve ingyenes.</p>
+      <div class="web"><a href="https://www.planai.at/">planai.at</a></div>
+    </div>
+
+    <h4>Vadaspark / állatkert</h4>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Der Wilde Berg — Mautern</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">~50-55 km (A9 felé, becslés) · jún. 18-tól naponta · egész napos belépő</div>
+      <p>Alpesi vad- és élménypark Mauternben: szabadon mozgó szarvasok, farkasok, kecskék, ragadozó- és repülőbemutatókkal, és nyári bobozással. A belépő, valamint a dupla sesselbahn vagy a parkbusz a kártyával ingyenes — a gyerekeknek egész napos program. Picit messzebb van (az A9 felé), de a teljes belépő ingyenessége miatt megéri.</p>
+      <div class="web"><a href="https://www.derwildeberg.at/">derwildeberg.at</a></div>
+    </div>
+
+    <h4>Fürdők, tavak</h4>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Panoramabad Gröbming</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">helyben (~1-2 km) · máj. 15-től nyitva</div>
+      <p>Gröbming szabadtéri élményfürdője a szállástól pár percre, sportmedencével, gyerekrésszel és panorámával. Tökéletes egy meleg délutánra vagy egy túra utáni felfrissülésre. A kártyával ingyenes, így a legkönnyebben elérhető fürdőzés.</p>
+      <div class="web"><a href="https://www.panoramabad.at/">panoramabad.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Putterersee (Aigen)</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">~15 km · természetes strandtó · máj. 29-től</div>
+      <p>Természetes fürdőtó nagy napozóréttel Aigenben, csónak- és SUP-kölcsönzéssel, gyerek-/pancsolómedencével és strandkávézóval. A környék egyik legkedveltebb, családbarát tava. Ingyenes a kártyával; az úszó szauna kedd/cs/szo ingyen használható.</p>
+      <div class="web"><a href="https://www.putterersee.at/">putterersee.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Freizeitsee Aich</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">~10 km · fürdőtó · máj. 29-től</div>
+      <p>Közeli fürdőtó vízi trambulinnal, szigettel, beachvolleyval, csúszdával és slacklinnel. A sekélyebb részekkel gyerekbarát, aktív strandnaphoz ideális. Ingyenes a kártyával.</p>
+      <div class="web"><a href="https://www.aich.at/">aich.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Erlebnisbad Schladming</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">~22 km · fedett + szabadtéri élményfürdő · max. 3 óra/látogatás</div>
+      <p>Élmény fedett és szabadtéri fürdő Schladming központjában — a fedett rész esőnapra is jó. Sport- és gyerekmedencék, csúszda. A kártyával ingyenes, de látogatásonként max. 3 óra a benntartózkodás.</p>
+      <div class="web"><a href="https://www.erlebnisbad-schladming.at/">erlebnisbad-schladming.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Dachstein Bad Ramsau</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">~25 km · élményfürdő · max. 3 óra; szauna NEM jár</div>
+      <p>Modern fürdő Ramsauban 25 m-es sportmedencével, élménymedencével és gyerekrésszel. Esős napra is jó megoldás a hegyek között. Ingyenes a kártyával (max. 3 óra), a szauna viszont külön fizetős.</p>
+      <div class="web"><a href="https://www.rvb.at/">rvb.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">További szabadtéri fürdők / tavak</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Freizeitsee Pichl · Badesee Lassing · Erlebnisbad Haus · Freibad Öblarn / St. Martin · Naturbad Pürgg · Erlebnisbad Stainach</div>
+      <p>Több kisebb tó és szabadtéri fürdő is a kártyában van a ~10-25 km-es körzetben, mind ingyenes. Pichl Stájerország egyik legtisztább tava, Lassing csúszdás-mászófalas, Haus fűtött medencés. Jó tartalék, ha a közelebbi fürdő tele lenne, vagy más völgyben járunk.</p>
+      <div class="web"><a href="https://www.schladming-dachstein.at/">schladming-dachstein.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Freizeitpark Ramsau Beach</span> <span class="badge closed">Zárva nálunk</span></div>
+      <div class="meta">~25 km · 6.000 m² tó · csak júliustól nyit</div>
+      <p>Nagy fürdőtó beachvolleyval és ugrótoronnyal, de csak júliustól nyit — a mi hetünkön zárva. Egy esetleges későbbi nyári úthoz jó tipp.</p>
+      <div class="web"><a href="https://www.rittisberg.at/">rittisberg.at</a></div>
+    </div>
+
+    <h4>Várak és múzeumok (esőnapra)</h4>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Schloss Trautenfels</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">~13 km (Stainach) · K-V · tájmúzeum</div>
+      <p>Barokk kastély a Grimming lábánál, benne a Joanneum tájmúzeuma és változó kiállítások. Közel van és esőnapra ideális, gyerekekkel is jól járható. A belépő a kártyával ingyenes (csoportos vezetés felár).</p>
+      <div class="web"><a href="https://www.schloss-trautenfels.at/">schloss-trautenfels.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Benediktinerstift Admont — könyvtár + múzeum</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">~45 km · K-V (szezonban) · vezetés felár</div>
+      <p>A világ legnagyobb barokk kolostorkönyvtára Admontban, lenyűgöző teremmel, mellette múzeumokkal. Kulturális csúcsélmény esős vagy lazább napra, a gyerekeknek is látványos. A belépő a kártyával ingyenes.</p>
+      <div class="web"><a href="https://www.stiftadmont.at/">stiftadmont.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Schloss Großsölk — Naturparkhaus</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">~25 km (Sölktäler) · Sze-Szo</div>
+      <p>A Sölktäler Naturpark kastélya jezsuita kerttel és kiállításokkal. Csendes, természetközeli kultúrprogram egy szép völgyben. Ingyenes a kártyával.</p>
+      <div class="web"><a href="https://www.soelktaeler.com/">soelktaeler.com</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Helyi múzeumok</span> <span class="badge free">Ingyenes</span></div>
+      <div class="meta">Gröbming Museum (helyben) · Stadtmuseum Schladming (jún. 16-tól) · ZEITROAS Ramsau</div>
+      <p>Több kisebb helytörténeti múzeum is a kártyában van a közvetlen környéken. Rövid, esőbiztos programok, ha pár óra kitöltése a cél. Mind ingyenes a kártyával.</p>
+      <div class="web"><a href="https://www.groebming.at/">groebming.at</a> · <a href="https://www.zeitroas.at/">zeitroas.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Burg Strechau</span> <span class="badge disc">Kedvezmény (-15%)</span></div>
+      <div class="meta">~30 km (Lassing) · K-V · csak vezetett</div>
+      <p>Hatalmas reneszánsz vár Lassing fölött, kizárólag vezetett túrával látogatható, külön gyerek-kvízzel. Esőnapra is jó, élményszerű. A kártyával 15% kedvezmény jár.</p>
+      <div class="web"><a href="https://www.burg-strechau.at/">burg-strechau.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Erlebnisburg Hohenwerfen</span> <span class="badge disc">Kedvezmény</span></div>
+      <div class="meta">~70 km (Werfen) · messze · sólyomrepülő-show</div>
+      <p>Látványos hegyi vár Werfen fölött, napi sólyomrepülő-bemutatóval — gyerekeknek nagy élmény. Viszont messze van (~70 km), így inkább egész napos kiruccanás. A kártyával kis kedvezmény jár (a belépő nem ingyenes).</p>
+      <div class="web"><a href="https://www.burg-hohenwerfen.at/">burg-hohenwerfen.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Dachstein jég- és mamutbarlang (Krippenstein)</span> <span class="badge paid">Fizetős</span></div>
+      <div class="meta">~50 km (Obertraun) · csak Sondertarif</div>
+      <p>Látványos jég- és mamutbarlang a Krippensteinen, felvonóval megközelítve. Esőnapra is jó, de a kártyával csak kedvezményes Sondertarif jár, nem ingyenes. Régión kívüli ajánlat.</p>
+      <div class="web"><a href="https://www.dachstein-salzkammergut.com/">dachstein-salzkammergut.com</a></div>
+    </div>
+
+    <h4>Panorámautak autóval (Mautstraßen)</h4>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Stoderzinken Alpenstraße</span> <span class="badge free">Ingyenes (PKW)</span></div>
+      <div class="meta">Gröbming (helyben) · PKW ingyenes máj. 14-júl. 10. (a mi időnkben igen)</div>
+      <p>Gröbming házicsúcsára, a Stoderzinkenre vivő panoráma-hegyiút, fent tág kilátás az Ennstalra és túrakiindulás (pl. a Friedenskircherl kápolnához). A mi időablakunkban autóval ingyenes a kártyával — szép, könnyű kiruccanás közvetlenül a szállástól. Az út egész évben nyitva.</p>
+      <div class="web"><a href="https://www.schladming-dachstein.at/">schladming-dachstein.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Dachstein Mautstraße</span> <span class="badge free">Ingyenes (PKW)</span></div>
+      <div class="meta">Ramsau · a gleccser völgyállomásához</div>
+      <p>A Ramsauból a Dachstein-gleccser völgyállomásához vezető fizetős hegyiút, a kártyával autóval ingyenes. Akkor hasznos, ha a gleccserre megyünk fel. Szép alpesi felvezetés a Dachstein tövébe.</p>
+      <div class="web"><a href="https://www.derdachstein.at/">derdachstein.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Steirischer Bodensee (Gössenberg / Seewigtal)</span> <span class="badge free">Ingyenes (PKW)</span></div>
+      <div class="meta">Aich / Ruperting · két felvezető út</div>
+      <p>Két fizetős hegyiút (Aichból, ill. Rupertingből) visz a Steirischer Bodensee hegyi tóhoz, mindkettő a kártyával ingyenes. A tó körül könnyű, babakocsi-/kerekesszékbarát körút sétálható. A gyerekeknek a saját erőből evezős csónakázás külön élmény.</p>
+      <div class="web"><a href="https://www.schladming-dachstein.at/">schladming-dachstein.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Reiteralm Mautstraße (Eiskarhütte) · Forstau Mautstraße</span> <span class="badge free">Ingyenes (PKW)</span></div>
+      <div class="meta">Pichl/Preunegg · Forstau (Winkltal)</div>
+      <p>Két további völgyi hegyiút a kártyával ingyenes: a Reiteralm Mautstraße az Eiskarhütte-hez, és a ~7,5 km-es Forstau Mautstraße a Winkltalba. Mindkettő szép, csendes túrakiindulás. Rossz útviszony esetén zárhatnak.</p>
+      <div class="web"><a href="https://www.eiskarhuette.at/">eiskarhuette.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Ursprungalm Mautstraße</span> <span class="badge paid">Autóval fizetős</span></div>
+      <div class="meta">Preuneggtal · a busz a kártyával ingyenes</div>
+      <p>A Preuneggtalból az Ursprungalmra (1.610 m) vivő út autóval fizetős, viszont a kártyás busz ingyenes. Fent túrakiindulás a Giglachseenhez (lásd a hegytetői túráknál).</p>
+      <div class="web"><a href="https://www.planaibus.at/">planaibus.at</a></div>
+    </div>
+
+    <div class="prog">
+      <div class="ph"><span class="name">Tauplitzalm Alpenstraße</span> <span class="badge disc">Kedvezmény</span></div>
+      <div class="meta">Bad Mitterndorf (~30 km) · €16 helyett €14/PKW · régión kívül</div>
+      <p>Panorámás magashegyi út a Tauplitzalm fennsíkjára (tóláncolat, túrák). A kártyával kedvezményes a díj (€16 helyett €14/PKW), de csak nyitott fizetőkapunál (08-17). Régión kívüli ajánlat.</p>
+      <div class="web"><a href="https://www.alpenstrasse.at/">alpenstrasse.at</a></div>
+    </div>
+
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">8</span> Szállás</h3>
+    <p class="lead">
+      <b>dein Dahoam Boutique Appartements</b> (4 csillag) — <b>Apartman (Gröbming)</b>,
+      lefoglalva. Önálló, kétszobás apartman teljes konyhával (önellátáshoz ideális),
+      terasszal és hegyre nyíló kilátással, a Stoderstraße-n (a Stoderzinken felé).
+    </p>
+
+    <h4>Kulcsadatok</h4>
+    <table>
+      <tbody>
+        <tr><td><b>Cím</b></td><td>Gröbming, 8962 Gröbming · tel. +43 664 4854837</td></tr>
+        <tr><td><b>Bejelentkezés</b></td><td>2026. jún. 21. (V) 15:00–23:30 — önálló, az ajtó <b>kóddal</b> nyílik (WhatsApp/SMS a check-in előtt)</td></tr>
+        <tr><td><b>Kijelentkezés</b></td><td>2026. jún. 26. (P) 07:00–10:00</td></tr>
+        <tr><td><b>Foglalás</b></td><td>Apartman (Gröbming) · 2 felnőtt + 2 gyerek, 5 éj (a szállás a szállás besorolása szerint)</td></tr>
+        <tr><td><b>Parkolás</b></td><td>1 saját parkolóhely az árban (külön költség nincs)</td></tr>
+        <tr><td><b>Extra</b></td><td>1 üveg bor / tartózkodás</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Ár</h4>
+    <table>
+      <thead><tr><th>Tétel</th><th class="num">EUR</th><th class="num">HUF (355)</th></tr></thead>
+      <tbody>
+        <tr><td>Online fizetve (apartman + 10% ÁFA + €100 takarítás)</td><td class="num">€855,35</td><td class="num">~303.650</td></tr>
+        <tr><td>Idegenforgalmi adó (helyszínen; 3 fő 15+ × €3,25 × 5 éj)</td><td class="num">€48,75</td><td class="num">~17.300</td></tr>
+        <tr><td><b>Összesen</b></td><td class="num"><b>€904,10</b></td><td class="num"><b>~320.950</b></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--muted);margin:4px 0 0;">~€181/éj all-in — a teljes költségvetés legnagyobb tétele; a napi keret így is tartható (részletek a 4. szekcióban).</p>
+
+    <h4>Felszereltség (kiemelt)</h4>
+    <p style="font-size:13px;margin:4px 0;">
+      Teljes konyha: hűtő, <b>mosogatógép, sütő, főzőlap</b>, vízforraló, kávéfőző,
+      kenyérpirító, étkezőasztal. Saját fürdő (zuhany) + külön vendég-WC, terasz,
+      kertre és <b>hegyre nyíló kilátás</b>, kanapé/ülősarok, parketta, hangszigetelés,
+      fűtés, síkképernyős (műholdas) tévé, hajszárító, törölköző + ágynemű. Nemdohányzó.
+      A felső szintek csak lépcsőn (nincs lift).
+    </p>
+
+    <div class="tips">
+      <b>Teendő / fontos</b>
+      <ul>
+        <li><b>Schladming-Dachstein Card: megerősítve — jár!</b> A házigazda (Melanie, 2026-06-13) visszaigazolta, hogy a kártya benne van. Így a kártyás ingyenes programok (felvonók, fürdők, Dachstein, Stoderzinken autóút) mind élnek.</li>
+        <li><b>Check-in 15:00-tól</b>, de vasárnap reggel ~7-kor érkezünk — a délelőtt a lakás nélkül telik (lásd 1. nap).</li>
+        <li>A belépőkód megérkezését (WhatsApp/SMS) érdemes a check-in előtt ellenőrizni.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">9</span> Praktikus helyi infók (Gröbming)</h3>
+    <p class="lead">Hasznos elérhetőségek a tartózkodásra (a hivatalos groebming.at és helyi források alapján).</p>
+
+    <div class="callout alert">
+      <b>Vészhelyzeti számok (Ausztria)</b>
+      <ul>
+        <li><b>112</b> — általános segélyhívó (EU) &middot; <b>144</b> — mentő &middot; <b>140</b> — hegyi mentő &middot; <b>133</b> — rendőrség &middot; <b>122</b> — tűzoltó</li>
+      </ul>
+    </div>
+
+    <table>
+      <thead><tr><th>Mit</th><th>Hol / elérhetőség</th><th>Megjegyzés</th></tr></thead>
+      <tbody>
+        <tr><td><b>Gyógyszertár</b></td><td>Alpenapotheke, Hauptstraße 56 · +43 3685 22306</td><td>H-P 08:00-12:30 és 14:30-18:00, Szo 08:00-12:00; V 10:00-11:00 csak ügyeletkor</td></tr>
+        <tr><td><b>Orvosi központ</b></td><td>MEZ Gröbming, Nordumfahrung 899 · tel. 03687 23400 (ellenőrizendő)</td><td>helyi rendelő</td></tr>
+        <tr><td><b>Legközelebbi kórház / ügyelet</b></td><td>Klinik Diakonissen Schladming, Salzburgerstraße 777 · +43 3687 20200</td><td>~20 km; 24 órás sürgősségi (mentő/helikopter)</td></tr>
+        <tr><td><b>Községháza (info)</b></td><td>Gemeindeamt, Hauptstraße 200 · +43 3685 22150</td><td>H-Cs 08:00-12:30, P 08:00-12:00</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Esemény a héten</h4>
+    <p style="font-size:13px;margin:4px 0;"><b>Jún. 25. (Cs) 17:00</b> — a Gröbmingi zeneiskola növendékhangversenye (Vorspielstunde), <b>Verweilzone Stoderplatzl</b> (városközpont, szabadtéri, ingyenes). Laza esti program, ha aznap a városban vagyunk.</p>
+    <p style="font-size:12px;color:var(--muted);margin:2px 0;">Más turisztikailag releváns városi esemény nem szerepelt a naptárban a héten; boltok vasárnap zárva, heti piac nincs jelezve. Az EHIC (EU-kártya) érvényessége utazás előtt ellenőrizendő.</p>
+  </section>
+
+  <section class="block">
+    <h3 class="sectitle"><span class="secnum">10</span> Linkek &amp; térképek</h3>
+    <p class="lead">Minden helyszín kattintható: „Maps" = Google Maps útvonal, „Web" = hivatalos oldal. (A boltok és éttermek linkjei az 5. és 6. szekció tábláiban is megvannak.)</p>
+
+    <h4>Schladming-Dachstein Card — app (Android)</h4>
+    <p style="font-size:13px;"><b>Google Play:</b> <a class="maplink" href="https://play.google.com/store/apps/details?id=at.schladmingdachstein.app">Schladming-Dachstein app</a> — ebben digitalizálható a kártya (a fizikai kártyát beszkenneled, és a telefonon hordod; családon belül átküldhető másik telefonra).</p>
+
+    <h4>Települések</h4>
+    <p style="font-size:13px;line-height:2;">
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Schladming+%C3%96sterreich">Schladming</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Ramsau+am+Dachstein">Ramsau am Dachstein</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Haus+im+Ennstal">Haus im Ennstal</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Irdning">Irdning</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=%C3%96blarn">Öblarn</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=P%C3%BCrgg+Stainach">Pürgg</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Bad+Mitterndorf">Bad Mitterndorf</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Bad+Aussee">Bad Aussee</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Altaussee">Altaussee</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Grundlsee">Grundlsee</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Gr%C3%B6bming">Gröbming</a>
+    </p>
+
+    <h4>Programok, látnivalók</h4>
+    <ul style="font-size:13px;">
+      <li><b>Rittisberg</b> (Ramsau) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Rittisbergbahn+Talstation+Ramsau">Maps</a> · <a class="maplink" href="https://www.rittisberg.at/">Web</a></li>
+      <li><b>Dachstein-gleccser</b> (Ramsau, völgyállomás) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Dachstein+Gletscherbahn+Talstation+Ramsau">Maps</a> · <a class="maplink" href="https://www.derdachstein.at/">Web</a></li>
+      <li><b>Der Wilde Berg</b> (Mautern) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Der+Wilde+Berg+Mautern">Maps</a> · <a class="maplink" href="https://www.derwildeberg.at/">Web</a></li>
+      <li><b>Planai</b> (Schladming) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Planai+Talstation+Coburgstra%C3%9Fe+52+Schladming">Maps</a> · <a class="maplink" href="https://www.planai.at/">Web</a></li>
+      <li><b>Flying Coaster / Zipline / Abenteuerpark</b> (Stoderstraße 114) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Flying+Coaster+Stoderstra%C3%9Fe+114+Gr%C3%B6bming">Maps</a> · <a class="maplink" href="https://www.flyingcoaster.at/">Web</a></li>
+      <li><b>Stoderzinken / Friedenskircherl</b> — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Friedenskircherl+Stoderzinken">Maps</a> · <a class="maplink" href="https://www.stoderzinken.at/">Web</a></li>
+      <li><b>Steirischer Bodensee</b> (Seewigtal) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Steirischer+Bodensee+Seewigtal">Maps</a></li>
+      <li><b>Stift Admont</b> (esőnap-alt.) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Stift+Admont">Maps</a> · <a class="maplink" href="https://www.stiftadmont.at/">Web</a></li>
+      <li><b>Erlebnisburg Hohenwerfen</b> (esőnap) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Erlebnisburg+Hohenwerfen+Werfen">Maps</a> · <a class="maplink" href="https://www.burg-hohenwerfen.at/">Web</a></li>
+      <li><b>Schloss Trautenfels</b> (esőnap-alt.) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Schloss+Trautenfels+Stainach">Maps</a> · <a class="maplink" href="https://www.schloss-trautenfels.at/">Web</a></li>
+    </ul>
+
+    <h4>Fürdők (kártyás, kivéve jelölt)</h4>
+    <ul style="font-size:13px;">
+      <li><b>Panoramabad Gröbming</b> — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Panoramabad+Gr%C3%B6bming">Maps</a> · <a class="maplink" href="https://www.panoramabad.at/">Web</a></li>
+      <li><b>Putterersee</b> (Aigen) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Putterersee+Aigen+im+Ennstal">Maps</a> · <a class="maplink" href="https://www.putterersee.at/">Web</a></li>
+      <li><b>Erlebnisbad Schladming</b> (Hallenbad) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Erlebnisbad+Schladming">Maps</a> · <a class="maplink" href="https://www.erlebnisbad-schladming.at/">Web</a></li>
+      <li><b>Dachstein Bad Ramsau</b> — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Dachstein+Bad+Ramsau">Maps</a> · <a class="maplink" href="https://www.rvb.at/">Web</a></li>
+      <li><b>Erlebnisbad Stainach</b> — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Erlebnisbad+Stainach">Maps</a></li>
+      <li><b>Grimming-Therme</b> (nem kártyás) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Grimming-Therme+Bad+Mitterndorf">Maps</a></li>
+    </ul>
+
+    <h4>Boltok (Maps)</h4>
+    <p style="font-size:13px;line-height:2;">
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=EUROSPAR+Landmarkt+Wiesackstra%C3%9Fe+513+8962+Gr%C3%B6bming">Eurospar Gröbming</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=BILLA+Buchenweg+830+8962+Gr%C3%B6bming">Billa Gröbming</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=HOFER+Salzburger+Siedlung+259+8970+Schladming">Hofer Schladming</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=HOFER+Bahnhofstra%C3%9Fe+518+8950+Stainach-P%C3%BCrgg">Hofer Stainach</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=PENNY+Salzburger+Stra%C3%9Fe+495+8950+Stainach">Penny Stainach</a> ·
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Lidl+Ges%C3%A4usestra%C3%9Fe+2+8940+Liezen">Lidl Liezen</a>
+    </p>
+
+    <h4>Éttermek / pékségek</h4>
+    <p style="font-size:13px;">Maps + Web linkek a 6. szekció tábláiban (La Piazza, Bella Italia, Landalm, Waldhäuslalm, Sattler's, Steffl-Bäck, Bäckerei Baier).</p>
+
+    <h4>Hazaúti megálló</h4>
+    <p style="font-size:13px;"><b>Dr. Vogelgesang-Klamm</b> (Spital am Pyhrn) — <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=Dr.+Vogelgesang-Klamm+Spital+am+Pyhrn">Maps</a> · <a class="maplink" href="https://www.360alpenland.com/oesterreich-tour/detail/430000994/dr-vogelgesang-klamm.html">infó</a></p>
+  </section>
+
+  <footer class="note">
+    Készült: 2026-06-13. &nbsp;<span class="pill">Árfolyam: 1 EUR = 355 HUF</span>
+    &nbsp;<span class="pill">becslés</span> = nagyságrendi &nbsp;<span class="pill">ellenőrizendő</span> = indulás előtt pontosítandó.
+    Az árak/nyitvatartások változhatnak; a kártyás programok a hivatalos 2026-os nyári brosúrából.
+  </footer>
+
+</div>
+
+</body>
+</html>
