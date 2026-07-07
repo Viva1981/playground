@@ -180,12 +180,23 @@
   .paint-vid{position:absolute;left:50%;top:50%;width:440px;max-width:82vw;height:auto;transform:translate(-50%,-50%);mix-blend-mode:multiply;pointer-events:none;opacity:0;transition:opacity .3s;z-index:6}
   .paint-vid.show{opacity:1}
   .about{position:relative}
-  .pillango{position:absolute;top:clamp(30px,5vw,54px);right:clamp(12px,5vw,44px);width:clamp(26px,4vw,36px);height:auto;opacity:.85;z-index:1;line-height:0;pointer-events:auto}
+  .pillango{position:absolute;left:0;top:0;width:clamp(24px,3.4vw,32px);height:auto;opacity:.82;z-index:1;line-height:0;pointer-events:none;will-change:left,top,transform;animation:fly 26s ease-in-out infinite}
   .pillango svg{width:100%;height:auto;display:block;overflow:visible}
-  .fly-wings{transform-box:fill-box;transform-origin:center;animation:flap 6.5s ease-in-out infinite}
-  @keyframes flap{0%,78%,100%{transform:scaleX(1)}83%{transform:scaleX(.4)}88%{transform:scaleX(1)}93%{transform:scaleX(.4)}98%{transform:scaleX(1)}}
-  .pillango:hover .fly-wings{animation-duration:.85s}
-  @media (prefers-reduced-motion:reduce){.fly-wings{animation:none}}
+  .fly-wings{transform-box:fill-box;transform-origin:center;animation:flap .45s ease-in-out infinite}
+  @keyframes flap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.32)}}
+  @keyframes fly{
+    0%{left:5%;top:12%;transform:rotate(-8deg)}
+    11%{left:34%;top:4%;transform:rotate(7deg)}
+    22%{left:64%;top:13%;transform:rotate(-5deg)}
+    33%{left:83%;top:33%;transform:rotate(11deg)}
+    44%{left:69%;top:57%;transform:rotate(4deg)}
+    55%{left:43%;top:69%;transform:rotate(-7deg)}
+    66%{left:19%;top:54%;transform:rotate(8deg)}
+    77%{left:7%;top:33%;transform:rotate(-4deg)}
+    88%{left:29%;top:22%;transform:rotate(6deg)}
+    100%{left:5%;top:12%;transform:rotate(-8deg)}
+  }
+  @media (prefers-reduced-motion:reduce){.pillango{animation:none;left:auto;right:clamp(12px,5vw,44px);top:clamp(30px,5vw,54px)}.fly-wings{animation:none}}
 </style>
 
 <div class="wrap">
