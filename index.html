@@ -175,7 +175,8 @@
   @media (prefers-reduced-motion:reduce){footer .heart{animation:none}.rot{transition:none}}
 
   .circled{position:relative;display:inline-block}
-  .circle-vid{position:absolute;left:50%;top:48%;width:min(225px,54vw);height:auto;transform:translate(-50%,-50%) rotate(-4deg);mix-blend-mode:multiply;pointer-events:none;z-index:2}
+  .circle-vid{position:absolute;left:50%;top:48%;width:min(202px,48vw);height:auto;transform:translate(-50%,-50%) rotate(-4deg);mix-blend-mode:multiply;pointer-events:none;z-index:2;transition:opacity .8s ease}
+  .circle-vid.gone{opacity:0}
   .paint-vid{position:absolute;left:50%;top:50%;width:440px;max-width:82vw;height:auto;transform:translate(-50%,-50%);mix-blend-mode:multiply;pointer-events:none;opacity:0;transition:opacity .3s;z-index:6}
   .paint-vid.show{opacity:1}
   .about{position:relative}
@@ -338,7 +339,7 @@
     viva.addEventListener('click',function(){try{pv.currentTime=0;}catch(e){}pv.classList.add('show');pv.play();setTimeout(function(){pv.classList.remove('show');},9000);});}
   // AI-karika: betoltes utan 3.5s-cel indul, egyszer megy le (nincs loop -> a kesz koron megall)
   var cv=document.querySelector('.circle-vid');
-  if(cv){cv.pause();try{cv.currentTime=0;}catch(e){}setTimeout(function(){var pr=cv.play();if(pr&&pr.catch)pr.catch(function(){});},10000);}
+  if(cv){cv.pause();try{cv.currentTime=0;}catch(e){}cv.addEventListener('ended',function(){setTimeout(function(){cv.classList.add('gone');},5000);});setTimeout(function(){var pr=cv.play();if(pr&&pr.catch)pr.catch(function(){});},10000);}
 })();
 </script>
 
