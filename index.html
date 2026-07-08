@@ -154,7 +154,10 @@
   .sol-links a{ font-family:var(--mono); font-size:.72rem; color:var(--accent); letter-spacing:.02em; text-decoration:none; }
   .sol-links a:hover{ text-decoration:underline; }
   @media (max-width:760px){ .sol-grid{ grid-template-columns:1fr; } }
-  .sol-hook{ font-weight:700; font-size:.9rem; color:var(--accent); margin:0 0 9px; max-width:none; }
+  .sol-hook{ font-weight:700; font-size:clamp(1.02rem,1.5vw,1.16rem); color:var(--ink); margin:2px 0 6px; max-width:none; }
+  .sol-list{ list-style:none; margin:0 0 14px; padding:0; display:flex; flex-direction:column; gap:5px; }
+  .sol-list li{ position:relative; padding-left:15px; font-size:.9rem; color:var(--muted); line-height:1.45; }
+  .sol-list li::before{ content:""; position:absolute; left:0; top:.52em; width:5px; height:5px; border-radius:50%; background:var(--accent); }
   .sol-note{ margin-top:20px; padding:14px 18px; border:1px solid color-mix(in srgb,var(--accent) 25%,transparent); background:var(--accent-soft); border-radius:12px; font-size:.95rem; color:var(--ink); max-width:none; }
   .sol-note a{ color:var(--accent); font-weight:700; text-decoration:none; }
   .sol-note a:hover{ text-decoration:underline; }
@@ -319,20 +322,34 @@
 
     <section class="reveal solutions">
       <h2 class="sol-title">Megoldások <span class="om-badge"><img src="data:image/webp;base64,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" alt="OneMin"></span> partnereknek.</h2>
-      <p>Sok OneMin-partner még a régebbi buildert használja. Ezeken is rengeteget lehet javítani anélkül, hogy új weboldalt kellene készíteni. Ezekben tudunk segíteni.</p>
+      <p class="sol-hook">A régi oldalad, felturbóznád?</p>
       <div class="sol-grid">
         <div class="sol">
-          <p class="sol-hook">A régi oldalad, felturbóznád?</p>
           <h3>Komponens-könyvtár</h3>
-          <p>Kész, bemásolható, személyre szabott HTML/CSS blokkok — hero-k, kártyák, galériák, popupok —, amikkel a meglévő oldalad tartalma modern, prémium megjelenést kap. Nem kell új rendszer: a mostaniba épülnek be.</p>
+          <p>Kész, személyre szabható HTML/CSS blokkok:</p>
+          <ul class="sol-list">
+            <li>Hero</li>
+            <li>Kártyák</li>
+            <li>Galériák</li>
+            <li>Popupok</li>
+            <li>Információs szekciók</li>
+          </ul>
+          <p>A meglévő OneMin-weboldalba beépíthetők, anélkül, hogy új weboldalt kellene készíteni.</p>
           <div class="sol-links">
-            <a href="elemtar.html">Nézd meg élőben az elemeket →</a>
-            <a href="https://www.dolcevitaszarvas.hu/" target="_blank" rel="noopener">példa élesben: dolcevitaszarvas.hu ↗</a>
+            <a href="https://www.dolcevitaszarvas.hu/" target="_blank" rel="noopener">Élő példa → dolcevitaszarvas.hu ↗</a>
+            <a href="elemtar.html">Az összes elem élőben →</a>
           </div>
         </div>
         <div class="sol">
           <h3>Weboldal-karbantartás</h3>
-          <p>Lehetőség van a weboldal időszakos tartalmainak frissítésére, például aktuális akciók, ünnepi nyitvatartás vagy szezonális ajánlatok megjelenítésére, így az oldal mindig naprakész maradhat.</p>
+          <p>Lehetőség van a weboldal tartalmának időszakos frissítésére.</p>
+          <ul class="sol-list">
+            <li>Aktuális akciók</li>
+            <li>Ünnepi nyitvatartás</li>
+            <li>Szezonális ajánlatok</li>
+            <li>Egyéb tartalmi módosítások</li>
+          </ul>
+          <p>Így az oldal mindig naprakész maradhat.</p>
         </div>
         <div class="sol">
           <h3>Heti menü feltöltés</h3>
