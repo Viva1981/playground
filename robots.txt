@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /grobming.html
 
-Sitemap: https://playground-kappa-sooty.vercel.app/sitemap.xml
+Sitemap: https://stullerzsolt.triplog.hu/sitemap.xml
