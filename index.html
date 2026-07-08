@@ -143,6 +143,17 @@
     padding:2px 9px; border-radius:999px; background:transparent; color:var(--muted); border:1px solid var(--line); margin:0 0 9px; }
   .group-label{ display:flex; align-items:center; gap:14px; font-size:.82rem; font-weight:750; letter-spacing:.01em; color:var(--ink); margin:24px 0 8px; }
   .group-label::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .om-badge{ display:inline-flex; align-items:center; background:#e73423; border-radius:8px; padding:.16em .44em; vertical-align:-.2em; margin:0 .04em; }
+  .om-badge img{ height:.66em; width:auto; display:block; }
+  .sol-title{ max-width:32ch; }
+  .sol-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:18px; }
+  .sol{ display:flex; flex-direction:column; border:1px solid var(--line); border-radius:14px; padding:20px 20px 18px; background:var(--surface); }
+  .sol h3{ margin:0 0 8px; font-size:1.05rem; font-weight:700; }
+  .sol p{ margin:0 0 14px; font-size:.92rem; color:var(--muted); line-height:1.55; max-width:none; }
+  .sol-links{ margin-top:auto; display:flex; flex-direction:column; gap:7px; }
+  .sol-links a{ font-family:var(--mono); font-size:.72rem; color:var(--accent); letter-spacing:.02em; text-decoration:none; }
+  .sol-links a:hover{ text-decoration:underline; }
+  @media (max-width:760px){ .sol-grid{ grid-template-columns:1fr; } }
 
   .lib-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:8px; }
   .lib-item{ margin:0; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--surface); }
@@ -256,8 +267,7 @@
     </section>
 
     <section>
-      <p class="kicker">Amikkel mostanában foglalkoztam</p>
-      <h2>Nem csak OneMin partnereknek.</h2>
+      <h2>Amikkel mostanában foglalkoztam.</h2>
       <p class="group-label">Projektek</p>
       <div class="work-grid">
       <a class="work" href="https://www.kolorhalkoztarsasag.hu/" target="_blank" rel="noopener">
@@ -303,18 +313,27 @@
     </section>
 
 
-    <section class="reveal">
-      <p class="kicker">Komponens-könyvtár</p>
-      <h2>Egy saját elemtár, amiből építek.</h2>
-      <p>Az évek alatt összeraktam egy <b>HTML/CSS elemkönyvtárat</b> az éttermi oldalakhoz — hero-k, kártyák, galériák, popupok, interaktív blokkok —, mind JavaScript nélkül. Ebből gyorsan és következetesen áll össze egy új oldal, ahelyett hogy mindig nulláról kezdeném.</p>
-      <div class="stat-row">
-        <div class="stat"><b data-target="70" data-suffix="+">70+</b><span>bevált komponens</span></div>
-        <div class="stat"><b>0</b><span>sor JavaScript</span></div>
-        <div class="stat"><b data-target="40" data-suffix="+">40+</b><span>étterem élesben</span></div>
-        <div class="stat"><b data-target="100" data-suffix="%">100%</b><span>önálló, bemásolható blokk</span></div>
+    <section class="reveal solutions">
+      <h2 class="sol-title">Megoldások <span class="om-badge"><img src="data:image/webp;base64,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" alt="OneMin"></span> partnereknek.</h2>
+      <p>Ha a céged oldala a OneMin régebbi builderén fut, azon is sokat lehet szépíteni — igaz, kézi munkával. Három dologban tudok segíteni a már meglévő partnereknek:</p>
+      <div class="sol-grid">
+        <div class="sol">
+          <h3>Komponens-könyvtár</h3>
+          <p>Kész, bemásolható HTML/CSS blokkok — hero-k, kártyák, galériák, popupok —, amikkel a meglévő oldalad tartalma modern, prémium megjelenést kap. Nem kell új rendszer: a mostaniba épülnek be.</p>
+          <div class="sol-links">
+            <a href="elemtar.html">Nézd meg élőben az elemeket →</a>
+            <a href="https://www.dolcevitaszarvas.hu/" target="_blank" rel="noopener">példa élesben: dolcevitaszarvas.hu ↗</a>
+          </div>
+        </div>
+        <div class="sol">
+          <h3>Étlap feltöltés</h3>
+          <p>Feltöltöm és rendbe rakom az étlapot — kategóriák, árak, leírások, képek —, hogy tisztán és naprakészen jelenjen meg. Neked csak az anyagot kell átküldened, a többit megoldom.</p>
+        </div>
+        <div class="sol">
+          <h3>Weboldal-karbantartás</h3>
+          <p>Ami rendszeresen változik, azt kiteszem helyetted. Heti menü, egy aktuális akció, ünnepi nyitvatartás — megírom HTML-ben, és felkerül, hogy az oldal mindig friss legyen.</p>
+        </div>
       </div>
-      <p><b>Van egy régi oldalad, amit felturbóznál?</b> Ezekből az elemekből gyorsan összeáll egy modern, prémium megjelenés — a meglévő rendszereden belül.</p>
-      <p style="margin-top:20px;"><a class="cta" href="elemtar.html">Nézd meg élőben az elemeket →</a></p>
     </section>
 
     <section class="contact reveal">
