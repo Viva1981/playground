@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /grobming.html
+
+Sitemap: https://playground-kappa-sooty.vercel.app/sitemap.xml
