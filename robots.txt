@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /grobming.html
 
-Sitemap: https://stullerzsolt.triplog.hu/sitemap.xml
+Sitemap: https://stullerzsolt.hu/sitemap.xml
